@@ -1,0 +1,17 @@
+{% with request.resolver_match.url_name as url_name %}
+
+<ul class="nav nav-tabs">
+{% for task in tasks.all %}
+  <li class="nav-item dropdown ">    
+    <a class="nav-link dropdown-toggle {% for url in task.url_list %}{% if request.resolver_match.url_name == url %}active{% endif %}{% endfor %}" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{task.title}}</a>
+    <div class="dropdown-menu">
+      {% for k,v in task.url_button_dict.items %}
+      <a class="dropdown-item" href="{% url k %}">{{v}}</a>
+      {% endfor %}
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% endwith %}
+<p> </p>
+

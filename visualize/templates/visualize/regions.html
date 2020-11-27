@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<h2>Regions</h2>
+</br>
+
+<table class="table table-bordered table-hover">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">id_region</th>
+      <th scope="col">cp</th>
+      <th scope="col">location</th>
+      <th scope="col">country</th>
+      <th scope="col">region</th>
+      <th scope="col">coords</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for region in regions.all %} 
+    <tr>
+      <th scope="row">{{region.id_region}}</th>
+      <td>{{region.cp}}</td>
+      <td>{{region.location}}</td>
+      <td>{{region.country}}</td>
+      <td>{{region.region}}</td>
+      <td>({{region.latitude}}, {{region.longitude}})</td>
+    </tr>
+    {% endfor %}
+
+  </tbody>
+</table>
+
+
+<form>
+      <div class="form-row">
+        <div class="col-md-2 mx-auto text-center">
+            <nav aria-label="...">
+              <ul class="pagination pagination-sm justify-content-center">
+                <li class="page-item">
+                  <a class="page-link" href="#">Prev</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item active" aria-current="page">
+                  <span class="page-link">
+                    2
+                    <span class="sr-only">(current)</span>
+                  </span>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                  <a class="page-link" href="#">Next</a>
+                </li>
+              </ul>
+            </nav>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="col-md-1 mx-auto text-center">
+            <select class="custom-select custom-select-sm">
+              <option selected>10</option>
+              <option value="1">25</option>
+              <option value="2">50</option>
+              <option value="3">100</option>
+            </select> 
+        </div>
+    </div>
+</form>
+
+
+{% endblock %}

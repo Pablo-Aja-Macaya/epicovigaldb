@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<main role="main">
+
+
+    <div class="container text-center">
+      <h2>Welcome!</h2>
+      <p class="lead text-muted">This is EPICOVIGAL DB Manager, here you will be able to perform certain tasks on the database, such as: uploading files, running tests, visualizing results, checking each job status and mapping the data!</p>
+      <p>
+        <a href="#" class="btn btn-primary my-2">About</a>
+      </p>
+    </div>
+
+  <div class="album py-5 bg-light">
+    <div class="container">
+      <div class="row">
+        {% for task in tasks.all %}      
+        <div class="col-md-4 text-center">  <!--mx-auto -->
+          <div class="card mb-4 shadow-sm" >
+            <div class="card-body">
+              <img src="{{ task.image.url }}" class="img-fluid" />
+              <h4 class="card-text text-center pt-3">{{ task.title }} </h4>
+              <hr style="width:70%"></hr>
+              <p>{{ task.summary }}</p>
+              <div class="d-flex justify-content-center align-items-center">
+                <div class="btn-group">
+                  {% for k,v in task.url_button_dict.items %}
+                  
+                  <button type="button" class="btn btn-primary my-2 border border-dark" onclick="window.location='{% url k %}';" style="cursor: pointer;">{{v}}</button>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {% endfor %}
+
+</main>
+
+
+
+{% endblock %}

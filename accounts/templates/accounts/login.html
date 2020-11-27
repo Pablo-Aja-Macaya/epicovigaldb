@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if error %}
+<div class="alert alert-danger" role="alert">
+  {{ error }}
+</div>
+<br />
+
+{% endif %}
+
+<body class="text-center">
+    <h3><span class="oi oi-aperture"></span> EPICOVIGAL DB</h3>
+    <form method="POST" action="{% url 'login' %}">
+        {% csrf_token %}
+        <br />
+        <input type="text" name="username"  placeholder="User"/>
+        <br />
+        <br />
+        <input type="password" name="password" placeholder="Password" />
+        <br />
+        <br />
+        <input class="btn btn-primary" type="submit" value="Login" />
+    </form>
+</body>
+
+
+{% endblock %}

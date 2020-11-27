@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<p>Select the samples:</p>
+<div class="custom-control custom-radio custom-control">
+  <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input">
+  <label class="custom-control-label" for="customRadioInline1">Every sample</label>
+</div>
+<div class="custom-control custom-radio custom-control">
+  <input type="radio" id="customRadioInline2" name="customRadioInline1" class="custom-control-input">
+  <label class="custom-control-label" for="customRadioInline2">Samples which have not been tested</label>
+</div>
+
+<div class="custom-control custom-radio custom-control type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"">
+  <input type="radio" id="customRadioInline3" name="customRadioInline1" class="custom-control-input">
+  <label class="custom-control-label" for="customRadioInline3">Select samples via CSV</label>
+</div>
+
+<div class="collapse" id="collapseExample">
+  <div class="card card-body border-0">
+    
+    <div class="input-group">
+      <div class="custom-file ">
+        <input type="file" class="custom-file-input" name="document">
+        <label class="custom-file-label" for="inputGroupFile04">Choose file</label>
+      </div>
+      <div class="input-group-append">
+         <a href=""><button class="btn btn-primary" type="submit">Upload</button></a>
+      </div>
+    </div>
+    
+   </div>
+</div>
+
+
+<div class="custom-control custom-radio custom-control">
+  <input type="radio" id="customRadioInline4" name="customRadioInline1" class="custom-control-input">
+  <label class="custom-control-label" for="customRadioInline4">Select samples manually</label>
+</div>
+
+
+
+
+
+
+<hr></hr>
+
+<p>Select the tests:</p>
+{% with 'Picard SingleCheck NGSStats NextClade iVar Lineages' as list %}
+  {% for i in list.split %}
+    <div class="form-check form-check">
+      <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+      <label class="form-check-label" for="inlineCheckbox1">{{i}}</label>
+    </div>
+  {% endfor %}
+{% endwith %}
+
+<div class="form-check form-check">
+  <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3" disabled>
+  <label class="form-check-label" for="inlineCheckbox3">Other test</label>
+</div>
+
+<hr></hr>
+
+<div class="col-auto my-1 text-center">
+  <button type="submit" class="btn btn-primary">Submit</button>
+</div>
+
+{% endblock %}
