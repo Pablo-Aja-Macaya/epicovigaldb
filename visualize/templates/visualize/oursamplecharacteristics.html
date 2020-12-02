@@ -2,8 +2,7 @@
 
 {% block content %}
 
-
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs ">
   <li class="nav-item dropdown">
     <a class="nav-link dropdown-toggle active" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Data</a>
     <div class="dropdown-menu">
@@ -27,29 +26,29 @@
 </ul>
 </br>
 
-<h2>Regions</h2>
+<h2>oursamplecharacteristics</h2>
 </br>
 
 <div class="col-md-2 mx-auto text-center">
   <nav aria-label="...">
-    {% if regions.has_other_pages %}
+    {% if oursamplecharacteristics.has_other_pages %}
       <ul class="pagination pagination-sm justify-content-center">
-        {% if regions.has_previous %}
-          <li class="page-item"><a class="page-link" href="?page={{ regions.previous_page_number }}">&lt;</a></li>
+        {% if oursamplecharacteristics.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ oursamplecharacteristics.previous_page_number }}">&lt;</a></li>
         {% else %}
           <li class="page-item disabled" aria-current="page"><a class="page-link"><span>&lt;</span></a></li>
         {% endif %}
         
-        {% for i in regions.paginator.page_range %}
-          {% if regions.number == i %}
+        {% for i in oursamplecharacteristics.paginator.page_range %}
+          {% if oursamplecharacteristics.number == i %}
             <li class="page-item active"><a class="page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></a></li>
           {% else %}
             <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
           {% endif %}
         {% endfor %}
         
-        {% if regions.has_next %}
-          <li class="page-item"><a class="page-link" href="?page={{ regions.next_page_number }}">&gt;</a></li>
+        {% if oursamplecharacteristics.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ oursamplecharacteristics.next_page_number }}">&gt;</a></li>
         {% else %}
           <li class="page-item disabled"><a class="page-link"><span>&gt;</span></a></li>
         {% endif %}
@@ -59,24 +58,32 @@
 </div>
 
 
-<table class="table table-hover table-bordered ">
+
+<table class="table table-responsive table-bordered table-hover">
   <thead class="thead-dark">
     <tr>
-      {% for field in region_fields %} 
+      {% for field in oursamplecharacteristics_fields %} 
       <th scope="col">{{field.name}}</th>
       {% endfor %}
     </tr>
   </thead>
   <tbody>
-    {% for region in regions %} 
+    {% for sample in oursamplecharacteristics %} 
     <tr>
-      <th scope="row">{{region.id_region}}</th>
-      <td>{{region.cp}}</td>
-      <td>{{region.location}}</td>
-      <td>{{region.country}}</td>
-      <td>{{region.region}}</td>
-      <td>{{region.latitude}}</td>
-      <td>{{region.longitude}}</td>
+      <th scope="row">{{sample.id_uvigo}}</th>
+      <td>{{sample.id_patient}}</td>
+      <td>{{sample.numero_envio}}</td>
+      <td>{{sample.id_tube}}</td>
+      <td>{{sample.id_sample}}</td>
+      <td>{{sample.hospitalizacion}}</td>
+      <td>{{sample.uci}}</td>
+      <td>{{sample.ct_orf1ab}}</td>
+      <td>{{sample.ct_gen_e}}</td>
+      <td>{{sample.ct_gen_n}}</td>
+      <td>{{sample.ct_redrp}}</td>
+      <td>{{sample.fecha_sintomas|date:"d-m-Y"}}</td>
+      <td>{{sample.fecha_diagnostico|date:"d-m-Y"}}</td>
+      <td>{{sample.fecha_entrada_uv|date:"d-m-Y"}}</td>
     </tr>
     {% endfor %}
 
@@ -86,26 +93,26 @@
 
 <div class="col-md-2 mx-auto text-center">
   <nav aria-label="...">
-    {% if regions.has_other_pages %}
+    {% if oursamplecharacteristics.has_other_pages %}
       <ul class="pagination pagination-sm justify-content-center">
-        {% if regions.has_previous %}
-          <li class="page-item"><a class="page-link" href="?page={{ regions.previous_page_number }}">&laquo;</a></li>
+        {% if oursamplecharacteristics.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ oursamplecharacteristics.previous_page_number }}">&lt;</a></li>
         {% else %}
-          <li class="page-item disabled" aria-current="page"><a class="page-link"><span>&laquo;</span></a></li>
+          <li class="page-item disabled" aria-current="page"><a class="page-link"><span>&lt;</span></a></li>
         {% endif %}
         
-        {% for i in regions.paginator.page_range %}
-          {% if regions.number == i %}
+        {% for i in oursamplecharacteristics.paginator.page_range %}
+          {% if oursamplecharacteristics.number == i %}
             <li class="page-item active"><a class="page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></a></li>
           {% else %}
             <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
           {% endif %}
         {% endfor %}
         
-        {% if regions.has_next %}
-          <li class="page-item"><a class="page-link" href="?page={{ samples.next_page_number }}">&raquo;</a></li>
+        {% if oursamplecharacteristics.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ oursamplecharacteristics.next_page_number }}">&gt;</a></li>
         {% else %}
-          <li class="page-item disabled"><a class="page-link"><span>&raquo;</span></a></li>
+          <li class="page-item disabled"><a class="page-link"><span>&gt;</span></a></li>
         {% endif %}
       </ul>
     {% endif %}

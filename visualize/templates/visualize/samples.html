@@ -3,32 +3,28 @@
 {% block content %}
 
 <ul class="nav nav-tabs">
-  <li class="nav-item">
-    <a class="nav-link" href="regions">Regions</a>
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle active" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Data</a>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" href="samples">Samples</a>
+      <a class="dropdown-item" href="regions">Regions</a>
+      <a class="dropdown-item" href="oursamplecharacteristics">OurSampleCharacteristics</a>
+    </div>
   </li>
-  <li class="nav-item">
-    <a class="nav-link active" href="samples">Samples</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="#">Picard</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="#">SingleCheck</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="#">NGSStats</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="#">NextClade</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="#">iVar</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="#">Pangolin</a>
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Results</a>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" href="#">Picard</a>
+      <a class="dropdown-item" href="#">SingleCheck</a>
+      <a class="dropdown-item" href="#">NGSStats</a>
+      <a class="dropdown-item" href="#">NextClade</a>
+      <a class="dropdown-item" href="#">iVar</a>
+      <a class="dropdown-item" href="#">Pangolin</a>
+
+    </div>
   </li>
 </ul>
-<p></p>
+</br>
 
 <h2>Samples</h2>
 </br>
@@ -38,9 +34,9 @@
     {% if samples.has_other_pages %}
       <ul class="pagination pagination-sm justify-content-center">
         {% if samples.has_previous %}
-          <li class="page-item"><a class="page-link" href="?page={{ samples.previous_page_number }}">&laquo;</a></li>
+          <li class="page-item"><a class="page-link" href="?page={{ samples.previous_page_number }}">&lt;</a></li>
         {% else %}
-          <li class="page-item disabled" aria-current="page"><a class="page-link"><span>&laquo;</span></a></li>
+          <li class="page-item disabled" aria-current="page"><a class="page-link"><span>&lt;</span></a></li>
         {% endif %}
         
         {% for i in samples.paginator.page_range %}
@@ -52,9 +48,9 @@
         {% endfor %}
         
         {% if samples.has_next %}
-          <li class="page-item"><a class="page-link" href="?page={{ samples.next_page_number }}">&raquo;</a></li>
+          <li class="page-item"><a class="page-link" href="?page={{ samples.next_page_number }}">&gt;</a></li>
         {% else %}
-          <li class="page-item disabled"><a class="page-link"><span>&raquo;</span></a></li>
+          <li class="page-item disabled"><a class="page-link"><span>&gt;</span></a></li>
         {% endif %}
       </ul>
     {% endif %}

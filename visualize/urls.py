@@ -6,4 +6,5 @@ from visualize import views
 urlpatterns = [
     path('regions', views.regions, name='regions'),
     path('samples', views.samples, name='samples'),
+    path('oursamplecharacteristics', views.oursamplecharacteristics, name='oursamplecharacteristics'),
 ]

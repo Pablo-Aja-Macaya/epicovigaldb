@@ -41,7 +41,9 @@
         }
       }
 
-
+     .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+       background-color:  #DAF7A6    ;
+     }
    
     </style>
     <!-- Custom styles for this template -->
@@ -67,9 +69,9 @@
                   Tasks
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                  <a class="dropdown-item" href="#">Upload</a>
-                  <a class="dropdown-item" href="#">Run test</a>
-                  <a class="dropdown-item" href="#">Visualize</a>
+                  <a class="dropdown-item" href="{% url 'csv' %}">Upload</a>
+                  <a class="dropdown-item" href="{% url 'selection' %}">Run test</a>
+                  <a class="dropdown-item" href="{% url 'samples' %}">Visualize</a>
                   <a class="dropdown-item" href="#">Jobs' status</a>
                   <a class="dropdown-item" href="#">Map</a>
 
