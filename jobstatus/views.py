@@ -8,7 +8,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 @login_required(login_url="/accounts/login")
 def check(request):
     status_fields = Status._meta.get_fields()
-    status = Status.objects.order_by('date').all()
+    status = Status.objects.order_by('-date').all()
     page = request.GET.get('page', 1)
     paginator = Paginator(status, 10)
     

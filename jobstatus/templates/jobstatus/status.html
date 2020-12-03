@@ -51,9 +51,11 @@
       <td>{{i.command}}</td>
       <td>{{i.get_status_display}}</td>
       <td>{{i.date|date:"H:i:s d/m/Y"}}</td>
-      <td>{{i.elapsed_time}}</td>
-
-
+      {% if i.elapsed_time == 0 %}
+      <td>{{i.date|timesince}}</td>
+      {% else %}
+      <td>{{i.elapsed_time}} seconds</td>
+      {% endif %}
     </tr>
     {% endfor %}
 
