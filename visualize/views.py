@@ -5,7 +5,6 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 @login_required(login_url="/accounts/login")
 def regions(request):
-
     region_fields = Region._meta.get_fields()
     regions = Region.objects.order_by('location','cp').all()
     page = request.GET.get('page', 1)

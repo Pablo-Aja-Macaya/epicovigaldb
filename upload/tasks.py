@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from epicovigal.celery import app
 from .models import Region, Sample, OurSampleCharacteristic
+from jobstatus.models import Status
 import io, csv
 from datetime import datetime
 
 @app.task
 def upload_csv_task(number):
     print('Uploading file...', number)
+
+
 
 
 
@@ -20,10 +23,36 @@ def coords(place):
         return location.latitude,location.longitude
     except:
         return 'NULL','NULL'
-    
+
 @app.task
-def upload_sample_hospital(data):
-    print('Starting hospital sample upload...')
+def start_process(id, c, d):
+    _, created = Status.objects.update_or_create(
+        id_task = id,
+        command = c,
+        status = 'O',
+        date = d,
+        elapsed_time = 0
+        )      
+
+@app.task
+def finish_process(id, time):
+    Status.objects.filter(id_task=id).update(
+        status = 'C',
+        elapsed_time = time.seconds,
+        )      
+
+
+
+
+@app.task(bind=True)
+def upload_sample_hospital(self, data):
+    start = datetime.now()
+    id = self.request.id
+    command = 'UploadHospital'
+    
+    start_process.delay(id, command, start.strftime('%Y-%m-%d %H:%M:%S'))
+    
+    print(f'Starting hospital sample upload... (Task ID: {id})')
     substitute = 'id_uvigo;fecha_entrada_uv;id_hospital;numero_envio;id_tube;id_sample;collection_date;id_patient;gender;age;location;cp;ct_orf1ab;ct_gen_e;ct_gen_n;ct_rdrp;hospitalizacion;uci;fecha_sintomas;fecha_diagnostico;observaciones'
     fieldnames = substitute.split(';')
     io_string = io.StringIO(data)
@@ -109,7 +138,10 @@ def upload_sample_hospital(data):
                     fecha_diagnostico = f_diagnostico,
                     fecha_entrada_uv = f_entrada_uv
                 ) 
-    print('Sample upload finished!')
+    finish = datetime.now()
+    elapsed_time = finish - start
+    finish_process(id, elapsed_time)
+    print(f'Sample upload finished! (Elapsed time (s): {elapsed_time.seconds} (Task ID: {id})')
 
 def upload_sample_gisaid():
     pass

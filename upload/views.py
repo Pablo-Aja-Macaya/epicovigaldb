@@ -1,7 +1,7 @@
 from django.shortcuts import render
 # from .models import Region, Sample, OurSampleCharacteristic
 # from .models import upload_sample_hospital
-from .tasks import upload_csv_task, upload_sample_hospital
+from .tasks import upload_sample_hospital
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
@@ -17,21 +17,20 @@ def upload_csv(request):
 
 @login_required(login_url="/accounts/login")
 def upload(request):
-    import io
     def check_file():
         pass     
     if request.method == 'POST':
-        uploaded_file = request.FILES['document']
-        data = uploaded_file.read().decode('UTF-8')
-        io_string = io.StringIO(data)
-        if request.POST.get('origin') == 'hospital':
-            upload_sample_hospital.delay(data)
-            # upload_sample_hospital(io_string)
-            # upload_csv_task.delay(1)
-            return render(request, 'upload/csv.html', {'message':'Uploading in the back!'})
-        
-        else:
-            return render(request, 'upload/csv.html',{'warning':'Origin not implemented yet'})
+        try:
+            uploaded_file = request.FILES['document']
+            data = uploaded_file.read().decode('UTF-8')
+            if request.POST.get('origin') == 'hospital':
+                upload_sample_hospital.delay(data)
+                return render(request, 'upload/csv.html', {'message':'Uploading in the back!'})
+            
+            else:
+                return render(request, 'upload/csv.html',{'warning':'Origin not implemented yet'})
+        except:
+            return render(request, 'upload/csv.html',{'warning':'No file selected'})
 
     else:
         return render(request, 'upload/csv.html',{'message':'Something went wrong.'})
