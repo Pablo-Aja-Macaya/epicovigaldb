@@ -29,6 +29,8 @@ class Sample(models.Model):
 
     def __str__(self):
         return str(self.id_uvigo)
+    def hospital_id(self):
+        return str(self.id_uvigo.split('.')[1])
     
 class OurSampleCharacteristic(models.Model):
     id_uvigo = models.CharField(max_length=20, primary_key=True)

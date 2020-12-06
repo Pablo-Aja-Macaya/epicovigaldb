@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<script src="https://code.highcharts.com/highcharts.src.js"></script>
+
+
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link active" href="#">Summary</a>
+  </li>
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Data</a>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" href="samples">Samples</a>
+      <a class="dropdown-item" href="regions">Regions</a>
+      <a class="dropdown-item" href="oursamplecharacteristics">OurSampleCharacteristics</a>
+    </div>
+  </li>
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Results</a>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" href="#">Picard</a>
+      <a class="dropdown-item" href="#">SingleCheck</a>
+      <a class="dropdown-item" href="#">NGSStats</a>
+      <a class="dropdown-item" href="#">NextClade</a>
+      <a class="dropdown-item" href="#">iVar</a>
+      <a class="dropdown-item" href="#">Pangolin</a>
+
+    </div>
+  </li>
+</ul>
+</br>
+
+<h2>Summary</h2>
+</br>
+<hr></hr>
+<div  class="container" >
+  <div class="row">
+    <div class="col col-lg-6 text-center" id="container" >
+      <script>
+        Highcharts.chart('container', {
+            chart: {
+                type: 'pie'
+            },
+            title: {
+                text: 'Samples by hospital'
+            },
+            xAxis: {
+                categories: [
+                  {% for entry in hospitals %}'{{ entry.hospital }}'{% if not forloop.last %}, {% endif %}{% endfor %}
+                ]
+            },
+            series: [{
+                name: 'Sample count',
+                data: [
+                  {% for entry in hospitals %}{{ entry.number }},{% endfor %}
+                ]
+            }]
+        });
+      </script>
+    </div>
+    <div class="col col-lg-6 text-center" id="container2">
+      <script>
+        Highcharts.chart('container2', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Samples by hospital'
+            },
+            xAxis: {
+                categories: [
+                  {% for entry in hospitals %}'{{ entry.hospital }}'{% if not forloop.last %}, {% endif %}{% endfor %}
+                ]
+            },
+            series: [{
+                name: 'Sample count',
+                data: [
+                  {% for entry in hospitals %}{{ entry.number }},{% endfor %}
+                ]
+            }]
+        });
+      </script>
+    </div>
+  </div>
+</div>
+  
+
+{% endblock %}
