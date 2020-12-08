@@ -1,22 +1,21 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from upload.models import Region, Sample, OurSampleCharacteristic
-from django.db.models import Count, Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from collections import Counter
 
 @login_required(login_url="/accounts/login")
 def general(request):  
-    samples = list(Sample.objects.all().values('id_uvigo').distinct())
     
-    for i in samples:
-        i['id_uvigo'] = i['id_uvigo'].split('.')[1]
-
+    hospital_list = []
+    for i in Sample.objects.all():
+        hospital_list.append(i.hospital_id())
+    
     queryset = []
-    hospital_count = Counter(i['id_uvigo'] for i in samples)
+    hospital_count = Counter(i['id_uvigo'] for i in hospital_list)
     for k,v in hospital_count.items():
         queryset.append({'hospital':k, 'number':int(v)})
-    print(queryset)
+    
     return render(request, 'visualize/general.html', {'hospitals':queryset})
     
 

@@ -27,7 +27,7 @@
   <body>
     <header>
     
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
           <a class="navbar-brand" href="{% url 'home' %}">
           <span class="oi oi-aperture"></span>
@@ -46,7 +46,7 @@
                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                   <a class="dropdown-item" href="{% url 'csv' %}">Upload</a>
                   <a class="dropdown-item" href="{% url 'selection' %}">Run test</a>
-                  <a class="dropdown-item" href="{% url 'samples' %}">Visualize</a>
+                  <a class="dropdown-item" href="{% url 'general' %}">Visualize</a>
                   <a class="dropdown-item" href="#">Jobs' status</a>
                   <a class="dropdown-item" href="#">Map</a>
 
@@ -66,10 +66,11 @@
           </div>
         </div>
         </nav>
+
   </header>
   </br>
 
-  <div class="container">
+  <div class="container pt-5">
     {% block content%}
     {% endblock %}
   </div>
