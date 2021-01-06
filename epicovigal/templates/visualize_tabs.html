@@ -1,11 +1,11 @@
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs nav-justified">
   <li class="nav-item">
     <a class="nav-link {% if request.resolver_match.url_name == "general" %}active{% endif %}" href="{% url 'general' %}">Summary</a>
   </li>
   <li class="nav-item dropdown ">
   {% with 'samples, regions, oursamplecharacteristics' as list %}
     <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name in list %}active{% endif %}" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Raw data</a>
-    <div class="dropdown-menu">
+    <div class="dropdown-menu w-100 border-top-0">
       <a class="dropdown-item {% if request.resolver_match.url_name == "samples" %}active{% endif %}" href="{% url 'samples' %}">Samples</a>
       <a class="dropdown-item {% if request.resolver_match.url_name == "regions" %}active{% endif %}" href="{% url 'regions' %}">Regions</a>
       <a class="dropdown-item {% if request.resolver_match.url_name == "oursamplecharacteristics" %}active{% endif %}" href="{% url 'oursamplecharacteristics' %}">OurSampleCharacteristics</a>
@@ -14,7 +14,7 @@
   </li>
   <li class="nav-item dropdown">
     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Test results</a>
-    <div class="dropdown-menu">
+    <div class="dropdown-menu w-100 border-top-0">
       <a class="dropdown-item" href="#">Picard</a>
       <a class="dropdown-item" href="#">SingleCheck</a>
       <a class="dropdown-item" href="#">NGSStats</a>

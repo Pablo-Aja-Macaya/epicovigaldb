@@ -4,7 +4,7 @@ from upload.models import Region, Sample, OurSampleCharacteristic
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from collections import Counter
 
-@login_required(login_url="/accounts/login")
+@login_required(login_url="/accounts/login") 
 def general(request):  
     
     hospital_list = []

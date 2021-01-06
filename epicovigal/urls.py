@@ -27,4 +27,5 @@ urlpatterns = [
     path('tests/', include('tests.urls')),
     path('visualize/', include('visualize.urls')),
     path('jobstatus/', include('jobstatus.urls')),
+    path('nextstrain/', include('nextstrainApp.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

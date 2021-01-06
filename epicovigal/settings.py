@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'nextstrainApp.apps.NextstrainappConfig',
     'jobstatus.apps.JobstatusConfig',
     'visualize.apps.VisualizeConfig',
     'tests.apps.TestsConfig',
