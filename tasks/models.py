@@ -6,7 +6,8 @@ class Task(models.Model):
     buttons = models.TextField() # escribir posibles botones separados por ;
     image = models.ImageField(upload_to='images/')
     body = models.TextField(max_length=300)
-    
+    show_to = models.TextField(max_length=10, default=None, blank=True)
+
     def __str__(self):
         return self.title
     def summary(self):
