@@ -1,101 +1,102 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="container">
+  {% include 'visualize_tabs.html' %}
 
-{% include 'visualize_tabs.html' %}
+  <h2>oursamplecharacteristics</h2>
+  Quisque venenatis eu arcu vel dignissim. Phasellus nec pharetra turpis, at tempus urna. Ut dapibus urna quis dui pellentesque, nec blandit lectus eleifend. Mauris convallis ornare libero, at porttitor tortor eleifend ut. Nunc nec magna in justo dapibus dapibus at at diam. Mauris gravida sapien vitae pulvinar ultricies
+  </br>
 
-<h2>oursamplecharacteristics</h2>
-Quisque venenatis eu arcu vel dignissim. Phasellus nec pharetra turpis, at tempus urna. Ut dapibus urna quis dui pellentesque, nec blandit lectus eleifend. Mauris convallis ornare libero, at porttitor tortor eleifend ut. Nunc nec magna in justo dapibus dapibus at at diam. Mauris gravida sapien vitae pulvinar ultricies
-</br>
-
-<div class="col-md-2 mx-auto text-center">
-  <nav aria-label="...">
-    {% if oursamplecharacteristics.has_other_pages %}
-      <ul class="pagination pagination-sm justify-content-center">
-        {% if oursamplecharacteristics.has_previous %}
-          <li class="page-item"><a class="page-link" href="?page={{ oursamplecharacteristics.previous_page_number }}">&lt;</a></li>
-        {% else %}
-          <li class="page-item disabled" aria-current="page"><a class="page-link"><span>&lt;</span></a></li>
-        {% endif %}
-        
-        {% for i in oursamplecharacteristics.paginator.page_range %}
-          {% if oursamplecharacteristics.number == i %}
-            <li class="page-item active"><a class="page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></a></li>
+  <div class="col-md-2 mx-auto text-center">
+    <nav aria-label="...">
+      {% if oursamplecharacteristics.has_other_pages %}
+        <ul class="pagination pagination-sm justify-content-center">
+          {% if oursamplecharacteristics.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ oursamplecharacteristics.previous_page_number }}">&lt;</a></li>
           {% else %}
-            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+            <li class="page-item disabled" aria-current="page"><a class="page-link"><span>&lt;</span></a></li>
           {% endif %}
-        {% endfor %}
-        
-        {% if oursamplecharacteristics.has_next %}
-          <li class="page-item"><a class="page-link" href="?page={{ oursamplecharacteristics.next_page_number }}">&gt;</a></li>
-        {% else %}
-          <li class="page-item disabled"><a class="page-link"><span>&gt;</span></a></li>
-        {% endif %}
-      </ul>
-    {% endif %}
-  </nav>
-</div>
-
-
-
-<table class="table table-responsive table-bordered table-hover">
-  <thead class="thead-dark">
-    <tr>
-      {% for field in oursamplecharacteristics_fields %} 
-      <th scope="col">{{field.name}}</th>
-      {% endfor %}
-    </tr>
-  </thead>
-  <tbody>
-    {% for sample in oursamplecharacteristics %} 
-    <tr>
-      <th scope="row">{{sample.id_uvigo}}</th>
-      <td>{{sample.id_patient}}</td>
-      <td>{{sample.numero_envio}}</td>
-      <td>{{sample.id_tube}}</td>
-      <td>{{sample.id_sample}}</td>
-      <td>{{sample.hospitalizacion}}</td>
-      <td>{{sample.uci}}</td>
-      <td>{{sample.ct_orf1ab}}</td>
-      <td>{{sample.ct_gen_e}}</td>
-      <td>{{sample.ct_gen_n}}</td>
-      <td>{{sample.ct_redrp}}</td>
-      <td>{{sample.fecha_sintomas|date:"d-m-Y"}}</td>
-      <td>{{sample.fecha_diagnostico|date:"d-m-Y"}}</td>
-      <td>{{sample.fecha_entrada_uv|date:"d-m-Y"}}</td>
-    </tr>
-    {% endfor %}
-
-  </tbody>
-</table>
-
-
-<div class="col-md-2 mx-auto text-center">
-  <nav aria-label="...">
-    {% if oursamplecharacteristics.has_other_pages %}
-      <ul class="pagination pagination-sm justify-content-center">
-        {% if oursamplecharacteristics.has_previous %}
-          <li class="page-item"><a class="page-link" href="?page={{ oursamplecharacteristics.previous_page_number }}">&lt;</a></li>
-        {% else %}
-          <li class="page-item disabled" aria-current="page"><a class="page-link"><span>&lt;</span></a></li>
-        {% endif %}
-        
-        {% for i in oursamplecharacteristics.paginator.page_range %}
-          {% if oursamplecharacteristics.number == i %}
-            <li class="page-item active"><a class="page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></a></li>
+          
+          {% for i in oursamplecharacteristics.paginator.page_range %}
+            {% if oursamplecharacteristics.number == i %}
+              <li class="page-item active"><a class="page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></a></li>
+            {% else %}
+              <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+          {% endfor %}
+          
+          {% if oursamplecharacteristics.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ oursamplecharacteristics.next_page_number }}">&gt;</a></li>
           {% else %}
-            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+            <li class="page-item disabled"><a class="page-link"><span>&gt;</span></a></li>
           {% endif %}
-        {% endfor %}
-        
-        {% if oursamplecharacteristics.has_next %}
-          <li class="page-item"><a class="page-link" href="?page={{ oursamplecharacteristics.next_page_number }}">&gt;</a></li>
-        {% else %}
-          <li class="page-item disabled"><a class="page-link"><span>&gt;</span></a></li>
-        {% endif %}
-      </ul>
-    {% endif %}
-  </nav>
-</div>
+        </ul>
+      {% endif %}
+    </nav>
+  </div>
 
+
+  <div class="row justify-content-center">
+    <div class="col-auto">
+      <table class="table table-responsive table-bordered table-hover">
+        <thead class="thead-dark">
+          <tr>
+            {% for field in oursamplecharacteristics_fields %} 
+            <th scope="col">{{field.name}}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for sample in oursamplecharacteristics %} 
+          <tr>
+            <th scope="row">{{sample.id_uvigo}}</th>
+            <td>{{sample.id_patient}}</td>
+            <td>{{sample.numero_envio}}</td>
+            <td>{{sample.id_tube}}</td>
+            <td>{{sample.id_sample}}</td>
+            <td>{{sample.hospitalizacion}}</td>
+            <td>{{sample.uci}}</td>
+            <td>{{sample.ct_orf1ab}}</td>
+            <td>{{sample.ct_gen_e}}</td>
+            <td>{{sample.ct_gen_n}}</td>
+            <td>{{sample.ct_redrp}}</td>
+            <td>{{sample.fecha_sintomas|date:"d-m-Y"}}</td>
+            <td>{{sample.fecha_diagnostico|date:"d-m-Y"}}</td>
+            <td>{{sample.fecha_entrada_uv|date:"d-m-Y"}}</td>
+          </tr>
+          {% endfor %}
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-md-2 mx-auto text-center">
+    <nav aria-label="...">
+      {% if oursamplecharacteristics.has_other_pages %}
+        <ul class="pagination pagination-sm justify-content-center">
+          {% if oursamplecharacteristics.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ oursamplecharacteristics.previous_page_number }}">&lt;</a></li>
+          {% else %}
+            <li class="page-item disabled" aria-current="page"><a class="page-link"><span>&lt;</span></a></li>
+          {% endif %}
+          
+          {% for i in oursamplecharacteristics.paginator.page_range %}
+            {% if oursamplecharacteristics.number == i %}
+              <li class="page-item active"><a class="page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></a></li>
+            {% else %}
+              <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+          {% endfor %}
+          
+          {% if oursamplecharacteristics.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ oursamplecharacteristics.next_page_number }}">&gt;</a></li>
+          {% else %}
+            <li class="page-item disabled"><a class="page-link"><span>&gt;</span></a></li>
+          {% endif %}
+        </ul>
+      {% endif %}
+    </nav>
+  </div>
+</div>
 {% endblock %}

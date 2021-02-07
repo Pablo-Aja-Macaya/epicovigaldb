@@ -29,6 +29,7 @@
       </p>
     </div> -->
   <br>
+  <div class="container">
     <div class="card mb-3" style="max-width: 100%;">
       <div class="row no-gutters">
         <div class="col-md-4 my-auto">
@@ -43,33 +44,35 @@
         </div>
       </div>
     </div>
+  </div>  
 
-    
-  <div class="album py-5 bg-light">
-    <div class="container">
-      <div class="row">
-        {% for task in tasks.all %}      
-        <div class="col-md-4 text-center mx-auto">  <!--mx-auto -->
-          <div class="card mb-4 shadow-sm " >
-            <div class="card-body">
-              <img src="{{ task.image.url }}" class="img-fluid" style="max-width:80px;width:100%"/>
-              <h4 class="card-text text-center pt-3">{{ task.title }} </h4>
-              <hr style="width:70%">
-              <p>{{ task.summary }}</p>
-              <div class="d-flex justify-content-center align-items-center">
-                <div class="btn-group">
-                  {% for k,v in task.url_button_dict.items %}
-                  <button type="button" class="btn btn-primary my-2 border border-dark" onclick="window.location='{% url k %}';" style="cursor: pointer;">{{v}}</button>
-                  {% endfor %}
+  <div class="container">
+    <div class="album py-5 bg-light">
+      <div class="container">
+        <div class="row">
+          {% for task in tasks.all %}      
+          <div class="col-md-4 text-center mx-auto">  <!--mx-auto -->
+            <div class="card mb-4 shadow-sm " >
+              <div class="card-body">
+                <img src="{{ task.image.url }}" class="img-fluid" style="max-width:80px;width:100%"/>
+                <h4 class="card-text text-center pt-3">{{ task.title }} </h4>
+                <hr style="width:70%">
+                <p>{{ task.summary }}</p>
+                <div class="d-flex justify-content-center align-items-center">
+                  <div class="btn-group">
+                    {% for k,v in task.url_button_dict.items %}
+                    <button type="button" class="btn btn-primary my-2 border border-dark" onclick="window.location='{% url k %}';" style="cursor: pointer;">{{v}}</button>
+                    {% endfor %}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+          {% endfor %}
         </div>
-        {% endfor %}
       </div>
     </div>
-  </div>
+  </div>  
 
 </main>
 

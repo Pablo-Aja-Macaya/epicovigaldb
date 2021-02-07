@@ -22,288 +22,289 @@
 }
 </style>
 
-{% include 'visualize_tabs.html' %}
+<div class="container">
+  {% include 'visualize_tabs.html' %}
 
 
 
-<h2>Summary</h2>
-Suspendisse sodales eget felis sit amet gravida. Sed lacinia id neque in commodo. Donec urna enim, maximus lacinia consectetur sit amet, fermentum eu metus. Etiam sit amet quam eu arcu euismod placerat sed eu tellus. Aliquam malesuada libero nunc, eleifend rutrum ipsum eleifend at. Nunc mattis dolor ligula, sed aliquam risus sodales nec
+  <h2>Summary</h2>
+  Suspendisse sodales eget felis sit amet gravida. Sed lacinia id neque in commodo. Donec urna enim, maximus lacinia consectetur sit amet, fermentum eu metus. Etiam sit amet quam eu arcu euismod placerat sed eu tellus. Aliquam malesuada libero nunc, eleifend rutrum ipsum eleifend at. Nunc mattis dolor ligula, sed aliquam risus sodales nec
 
-<hr></hr>
-<div  class="container" >
-  <div class="row">
-    <div class="col col-lg-6 " id="container" >
-      <script>
-        Highcharts.chart('container', {
-            chart: {
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false,
-                type: 'pie'
-            },
-            title: {
-                text: 'Samples by hospital'
-            },
-            tooltip: {
-                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-            },
-            accessibility: {
-                point: {
-                    valueSuffix: '%'
-                }
-            },
-            plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    dataLabels: {
-                        enabled: true,
-                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-                    }
-                }
-            },
-            series: [{
-                name: 'Sample count',
-                colorByPoint: true,
-                data: [
-                {% for entry in hospitals %}
-                
-                { name: '{{ entry.hospital }}', y: {{entry.number}} },
-                
-                {% endfor %}
-                ]
-            }]
-        });
+  <hr></hr>
+  <div  class="container" >
+    <div class="row">
+      <div class="col col-lg-6 " id="container" >
+        <script>
+          Highcharts.chart('container', {
+              chart: {
+                  plotBackgroundColor: null,
+                  plotBorderWidth: null,
+                  plotShadow: false,
+                  type: 'pie'
+              },
+              title: {
+                  text: 'Samples by hospital'
+              },
+              tooltip: {
+                  pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+              },
+              accessibility: {
+                  point: {
+                      valueSuffix: '%'
+                  }
+              },
+              plotOptions: {
+                  pie: {
+                      allowPointSelect: true,
+                      cursor: 'pointer',
+                      dataLabels: {
+                          enabled: true,
+                          format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                      }
+                  }
+              },
+              series: [{
+                  name: 'Sample count',
+                  colorByPoint: true,
+                  data: [
+                  {% for entry in hospitals %}
+                  
+                  { name: '{{ entry.hospital }}', y: {{entry.number}} },
+                  
+                  {% endfor %}
+                  ]
+              }]
+          });
 
-      </script>
-    </div>
-    <div class="col col-lg-6 " id="container2">
-      <script>
-        var categories = [
-            '0-4', '5-9', '10-14', '15-19',
-            '20-24', '25-29', '30-34', '35-39', '40-44',
-            '45-49', '50-54', '55-59', '60-64', '65-69',
-            '70-74', '75-79', '80-84', '85-89', '90-94',
-            '95-99', '100 + '
-        ];
-        
-        Highcharts.chart('container2', {
-            chart: {
-                type: 'bar'
-            },
-            title: {
-                text: 'Population pyramid'
-            },
-            subtitle: {
-                text: 'Population distribution in EPICOVIGAL'
-            },
-            accessibility: {
-                point: {
-                    valueDescriptionFormat: '{index}. Age {xDescription}, {value}%.'
-                }
-            },
-            xAxis: [{
-                categories: categories,
-                reversed: false,
-                labels: {
-                    step: 1
-                },
-                accessibility: {
-                    description: 'Age (male)'
-                }
-            }, { // mirror axis on right side
-                opposite: true,
-                reversed: false,
-                categories: categories,
-                linkedTo: 0,
-                labels: {
-                    step: 1
-                },
-                accessibility: {
-                    description: 'Age (female)'
-                }
-            }],
-            yAxis: {
-                title: {
-                    text: null
-                },
-                labels: {
-                    formatter: function () {
-                        return Math.abs(this.value) + '%';
-                    }
-                },
-                accessibility: {
-                    description: 'Percentage population',
-                    rangeDescription: 'Range: 0 to 5%'
-                }
-            },
-        
-            plotOptions: {
-                series: {
-                    stacking: 'normal'
-                }
-            },
-        
-            tooltip: {
-                formatter: function () {
-                    return '<b>' + this.series.name + ', age ' + this.point.category + '</b><br/>' +
-                        'Population: ' + Highcharts.numberFormat(Math.abs(this.point.y), 1) + '%';
-                }
-            },
-        
-            series: [{
-                name: 'Male',
-                data: [
-                    -2.2, -2.1, -2.2, -2.4,
-                    -2.7, -3.0, -3.3, -3.2,
-                    -2.9, -3.5, -4.4, -4.1,
-                    -3.4, -2.7, -2.3, -2.2,
-                    -1.6, -0.6, -0.3, -0.0,
-                    -0.0
-                ]
-            }, {
-                name: 'Female',
-                data: [
-                    2.1, 2.0, 2.1, 2.3, 2.6,
-                    2.9, 3.2, 3.1, 2.9, 3.4,
-                    4.3, 4.0, 3.5, 2.9, 2.5,
-                    2.7, 2.2, 1.1, 0.6, 0.2,
-                    0.0
-                ]
-            }]
-        });
-      </script>
+        </script>
+      </div>
+      <div class="col col-lg-6 " id="container2">
+        <script>
+          var categories = [
+              '0-4', '5-9', '10-14', '15-19',
+              '20-24', '25-29', '30-34', '35-39', '40-44',
+              '45-49', '50-54', '55-59', '60-64', '65-69',
+              '70-74', '75-79', '80-84', '85-89', '90-94',
+              '95-99', '100 + '
+          ];
+          
+          Highcharts.chart('container2', {
+              chart: {
+                  type: 'bar'
+              },
+              title: {
+                  text: 'Population pyramid'
+              },
+              subtitle: {
+                  text: 'Population distribution in EPICOVIGAL'
+              },
+              accessibility: {
+                  point: {
+                      valueDescriptionFormat: '{index}. Age {xDescription}, {value}%.'
+                  }
+              },
+              xAxis: [{
+                  categories: categories,
+                  reversed: false,
+                  labels: {
+                      step: 1
+                  },
+                  accessibility: {
+                      description: 'Age (male)'
+                  }
+              }, { // mirror axis on right side
+                  opposite: true,
+                  reversed: false,
+                  categories: categories,
+                  linkedTo: 0,
+                  labels: {
+                      step: 1
+                  },
+                  accessibility: {
+                      description: 'Age (female)'
+                  }
+              }],
+              yAxis: {
+                  title: {
+                      text: null
+                  },
+                  labels: {
+                      formatter: function () {
+                          return Math.abs(this.value) + '%';
+                      }
+                  },
+                  accessibility: {
+                      description: 'Percentage population',
+                      rangeDescription: 'Range: 0 to 5%'
+                  }
+              },
+          
+              plotOptions: {
+                  series: {
+                      stacking: 'normal'
+                  }
+              },
+          
+              tooltip: {
+                  formatter: function () {
+                      return '<b>' + this.series.name + ', age ' + this.point.category + '</b><br/>' +
+                          'Population: ' + Highcharts.numberFormat(Math.abs(this.point.y), 1) + '%';
+                  }
+              },
+          
+              series: [{
+                  name: 'Male',
+                  data: [
+                      -2.2, -2.1, -2.2, -2.4,
+                      -2.7, -3.0, -3.3, -3.2,
+                      -2.9, -3.5, -4.4, -4.1,
+                      -3.4, -2.7, -2.3, -2.2,
+                      -1.6, -0.6, -0.3, -0.0,
+                      -0.0
+                  ]
+              }, {
+                  name: 'Female',
+                  data: [
+                      2.1, 2.0, 2.1, 2.3, 2.6,
+                      2.9, 3.2, 3.1, 2.9, 3.4,
+                      4.3, 4.0, 3.5, 2.9, 2.5,
+                      2.7, 2.2, 1.1, 0.6, 0.2,
+                      0.0
+                  ]
+              }]
+          });
+        </script>
+      </div>
     </div>
   </div>
-</div>
-</br>
+  </br>
 
-Quisque venenatis eu arcu vel dignissim. Phasellus nec pharetra turpis, at tempus urna. Ut dapibus urna quis dui pellentesque, nec blandit lectus eleifend. Mauris convallis ornare libero, at porttitor tortor eleifend ut. Nunc nec magna in justo dapibus dapibus at at diam. Mauris gravida sapien vitae pulvinar ultricies
-</br>
-<hr></hr>
-<div  class="container" >
-  <div class="row">
-    <small class="text-muted ml-2 mt-1">Action:</small>
-        <div class="col col-sm-4 " id="x" >
-          <select class="form-control form-control-sm">
-            <option>------------</option>
-            <option>Run tests</option>
-            <option>Show details</option>
-          </select>
-        </div>
-        <input type="hidden" name="select_across" value="0" class="select-across">
-            <button type="submit" class="btn btn-primary btn-sm" aria-describedby="passwordHelpInline" title="Run the selected action" name="index" value="0">Go</button>
-            <small id="passwordHelpInline" class="text-muted ml-2 mt-1">
-              X out of N samples selected. <a href="#">Select everything</a>
-            </small>
-  </div>
-</br>
-
+  Quisque venenatis eu arcu vel dignissim. Phasellus nec pharetra turpis, at tempus urna. Ut dapibus urna quis dui pellentesque, nec blandit lectus eleifend. Mauris convallis ornare libero, at porttitor tortor eleifend ut. Nunc nec magna in justo dapibus dapibus at at diam. Mauris gravida sapien vitae pulvinar ultricies
+  </br>
+  <hr></hr>
+  <div  class="container" >
+    <div class="row">
+      <small class="text-muted ml-2 mt-1">Action:</small>
+          <div class="col col-sm-4 " id="x" >
+            <select class="form-control form-control-sm">
+              <option>------------</option>
+              <option>Run tests</option>
+              <option>Show details</option>
+            </select>
+          </div>
+          <input type="hidden" name="select_across" value="0" class="select-across">
+              <button type="submit" class="btn btn-primary btn-sm" aria-describedby="passwordHelpInline" title="Run the selected action" name="index" value="0">Go</button>
+              <small id="passwordHelpInline" class="text-muted ml-2 mt-1">
+                X out of N samples selected. <a href="#">Select everything</a>
+              </small>
+    </div>
+  </br>
 
 
-<table class="table table-bordered table-hover text-center">
-  <thead class="thead-dark">
-  
-    <tr>
 
-      <th scope="col"  class="action-checkbox-column">
-         <div class="text"><span><input type="checkbox" id="action-toggle"></span></div>
-         <div class="clear"></div>
-      </th>
-      <th scope="col">id</th>
-      <th scope="col">iVar</th>
-      <th scope="col">Picard</th>
-      <th scope="col">NextClade</th>
-      <th scope="col">NGSStats</th>
-    </tr>
+  <table class="table table-bordered table-hover text-center">
+    <thead class="thead-dark">
     
-  </thead>
-  <tbody>
-  
-    <tr>
-      <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td>
-      <th scope="row"><a href="#">CHUAC.100</a></th>
-      <td><p data-status="1" class="status"></p></td>
-      <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-      <td><p data-status="1" class="status"></p></td>
-      <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
+      <tr>
 
-    </tr>
-    <tr>
-      <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td>    
-      <th scope="row"><a href="#">CHUAC.205</a></th>
-      <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-      <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-      <td><p data-status="1" class="status"></p></td>
-      <td><p data-status="1" class="status"></p></td>
+        <th scope="col"  class="action-checkbox-column">
+          <div class="text"><span><input type="checkbox" id="action-toggle"></span></div>
+          <div class="clear"></div>
+        </th>
+        <th scope="col">id</th>
+        <th scope="col">iVar</th>
+        <th scope="col">Picard</th>
+        <th scope="col">NextClade</th>
+        <th scope="col">NGSStats</th>
+      </tr>
+      
+    </thead>
+    <tbody>
+    
+      <tr>
+        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td>
+        <th scope="row"><a href="#">CHUAC.100</a></th>
+        <td><p data-status="1" class="status"></p></td>
+        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
+        <td><p data-status="1" class="status"></p></td>
+        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
 
-    </tr>
-    <tr>
-      <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
-      <th scope="row"><a href="#">CHUAC.300</a></th>
-      <td><p data-status="1" class="status"></p></td>
-      <td><p data-status="1" class="status"></p></td>
-      <td><p data-status="1" class="status"></p></td>
-      <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-    </tr>
-    <tr>
-      <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
-      <th scope="row"><a href="#">CHUAC.600</a></th>
-      <td><a href="#"><p data-status="2" class="status"></p></a></td>
-      <td><a href="#"><p data-status="2" class="status"></p></a></td>
-      <td><a href="#"><p data-status="2" class="status"></p></a></td>
-      <td><a href="#"><p data-status="2" class="status"></p></a></td>
-    </tr>
-    <tr>
-      <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
-      <th scope="row"><a href="#">CHUAC.115</a></th>
-      <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-      <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-      <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-      <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-    </tr>
-    <tr>
-      <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
-      <th scope="row"><a href="#">CHUAC.301</a></th>
-      <td><p data-status="1" class="status"></p></td>
-      <td><p data-status="1" class="status"></p></td>
-      <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-      <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-    </tr>
-    <tr>
-      <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
-      <th scope="row"><a href="#">CHUAC.211</a></th>
-      <td><p data-status="1" class="status"></p></td>
-      <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-      <td><p data-status="1" class="status"></p></td>
-      <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-    </tr>
-    <tr>
-      <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
-      <th scope="row"><a href="#">CHUAC.322</a></th>
-      <td><p data-status="1" class="status"></p></td>
-      <td><p data-status="1" class="status"></p></td>
-      <td><p data-status="1" class="status"></p></td>
-      <td><p data-status="1" class="status"></p></td>
-    </tr>
-    <tr>
-      <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
-      <th scope="row"><a href="#">CHUAC.670</a></th>
-      <td><p data-status="1" class="status"></p></td>
-      <td><p data-status="1" class="status"></p></td>
-      <td><p data-status="1" class="status"></p></td>
-      <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-    </tr>
-      <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
-      <th scope="row"><a href="#">CHUAC.123</a></th>
-      <td><p data-status="1" class="status"></p></td>
-      <td><p data-status="1" class="status"></p></td>
-      <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-      <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-    </tr>
-  </tbody>
-</table>
+      </tr>
+      <tr>
+        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td>    
+        <th scope="row"><a href="#">CHUAC.205</a></th>
+        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
+        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
+        <td><p data-status="1" class="status"></p></td>
+        <td><p data-status="1" class="status"></p></td>
 
+      </tr>
+      <tr>
+        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
+        <th scope="row"><a href="#">CHUAC.300</a></th>
+        <td><p data-status="1" class="status"></p></td>
+        <td><p data-status="1" class="status"></p></td>
+        <td><p data-status="1" class="status"></p></td>
+        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
+      </tr>
+      <tr>
+        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
+        <th scope="row"><a href="#">CHUAC.600</a></th>
+        <td><a href="#"><p data-status="2" class="status"></p></a></td>
+        <td><a href="#"><p data-status="2" class="status"></p></a></td>
+        <td><a href="#"><p data-status="2" class="status"></p></a></td>
+        <td><a href="#"><p data-status="2" class="status"></p></a></td>
+      </tr>
+      <tr>
+        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
+        <th scope="row"><a href="#">CHUAC.115</a></th>
+        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
+        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
+        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
+        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
+      </tr>
+      <tr>
+        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
+        <th scope="row"><a href="#">CHUAC.301</a></th>
+        <td><p data-status="1" class="status"></p></td>
+        <td><p data-status="1" class="status"></p></td>
+        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
+        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
+      </tr>
+      <tr>
+        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
+        <th scope="row"><a href="#">CHUAC.211</a></th>
+        <td><p data-status="1" class="status"></p></td>
+        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
+        <td><p data-status="1" class="status"></p></td>
+        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
+      </tr>
+      <tr>
+        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
+        <th scope="row"><a href="#">CHUAC.322</a></th>
+        <td><p data-status="1" class="status"></p></td>
+        <td><p data-status="1" class="status"></p></td>
+        <td><p data-status="1" class="status"></p></td>
+        <td><p data-status="1" class="status"></p></td>
+      </tr>
+      <tr>
+        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
+        <th scope="row"><a href="#">CHUAC.670</a></th>
+        <td><p data-status="1" class="status"></p></td>
+        <td><p data-status="1" class="status"></p></td>
+        <td><p data-status="1" class="status"></p></td>
+        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
+      </tr>
+        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
+        <th scope="row"><a href="#">CHUAC.123</a></th>
+        <td><p data-status="1" class="status"></p></td>
+        <td><p data-status="1" class="status"></p></td>
+        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
+        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 
 

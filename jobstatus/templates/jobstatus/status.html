@@ -3,93 +3,93 @@
 {% block content %}
 
 
+<div class="container">
+  <h2>Jobs' Status</h2>
 
-<h2>Jobs' Status</h2>
+  Quisque venenatis eu arcu vel dignissim. Phasellus nec pharetra turpis, at tempus urna. Ut dapibus urna quis dui pellentesque, nec blandit lectus eleifend. Mauris convallis ornare libero, at porttitor tortor eleifend ut. Nunc nec magna in justo dapibus dapibus at at diam. Mauris gravida sapien vitae pulvinar ultricies
+  </br>
 
-Quisque venenatis eu arcu vel dignissim. Phasellus nec pharetra turpis, at tempus urna. Ut dapibus urna quis dui pellentesque, nec blandit lectus eleifend. Mauris convallis ornare libero, at porttitor tortor eleifend ut. Nunc nec magna in justo dapibus dapibus at at diam. Mauris gravida sapien vitae pulvinar ultricies
-</br>
-
-<div class="col-md-2 mx-auto text-center">
-  <nav aria-label="...">
-    {% if status.has_other_pages %}
-      <ul class="pagination pagination-sm justify-content-center">
-        {% if status.has_previous %}
-          <li class="page-item"><a class="page-link" href="?page={{ status.previous_page_number }}">&lt;</a></li>
-        {% else %}
-          <li class="page-item disabled" aria-current="page"><a class="page-link"><span>&lt;</span></a></li>
-        {% endif %}
-        
-        {% for i in status.paginator.page_range %}
-          {% if status.number == i %}
-            <li class="page-item active"><a class="page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></a></li>
+  <div class="col-md-2 mx-auto text-center">
+    <nav aria-label="...">
+      {% if status.has_other_pages %}
+        <ul class="pagination pagination-sm justify-content-center">
+          {% if status.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ status.previous_page_number }}">&lt;</a></li>
           {% else %}
-            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+            <li class="page-item disabled" aria-current="page"><a class="page-link"><span>&lt;</span></a></li>
           {% endif %}
-        {% endfor %}
-        
-        {% if status.has_next %}
-          <li class="page-item"><a class="page-link" href="?page={{ status.next_page_number }}">&gt;</a></li>
-        {% else %}
-          <li class="page-item disabled"><a class="page-link"><span>&gt;</span></a></li>
-        {% endif %}
-      </ul>
-    {% endif %}
-  </nav>
-</div>
-
-
-<table class="table table-bordered table-hover">
-  <thead class="thead-dark">
-    <tr>
-      {% for field in status_fields %} 
-      <th scope="col">{{field.name}}</th>
-      {% endfor %}
-    </tr>
-  </thead>
-  <tbody>
-    {% for i in status %} 
-    <tr>
-      <th scope="row">{{i.id_task}}</th>
-      <td>{{i.command}}</td>
-      <td>{{i.get_status_display}}</td>
-      <td>{{i.date|date:"H:i:s d/m/Y"}}</td>
-      {% if i.elapsed_time == 0 %}
-      <td>{{i.date|timesince}}</td>
-      {% else %}
-      <td>{{i.elapsed_time}} seconds</td>
+          
+          {% for i in status.paginator.page_range %}
+            {% if status.number == i %}
+              <li class="page-item active"><a class="page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></a></li>
+            {% else %}
+              <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+          {% endfor %}
+          
+          {% if status.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ status.next_page_number }}">&gt;</a></li>
+          {% else %}
+            <li class="page-item disabled"><a class="page-link"><span>&gt;</span></a></li>
+          {% endif %}
+        </ul>
       {% endif %}
-    </tr>
-    {% endfor %}
+    </nav>
+  </div>
 
-  </tbody>
-</table>
 
-<div class="col-md-2 mx-auto text-center">
-  <nav aria-label="...">
-    {% if status.has_other_pages %}
-      <ul class="pagination pagination-sm justify-content-center">
-        {% if status.has_previous %}
-          <li class="page-item"><a class="page-link" href="?page={{ status.previous_page_number }}">&lt;</a></li>
-        {% else %}
-          <li class="page-item disabled" aria-current="page"><a class="page-link"><span>&lt;</span></a></li>
-        {% endif %}
-        
-        {% for i in status.paginator.page_range %}
-          {% if status.number == i %}
-            <li class="page-item active"><a class="page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></a></li>
-          {% else %}
-            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
-          {% endif %}
+  <table class="table table-bordered table-hover">
+    <thead class="thead-dark">
+      <tr>
+        {% for field in status_fields %} 
+        <th scope="col">{{field.name}}</th>
         {% endfor %}
-        
-        {% if status.has_next %}
-          <li class="page-item"><a class="page-link" href="?page={{ status.next_page_number }}">&gt;</a></li>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in status %} 
+      <tr>
+        <th scope="row">{{i.id_task}}</th>
+        <td>{{i.command}}</td>
+        <td>{{i.get_status_display}}</td>
+        <td>{{i.date|date:"H:i:s d/m/Y"}}</td>
+        {% if i.elapsed_time == 0 %}
+        <td>{{i.date|timesince}}</td>
         {% else %}
-          <li class="page-item disabled"><a class="page-link"><span>&gt;</span></a></li>
+        <td>{{i.elapsed_time}} seconds</td>
         {% endif %}
-      </ul>
-    {% endif %}
-  </nav>
-</div>
+      </tr>
+      {% endfor %}
 
+    </tbody>
+  </table>
+
+  <div class="col-md-2 mx-auto text-center">
+    <nav aria-label="...">
+      {% if status.has_other_pages %}
+        <ul class="pagination pagination-sm justify-content-center">
+          {% if status.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ status.previous_page_number }}">&lt;</a></li>
+          {% else %}
+            <li class="page-item disabled" aria-current="page"><a class="page-link"><span>&lt;</span></a></li>
+          {% endif %}
+          
+          {% for i in status.paginator.page_range %}
+            {% if status.number == i %}
+              <li class="page-item active"><a class="page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></a></li>
+            {% else %}
+              <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+          {% endfor %}
+          
+          {% if status.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ status.next_page_number }}">&gt;</a></li>
+          {% else %}
+            <li class="page-item disabled"><a class="page-link"><span>&gt;</span></a></li>
+          {% endif %}
+        </ul>
+      {% endif %}
+    </nav>
+  </div>
+</div>
 {% endblock %}
