@@ -6,9 +6,11 @@ from django.contrib.auth.decorators import login_required
 def home(request):
     if request.user.is_authenticated:
         tasks = Task.objects
+        url = 'tasks/home.html'
     else:
         tasks = Task.objects.filter(show_to='all')
-    return render(request, 'tasks/home.html', {'tasks':tasks})
+        url = 'tasks/visitor_home.html'
+    return render(request, url, {'tasks':tasks})
 
 
 
