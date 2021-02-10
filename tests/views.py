@@ -12,6 +12,7 @@ def send_selection(request):
     if request.method == 'POST':
         test_list = ['Picard','SingleCheck', 'NGSStats', 'NextClade', 'iVar', 'Lineages']
         selected_tests = {}
+        print(request.POST)
         for i in test_list:
             if request.POST.get(i):
                 selected_tests[i.lower()] = 1

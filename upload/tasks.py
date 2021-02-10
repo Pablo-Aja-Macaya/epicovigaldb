@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from epicovigal.celery import app
-from .models import Region, Sample, OurSampleCharacteristic
+from .models import Region, Sample, SampleMetaData
 from jobstatus.models import Status
 import io, csv
 from datetime import datetime
@@ -127,8 +127,8 @@ def upload_sample_hospital(self, data):
                         additional_info = line['observaciones']
                     )
                 
-            if not OurSampleCharacteristic.objects.filter(id_uvigo=id_linea).exists():
-                _, created = OurSampleCharacteristic.objects.update_or_create(
+            if not SampleMetaData.objects.filter(id_uvigo=id_linea).exists():
+                _, created = SampleMetaData.objects.update_or_create(
                         id_uvigo = id_linea,
                         id_patient = patient,
                         numero_envio = line['numero_envio'],
@@ -153,6 +153,11 @@ def upload_sample_hospital(self, data):
         elapsed_time = finish - start
         print(f'Sample upload failed! (Elapsed time (s): {elapsed_time.seconds} (Task ID: {id})')
         failed_process.delay(id, elapsed_time.seconds)
+
+
+
+
+
 
 def upload_sample_gisaid():
     pass

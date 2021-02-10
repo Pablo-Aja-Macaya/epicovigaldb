@@ -1,8 +1,120 @@
 from django.shortcuts import render
-# from .models import Region, Sample, OurSampleCharacteristic
+# from .models import Region, Sample, SampleMetaData
 # from .models import upload_sample_hospital
 from .tasks import upload_sample_hospital
 from django.contrib.auth.decorators import login_required
+
+import io, csv
+from datetime import datetime
+import dateutil.parser
+
+def upload_sample_hospital(stream):
+    fields_correspondence = {
+        'Código UVIGO':'id_uvigo', 
+        'Entrada muestra UVIGO':'fecha_entrada_uv', 
+        'Hospital extracción':'id_hospital', 
+        'Nº Envío':'numero_envio', 
+        'ID tubo':'id_tubo', 
+        'ID muestra':'id_muestra', 
+        'Fecha toma muestra (DD/MM/AAAA)':'fecha_muestra', 
+        'ID paciente':'id_paciente', 
+        'Sexo paciente (H/M)':'sexo', 
+        'Edad paciente (años)':'edad', 
+        'Ciudad residencia paciente':'localizacion', 
+        'Código postal residencia paciente':'cp', 
+        'Ct ORF1ab':'ct_orf1ab', 
+        'Ct gen E':'ct_gen_e', 
+        'Ct gen N':'ct_gen_n', 
+        'Ct RdRP':'ct_rdrp', 
+        'Ct S':'ct_s', 
+        'Hospitalización paciente (S/N)':'hospitalizacion', 
+        'UCI paciente (S/N)':'uci', 
+        'Fecha inicio síntomas (DD/MM/AAAA)':'fecha_sintomas', 
+        'Fecha diagnóstico (DD/MM/AAAA)':'fecha_diagnostico', 
+        'Fecha envío cDNA':'fecha_envio_cdna', 
+        'Nodo de secuenciación':'nodo_secuenciación', 
+        'Fecha run NGS':'fecha_run_ngs', 
+        'Entrada FASTQ UVIGO':'fecha_entrada_fastq_uvigo', 
+        'Observaciones':'observaciones',
+    }
+    def time_transform(date):
+        # Esta función comprueba que sea una fecha y pasa de dia/mes/año a año/mes/dia para la base de datos
+        # Funciona tanto si el año es xx como xxxx
+        try:
+            transformed = dateutil.parser.parse(date, dayfirst=True,).strftime('%Y-%m-%d')
+        except:
+            transformed = ''
+        return transformed
+    
+    # substitute = 'id_uvigo;fecha_entrada_uv;id_hospital;numero_envio;id_tube;id_sample;collection_date;
+    # id_patient;gender;age;location;cp;ct_orf1ab;ct_gen_e;ct_gen_n;ct_rdrp;hospitalizacion;uci;fecha_sintomas;
+    # fecha_diagnostico;observaciones'
+
+    io_string = stream
+    dialect = csv.Sniffer().sniff(io_string.readline())
+    io_string.seek(0)
+    fieldnames = io_string.readline().strip().split(str(dialect.delimiter))[:-1] ### CUIDADO CON ESTE [:-1] se pone para eliminar un elemento que se crea al haber un ; al final de la cabecera (columna en blanco)
+
+    # Cambio de nombres de campos a los de la base de datos 
+    for i in range(len(fieldnames)):
+        fieldnames[i] = fields_correspondence[fieldnames[i]]
+    print(fieldnames)
+  
+    reader = csv.DictReader(io_string, fieldnames=fieldnames, dialect=dialect) 
+    
+    repl = str.maketrans("ÁÉÍÓÚ","AEIOU") # para quitar acentos
+    
+    for line in reader:
+        print('='*50)
+        #print(line)
+
+        id_linea = line['id_uvigo']
+        id_hospital = line['id_hospital']
+        id_patient = str(line['id_paciente'])
+        envio = line['numero_envio']
+        tube = line['id_tubo']
+        id_sample = line['id_muestra']
+        hosp = line['hospitalizacion']
+        uci = line['uci']
+        hosp = line['hospitalizacion']
+        nodo = line['nodo_secuenciación']
+        comentarios = line['observaciones']
+        postal_code = line['cp']
+        loc = line['localizacion']
+        sex = line['sexo']
+        age = line['edad']
+        
+        # Formateo de los ct (cambiar coma por puntos y cambiar espacio en blanco por 0 (quizás mejor Null?)) 
+        orf1ab = line['ct_orf1ab'].replace(',','.')
+        gen_e = line['ct_gen_e'].replace(',','.')
+        gen_n = line['ct_gen_n'].replace(',','.')
+        rdrp = line['ct_rdrp'].replace(',','.')
+        ct_s = line['ct_s'].replace(',','.')
+            
+        if orf1ab == '': orf1ab = 0.00
+        if gen_e == '': gen_e = 0.00
+        if gen_n == '': gen_n = 0.00
+        if rdrp == '': rdrp = 0.00
+        if ct_s == '': ct_s = 0.00
+
+        # Formateo de fechas
+        f_muestras = time_transform(line['fecha_muestra'])
+        f_sintomas = time_transform(line['fecha_sintomas'])
+        f_diagnostico = time_transform(line['fecha_diagnostico'])
+        f_entrada_uv = time_transform(line['fecha_entrada_uv'])
+        f_envio_cdna = time_transform(line['fecha_envio_cdna'])
+        f_run_ngs = time_transform(line['fecha_run_ngs'])
+        f_entrada_fastq_uvigo = time_transform(line['fecha_entrada_fastq_uvigo'])
+
+
+        try: 
+            int(postal_code)
+        except: postal_code = 0
+            
+        try:
+            int(age)
+        except: age = 0
+
 
 # Create your views here.
 @login_required(login_url="/accounts/login")
@@ -17,25 +129,31 @@ def upload_csv(request):
 
 @login_required(login_url="/accounts/login")
 def upload(request):
-    def check_file():
+    def check_file(): # TO-DO
         pass     
     if request.method == 'POST':
         try:
             uploaded_file = request.FILES['document']
             data = uploaded_file.read().decode('UTF-8')
+            io_string = io.StringIO(data)
             if request.POST.get('origin') == 'hospital':
-                upload_sample_hospital.delay(data)
+                #upload_sample_hospital.delay(data)
+                upload_sample_hospital(io_string)
                 return render(request, 'upload/csv.html', {'message':'Uploading in the back!'})
             
             else:
                 return render(request, 'upload/csv.html',{'warning':'Origin not implemented yet'})
-        except:
+        except Exception as e:
+            print(e)
             return render(request, 'upload/csv.html',{'warning':'No file selected'})
 
     else:
         return render(request, 'upload/csv.html',{'message':'Something went wrong.'})
     
-    
+
+
+
+
 
 # @login_required(login_url="/accounts/login")
 # def upload(request):
@@ -126,8 +244,8 @@ def upload(request):
 #                     additional_info = line['observaciones']
 #                 )
             
-#             if not OurSampleCharacteristic.objects.filter(id_uvigo=id_linea).exists():
-#                 _, created = OurSampleCharacteristic.objects.update_or_create(
+#             if not SampleMetaData.objects.filter(id_uvigo=id_linea).exists():
+#                 _, created = SampleMetaData.objects.update_or_create(
 #                     id_uvigo = id_linea,
 #                     id_patient = patient,
 #                     numero_envio = line['numero_envio'],

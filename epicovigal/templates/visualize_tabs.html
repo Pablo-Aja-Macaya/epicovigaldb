@@ -8,7 +8,7 @@
     <div class="dropdown-menu w-100 border-top-0">
       <a class="dropdown-item {% if request.resolver_match.url_name == "samples" %}active{% endif %}" href="{% url 'samples' %}">Samples</a>
       <a class="dropdown-item {% if request.resolver_match.url_name == "regions" %}active{% endif %}" href="{% url 'regions' %}">Regions</a>
-      <a class="dropdown-item {% if request.resolver_match.url_name == "oursamplecharacteristics" %}active{% endif %}" href="{% url 'oursamplecharacteristics' %}">OurSampleCharacteristics</a>
+      <a class="dropdown-item {% if request.resolver_match.url_name == "oursamplecharacteristics" %}active{% endif %}" href="{% url 'oursamplecharacteristics' %}">Sample meta data</a>
     </div>
   {% endwith %}
   </li>

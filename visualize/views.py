@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from upload.models import Region, Sample, OurSampleCharacteristic
+from upload.models import Region, Sample, SampleMetaData
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from collections import Counter
 
@@ -22,7 +22,7 @@ def general(request):
 @login_required(login_url="/accounts/login")
 def regions(request):
     region_fields = Region._meta.get_fields()
-    regions = Region.objects.order_by('location','cp').all()
+    regions = Region.objects.order_by('localizacion','cp').all()
     page = request.GET.get('page', 1)
     paginator = Paginator(regions, 100)    
     
@@ -53,8 +53,8 @@ def samples(request):
 
 @login_required(login_url="/accounts/login")
 def oursamplecharacteristics(request):
-    oursamplecharacteristics_fields = OurSampleCharacteristic._meta.get_fields()
-    oursamplecharacteristics = OurSampleCharacteristic.objects.order_by('id_uvigo').all()
+    oursamplecharacteristics_fields = SampleMetaData._meta.get_fields()
+    oursamplecharacteristics = SampleMetaData.objects.order_by('id_uvigo').all()
     page = request.GET.get('page', 1)
     paginator = Paginator(oursamplecharacteristics, 100)
     

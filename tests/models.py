@@ -81,11 +81,13 @@ class LineagesTest(models.Model): #_lineages.csv
     lineage = models.CharField(max_length=10)
     probability = models.DecimalField(max_digits=7, decimal_places=6) 
     pangolearn_version = models.CharField(max_length=15)
-
+    # TO-DO añadir columna de comentarios
     def __str__(self):
         return str(self.id_process)
 
 ### Functions ###
 def prueba():
     check_status.delay()
+
+
 
