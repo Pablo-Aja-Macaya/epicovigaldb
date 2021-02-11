@@ -1,12 +1,12 @@
 from django.shortcuts import render
-# from .models import Region, Sample, SampleMetaData
-# from .models import upload_sample_hospital
 from .tasks import upload_sample_hospital
 from django.contrib.auth.decorators import login_required
 
+# Función de upload
 import io, csv
 from datetime import datetime
 import dateutil.parser
+from .models import Region, Sample, SampleMetaData
 
 def upload_sample_hospital(stream):
     fields_correspondence = {
@@ -32,7 +32,7 @@ def upload_sample_hospital(stream):
         'Fecha inicio síntomas (DD/MM/AAAA)':'fecha_sintomas', 
         'Fecha diagnóstico (DD/MM/AAAA)':'fecha_diagnostico', 
         'Fecha envío cDNA':'fecha_envio_cdna', 
-        'Nodo de secuenciación':'nodo_secuenciación', 
+        'Nodo de secuenciación':'nodo_secuenciacion', 
         'Fecha run NGS':'fecha_run_ngs', 
         'Entrada FASTQ UVIGO':'fecha_entrada_fastq_uvigo', 
         'Observaciones':'observaciones',
@@ -43,7 +43,7 @@ def upload_sample_hospital(stream):
         try:
             transformed = dateutil.parser.parse(date, dayfirst=True,).strftime('%Y-%m-%d')
         except:
-            transformed = ''
+            transformed = None
         return transformed
     
     # substitute = 'id_uvigo;fecha_entrada_uv;id_hospital;numero_envio;id_tube;id_sample;collection_date;
@@ -58,26 +58,21 @@ def upload_sample_hospital(stream):
     # Cambio de nombres de campos a los de la base de datos 
     for i in range(len(fieldnames)):
         fieldnames[i] = fields_correspondence[fieldnames[i]]
-    print(fieldnames)
   
     reader = csv.DictReader(io_string, fieldnames=fieldnames, dialect=dialect) 
     
     repl = str.maketrans("ÁÉÍÓÚ","AEIOU") # para quitar acentos
     
     for line in reader:
-        print('='*50)
-        #print(line)
-
         id_linea = line['id_uvigo']
         id_hospital = line['id_hospital']
         id_patient = str(line['id_paciente'])
         envio = line['numero_envio']
         tube = line['id_tubo']
         id_sample = line['id_muestra']
-        hosp = line['hospitalizacion']
+        hosp = line['hospitalizacion'][:1]
         uci = line['uci']
-        hosp = line['hospitalizacion']
-        nodo = line['nodo_secuenciación']
+        nodo = line['nodo_secuenciacion']
         comentarios = line['observaciones']
         postal_code = line['cp']
         loc = line['localizacion']
@@ -90,22 +85,19 @@ def upload_sample_hospital(stream):
         gen_n = line['ct_gen_n'].replace(',','.')
         rdrp = line['ct_rdrp'].replace(',','.')
         ct_s = line['ct_s'].replace(',','.')
-            
-        if orf1ab == '': orf1ab = 0.00
-        if gen_e == '': gen_e = 0.00
-        if gen_n == '': gen_n = 0.00
-        if rdrp == '': rdrp = 0.00
-        if ct_s == '': ct_s = 0.00
 
-        # Formateo de fechas
-        f_muestras = time_transform(line['fecha_muestra'])
-        f_sintomas = time_transform(line['fecha_sintomas'])
-        f_diagnostico = time_transform(line['fecha_diagnostico'])
-        f_entrada_uv = time_transform(line['fecha_entrada_uv'])
-        f_envio_cdna = time_transform(line['fecha_envio_cdna'])
-        f_run_ngs = time_transform(line['fecha_run_ngs'])
-        f_entrada_fastq_uvigo = time_transform(line['fecha_entrada_fastq_uvigo'])
+        def check_numbers(number):
+            try:
+                int(number)
+                return number
+            except:
+                return None
 
+        orf1ab = check_numbers(orf1ab)
+        gen_e = check_numbers(gen_e)
+        gen_n = check_numbers(gen_n)
+        rdrp = check_numbers(rdrp)
+        ct_s = check_numbers(ct_s)       
 
         try: 
             int(postal_code)
@@ -114,6 +106,66 @@ def upload_sample_hospital(stream):
         try:
             int(age)
         except: age = 0
+
+        # Formateo de fechas
+        f_muestra = time_transform(line['fecha_muestra'])
+        f_sintomas = time_transform(line['fecha_sintomas'])
+        f_diagnostico = time_transform(line['fecha_diagnostico'])
+        f_entrada_uv = time_transform(line['fecha_entrada_uv'])
+        f_envio_cdna = time_transform(line['fecha_envio_cdna'])
+        f_run_ngs = time_transform(line['fecha_run_ngs'])
+        f_entrada_fastq_uvigo = time_transform(line['fecha_entrada_fastq_uvigo'])
+
+        # Quitar acentos y cosas raras a localización
+        loc = loc.upper().translate(repl) 
+
+        # Insertado en la base de datos
+        if not Region.objects.filter(cp=postal_code, localizacion=loc).exists():
+            _, created = Region.objects.update_or_create(
+                    cp = int(postal_code),
+                    localizacion = loc,
+                    pais = 'SPAIN',
+                    region = 'EUROPE',
+                    latitud = 0,
+                    longitud = 0
+                )
+            
+        if not Sample.objects.filter(id_uvigo=id_linea).exists():
+            _, created = Sample.objects.update_or_create(
+                    id_uvigo = id_linea,
+                    id_accession = 'NULL',
+                    id_region = Region.objects.get(cp=postal_code, localizacion=loc).pk,
+                    original_name = 'NULL',
+                    edad = age,
+                    sexo = sex[:1].upper(),
+                    patient_status = hosp,
+                    nodo_secuenciacion = nodo,
+                    fecha_muestra = f_muestra,
+                    observaciones = comentarios
+                )
+            
+        if not SampleMetaData.objects.filter(id_uvigo=id_linea).exists():
+            _, created = SampleMetaData.objects.update_or_create(
+                    id_uvigo = id_linea,
+                    id_paciente = id_patient,
+                    id_hospital = id_hospital,
+                    numero_envio = envio,
+                    id_tubo = tube,
+                    id_muestra = id_sample,
+                    hospitalizacion = hosp[:1], 
+                    uci = uci[:1],
+                    ct_orf1ab = orf1ab,
+                    ct_gen_e = gen_e,
+                    ct_gen_n = gen_n,
+                    ct_redrp = rdrp,
+                    ct_s = ct_s,
+                    fecha_sintomas = f_sintomas,
+                    fecha_diagnostico = f_diagnostico,
+                    fecha_entrada_uv = f_entrada_uv,
+                    fecha_envio_cdna = f_envio_cdna,
+                    fecha_run_ngs = f_run_ngs,
+                    fecha_entrada_fastq_uvigo = f_entrada_fastq_uvigo
+                ) 
 
 
 # Create your views here.
@@ -132,23 +184,30 @@ def upload(request):
     def check_file(): # TO-DO
         pass     
     if request.method == 'POST':
-        try:
-            uploaded_file = request.FILES['document']
-            data = uploaded_file.read().decode('UTF-8')
-            io_string = io.StringIO(data)
-            if request.POST.get('origin') == 'hospital':
-                #upload_sample_hospital.delay(data)
-                upload_sample_hospital(io_string)
-                return render(request, 'upload/csv.html', {'message':'Uploading in the back!'})
+        uploaded_file = request.FILES['document']
+        data = uploaded_file.read().decode('UTF-8')
+        io_string = io.StringIO(data)
+        if request.POST.get('origin') == 'hospital':
+            #upload_sample_hospital.delay(data)
+            upload_sample_hospital(io_string)
+            return render(request, 'upload/csv.html', {'message':'Uploading in the back!'})
+        # try:
+            # uploaded_file = request.FILES['document']
+            # data = uploaded_file.read().decode('UTF-8')
+            # io_string = io.StringIO(data)
+            # if request.POST.get('origin') == 'hospital':
+            #     #upload_sample_hospital.delay(data)
+            #     upload_sample_hospital(io_string)
+            #     return render(request, 'upload/csv.html', {'message':'Uploading in the back!'})
             
-            else:
-                return render(request, 'upload/csv.html',{'warning':'Origin not implemented yet'})
-        except Exception as e:
-            print(e)
-            return render(request, 'upload/csv.html',{'warning':'No file selected'})
+        #     else:
+        #         return render(request, 'upload/csv.html',{'warning':'Origin not implemented yet'})
+        # except Exception as e:
+        #     print(e)
+        #     return render(request, 'upload/csv.html',{'warning':'Something went wrong (1).'})
 
     else:
-        return render(request, 'upload/csv.html',{'message':'Something went wrong.'})
+        return render(request, 'upload/csv.html',{'message':'Something went wrong (2).'})
     
 
 

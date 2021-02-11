@@ -28,6 +28,7 @@ DEBUG = TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -94,6 +95,10 @@ DATABASES = {
         },
     }
 }
+
+#### QUITAR ESTO EN PRODUCCIÖN
+# Para poder manipular muchas filas en admin
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
 
 # Password validation
