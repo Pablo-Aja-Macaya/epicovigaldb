@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .tasks import upload_sample_hospital
+from .tasks import find_coords
 from django.contrib.auth.decorators import login_required
 
 # Función de upload
@@ -7,6 +7,9 @@ import io, csv
 from datetime import datetime
 import dateutil.parser
 from .models import Region, Sample, SampleMetaData
+from .utils import upload_utils
+
+
 
 def upload_sample_hospital(stream):
     fields_correspondence = {
@@ -88,7 +91,7 @@ def upload_sample_hospital(stream):
 
         def check_numbers(number):
             try:
-                int(number)
+                float(number)
                 return number
             except:
                 return None
@@ -117,7 +120,12 @@ def upload_sample_hospital(stream):
         f_entrada_fastq_uvigo = time_transform(line['fecha_entrada_fastq_uvigo'])
 
         # Quitar acentos y cosas raras a localización
-        loc = loc.upper().translate(repl) 
+        loc = loc.upper().translate(repl)
+        # Algunas son 'CORUÑA (A)', lo siguiente se usa para transformarlas en A CORUÑA
+        if '(O)' in loc:
+            loc = 'O ' + loc[:-4]
+        elif '(A)' in loc:
+            loc = 'A ' + loc[:-4]
 
         # Insertado en la base de datos
         if not Region.objects.filter(cp=postal_code, localizacion=loc).exists():
@@ -190,7 +198,8 @@ def upload(request):
         if request.POST.get('origin') == 'hospital':
             #upload_sample_hospital.delay(data)
             upload_sample_hospital(io_string)
-            return render(request, 'upload/csv.html', {'message':'Uploading in the back!'})
+            #find_coords.delay() # esto se hace por detrás con celery
+            return render(request, 'upload/csv.html', {'message':'Finishing in the back!'})
         # try:
             # uploaded_file = request.FILES['document']
             # data = uploaded_file.read().decode('UTF-8')

@@ -25,6 +25,29 @@ def coords(place):
         return 'NULL','NULL'
 
 @app.task
+def find_coords():
+    data = Region.objects.all()
+    for line in data:
+        country = line.pais
+        loc = line.localizacion
+        cp = line.cp
+        lat = line.latitud
+
+
+        if len(loc)>2:
+            lat, long = coords(str(cp)+' '+ loc + ' ' + country)
+            line.latitud = lat
+            line.longitud = long
+            line.save()
+            print(f'Updated {cp}, {loc}')   
+        else:
+            line.latitud = 'NULL'
+            line.longitud = 'NULL'
+            line.save()                 
+    print('Finished updating coordinates')
+
+
+@app.task
 def start_process(id, c, d):
     _, created = Status.objects.update_or_create(
         id_task = id,

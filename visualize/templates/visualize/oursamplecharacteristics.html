@@ -51,16 +51,21 @@
           {% for sample in oursamplecharacteristics %} 
           <tr>
             <th scope="row">{{sample.id_uvigo}}</th>
-            <td>{{sample.id_patient}}</td>
+            <td>{{sample.id_paciente}}</td>
+            <td>{{sample.id_hospital}}</td>
             <td>{{sample.numero_envio}}</td>
-            <td>{{sample.id_tube}}</td>
-            <td>{{sample.id_sample}}</td>
+            <td>{{sample.id_tubo}}</td>
+            <td>{{sample.id_muestra}}</td>
             <td>{{sample.hospitalizacion}}</td>
             <td>{{sample.uci}}</td>
             <td>{{sample.ct_orf1ab}}</td>
             <td>{{sample.ct_gen_e}}</td>
             <td>{{sample.ct_gen_n}}</td>
             <td>{{sample.ct_redrp}}</td>
+            <td>{{sample.ct_s}}</td>
+            <td>{{sample.fecha_envio_cdna|date:"d-m-Y"}}</td>
+            <td>{{sample.fecha_run_ngs|date:"d-m-Y"}}</td>
+            <td>{{sample.fecha_entrada_fastq_uvigo|date:"d-m-Y"}}</td>
             <td>{{sample.fecha_sintomas|date:"d-m-Y"}}</td>
             <td>{{sample.fecha_diagnostico|date:"d-m-Y"}}</td>
             <td>{{sample.fecha_entrada_uv|date:"d-m-Y"}}</td>
