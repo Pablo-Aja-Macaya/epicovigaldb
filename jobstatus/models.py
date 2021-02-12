@@ -8,7 +8,7 @@ class Status(models.Model):
         ('S', 'Stored'),
         ('F', 'Failed'),
     ]
-    id_task = models.CharField(max_length=40, primary_key=True)
+    id_process = models.CharField(max_length=40, primary_key=True)
     command = models.TextField(max_length=50)
     status = models.CharField(max_length=20, choices=status_choices)
     date = models.DateTimeField()

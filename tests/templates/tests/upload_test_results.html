@@ -54,46 +54,47 @@
     </div>
   </div>  
   <hr></hr>
-  <h2>Upload test results</h2>
-  <br>
-  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec non magna nec velit aliquet pretium ac a dolor. Aliquam hendrerit aliquet mauris a dignissim. </p>
+  <div class="container">
+    <h2>Upload test results</h2>
+    <br>
+    
+    <p class='pb-3'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec non magna nec velit aliquet pretium ac a dolor. Aliquam hendrerit aliquet mauris a dignissim. </p>
+  
 
-
-  <form id="send_results" method="POST" enctype="multipart/form-data" action="{% url 'send_results' %}">
-    {% csrf_token %}
-    <div class="form-group row">
-      <div class="input-group mb-3">
-        <div class="custom-file">
-          <input type="file" class="custom-file-input" name="documents" id="inputGroupFile02" multiple>
-          <label class="custom-file-label" for="inputGroupFile02" >Choose file</label>
-          <small id="inputHelpBlock" class="form-text text-muted">
-            The csv must have the same structure as the <a href="#" data-toggle="modal" data-target="#exampleModal"><strong>example</strong></a>.
-          </small>
-        </div>
-    </div>     
-    </div>  
-    <hr></hr>
-      <div class="form-group row justify-content-center">
-          <a href="javascript:{document.getElementById('send_results').submit()}"><button type="submit" class="btn btn-primary" data-toggle="collapse" data-target="#collapseLoading" aria-expanded="false" aria-controls="collapseExample">Upload</button></a>
-      </div>
-  </form>
-
-
-  <!-- Menú de carga colapsable -->
-  <div class="collapse" id="collapseLoading">
-    <div class="card card-body border-0">  
-      <div class="d-flex justify-content-center text-center">
-        <div class="spinner-border text-primary" style="width: 5rem; height: 5rem;" role="status">
-          <span class="sr-only">Loading...</span>   
-        </div>   
-      </div>
-      <div class="d-flex justify-content-center text-center pt-3">   
-      <strong>Loading</strong>
+    <form id="send_results" method="POST" enctype="multipart/form-data" action="{% url 'send_results' %}">
+      {% csrf_token %}
+      <div class="form-group row-10">
+        <div class="input-group mb-3">
+          <div class="custom-file">
+            <input type="file" class="custom-file-input" name="documents" id="inputGroupFile02" multiple>
+            <label class="custom-file-label" for="inputGroupFile02" >Choose file</label>
+            <small id="inputHelpBlock" class="form-text text-muted">
+              The csv must have the same structure as the <a href="#" data-toggle="modal" data-target="#exampleModal"><strong>example</strong></a>.
+            </small>
+          </div>
+      </div>     
       </div>  
+        <div class="form-group row justify-content-center">
+            <a href="javascript:{document.getElementById('send_results').submit()}"><button type="submit" class="btn btn-primary" data-toggle="collapse" data-target="#collapseLoading" aria-expanded="false" aria-controls="collapseExample">Upload</button></a>
+        </div>
+    </form>
+
+
+    <!-- Menú de carga colapsable -->
+    <div class="collapse" id="collapseLoading">
+      <div class="card card-body border-0">  
+        <div class="d-flex justify-content-center text-center">
+          <div class="spinner-border text-primary" style="width: 5rem; height: 5rem;" role="status">
+            <span class="sr-only">Loading...</span>   
+          </div>   
+        </div>
+        <div class="d-flex justify-content-center text-center pt-3">   
+        <strong>Loading</strong>
+        </div>  
+      </div>
     </div>
   </div>
 </div>
-
 <script>
   document.querySelector('.custom-file-input').addEventListener('change',function(e){
     var fileName = document.getElementById("inputGroupFile02").files[0].name;
