@@ -21,7 +21,7 @@ class PicardTest(models.Model): #.picardOutputCleaned.tsv
         return str(self.id_uvigo + ' - ' + self.date.strftime("%m/%d/%Y, %H:%M:%S"))
 
 class SingleCheckTest(models.Model): #.trimmed.sorted.SingleCheck.txt
-    id_uvigo = models.CharField(max_length=20, primary_key=True) # a partir de filas (primera) (sin cabecera)
+    id_uvigo = models.CharField(max_length=20, primary_key=True) # a partir de columna (primera) (sin cabecera)
     id_process = models.CharField(max_length=40)
 
     autocorrelation = models.DecimalField(max_digits=15, decimal_places=10) 
@@ -85,7 +85,7 @@ class VariantsTest(models.Model): #.tsv
     date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('id_uvigo','id_process','date')
+        unique_together = ('id_uvigo','id_process','date',)
     def __str__(self):
         return str(self.id_uvigo + ' - ' + self.date.strftime("%m/%d/%Y, %H:%M:%S"))
 
@@ -139,10 +139,11 @@ fields_correspondence = {
     # Este no tiene cabecera así que se usa el índice de la columna
     # Muestra a partir de la columna 0
     'SingleCheckTest':{
-        8:'autocorrelation',
-        9:'variation_coefficient',
-        10:'gini_coefficient',
-        11:'mad',
+        'id_uvigo':0,
+        'autocorrelation':8,
+        'variation_coefficient':9,
+        'gini_coefficient':10,
+        'mad':11,
     },
     # NGSStats #.ngsinfo.tsv
     # Muestra # a partir de columna 'sampleName'
@@ -201,11 +202,14 @@ def detect_file(header):
 
 def find_sample_name(string):
     # Encontrar si una cadena contiene 'EPI.*.X', si es así ese será el nombre de la muestra
-    sample_name = re.search(r'EPI\..+\.\d+',string.upper())
+    sample_name = re.search(r'EPI\..+\.\d+\.',string)
     if sample_name:
-        return sample_name.group()
+        return sample_name.group()[:-1]
     else:
         return None
+
+###################################
+### Subida según test #####
 
 def upload_picard(reader, sample_name):
     for line in reader:
@@ -228,6 +232,112 @@ def upload_picard(reader, sample_name):
                 pct_target_bases_10x = pct_target_bases_10x,
                 pct_target_bases_100x = pct_target_bases_100x,
                 )
+
+def upload_singlecheck(io_string, delimiter):
+    io_string.seek(0)
+
+    # TO-DO: usar diccionario fields_correspondence
+    id_uvigo_index = fields_correspondence['SingleCheckTest']['id_uvigo']
+    autocorrelation_index = fields_correspondence['SingleCheckTest']['autocorrelation']
+    variation_coefficient_index = fields_correspondence['SingleCheckTest']['variation_coefficient']
+    gini_coefficient_index = fields_correspondence['SingleCheckTest']['gini_coefficient']
+    mad_index = fields_correspondence['SingleCheckTest']['mad']
+
+    for line in io_string:
+        lista = line.strip().split(delimiter)
+
+        id_uvigo = find_sample_name(lista[id_uvigo_index])
+        id_process = 'U-XX'
+        autocorrelation = lista[autocorrelation_index]
+        variation_coefficient = lista[variation_coefficient_index]
+        gini_coefficient = lista[gini_coefficient_index]
+        mad = lista[mad_index]      
+
+        if id_uvigo and not SingleCheckTest.objects.filter(id_uvigo=id_uvigo).exists():
+            _, created = SingleCheckTest.objects.update_or_create(
+                id_uvigo = id_uvigo,
+                id_process = id_process,
+                autocorrelation = autocorrelation,
+                variation_coefficient = variation_coefficient,
+                gini_coefficient = gini_coefficient,
+                mad = mad,
+                )
+
+def upload_ngsstats(reader):
+    for line in reader:
+        id_uvigo = line['id_uvigo'] # igual hay que poner aquí find_sample_name() también
+        id_process = 'U-XXX'
+        total_reads = int(line['total_reads'].replace(',','.'))
+        mapped = int(line['mapped'].replace(',','.'))
+        trimmed = int(line['trimmed'].replace(',','.'))
+        if id_uvigo and not NGSstatsTest.objects.filter(id_uvigo=id_uvigo).exists():
+            _, created = NGSstatsTest.objects.update_or_create(
+                id_uvigo = id_uvigo,
+                id_process = id_process,
+                #date = '',
+                total_reads = total_reads,
+                mapped = mapped,
+                trimmed = trimmed,
+                )
+
+def upload_nextclade(reader):
+    for line in reader:
+        id_uvigo = find_sample_name(line['id_uvigo'])
+        id_process = 'U-XXX'
+        total_missing = int(line['total_missing'].replace(',','.'))
+        clade = line['clade']
+        qc_private_mutations_status = line['qc_private_mutations_status']
+        qc_missing_data_status = line['qc_missing_data_status']
+        qc_snp_clusters_status = line['qc_snp_clusters_status']
+        qc_mixed_sites_status = line['qc_mixed_sites_status']
+
+        if id_uvigo and not NextcladeTest.objects.filter(id_uvigo=id_uvigo).exists():
+            _, created = NextcladeTest.objects.update_or_create(
+                id_uvigo = id_uvigo,
+                id_process = id_process,
+                total_missing = total_missing,
+                clade = clade,
+                qc_private_mutations_status = qc_private_mutations_status,
+                qc_missing_data_status = qc_missing_data_status,
+                qc_snp_clusters_status = qc_snp_clusters_status,
+                qc_mixed_sites_status = qc_mixed_sites_status,
+                )
+
+def upload_variants(reader, sample_name):
+    id_uvigo = sample_name
+    id_process = 'U-XXX'
+    row = 0
+    ## HAY QUE ARREGLAR ESTA SUBIDA
+    ## HABRA QUE HACER LLAVE PRIMARIA DE id_uvigo y cada fila?
+    for line in reader:
+        r = '.'+str(row)
+        pos = line['pos']
+        ref = line['ref']
+        alt = line['alt']
+        alt_freq = line['alt_freq']
+        ref_codon = line['ref_codon']
+        ref_aa = line['ref_aa']
+        alt_codon = line['alt_codon']
+        alt_aa = line['alt_aa']
+
+        if id_uvigo and not VariantsTest.objects.filter(id_uvigo=id_uvigo+r).exists():
+            _, created = VariantsTest.objects.update_or_create(
+                id_uvigo = id_uvigo+r,
+                id_process = id_process,
+                pos = pos,
+                ref = ref,
+                alt = alt,
+                alt_freq = alt_freq,
+                ref_codon = ref_codon,
+                ref_aa = ref_aa,
+                alt_codon = alt_codon,
+                alt_aa = alt_aa,
+                )
+        row += 1
+
+def upload_lineages():
+    pass
+################################
 def send_results_processing(file):
     data = file.read().decode('UTF-8')
     io_string = io.StringIO(data)
@@ -245,14 +355,19 @@ def send_results_processing(file):
             substitute = fields_correspondence[test].get(fieldnames[i])
             if substitute:
                 fieldnames[i] = substitute
-        print(fieldnames)
     
         reader = csv.DictReader(io_string, fieldnames=fieldnames, dialect=dialect)
         if test == 'PicardTest':
             upload_picard(reader, sample_name)
+        elif test == 'NGSstatsTest':
+            upload_ngsstats(reader)
+            print('hola')
+        elif test == 'NextcladeTest':
+            upload_nextclade(reader)
+        elif test == 'VariantsTest':
+            upload_variants(reader, sample_name)
     
     else:
-        io_string.seek(0)
-        for line in io_string:
-            print(line.strip().split(str(dialect.delimiter)))
+        upload_singlecheck(io_string, str(dialect.delimiter))
+
 
