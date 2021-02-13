@@ -25,7 +25,7 @@ SECRET_KEY = '*5=a)@xbhtoyngk(yvi(1qjy_p5i)k8g8m&=iy9!g$=mu4v-6l'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = [
+ALLOWED_HOSTS = [#'192.168.1.40'
 
 ]
 
@@ -98,7 +98,7 @@ DATABASES = {
     }
 }
 
-#### QUITAR ESTO EN PRODUCCIÖN
+#### QUITAR ESTO EN PRODUCCIÖN !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # Para poder manipular muchas filas en admin
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 

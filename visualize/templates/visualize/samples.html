@@ -4,7 +4,7 @@
 <div class="container">
   {% include 'visualize_tabs.html' %}
 
-  <h2>Samples</h2>
+  <h2 >Samples</h2>
   Quisque venenatis eu arcu vel dignissim. Phasellus nec pharetra turpis, at tempus urna. Ut dapibus urna quis dui pellentesque, nec blandit lectus eleifend. Mauris convallis ornare libero, at porttitor tortor eleifend ut. Nunc nec magna in justo dapibus dapibus at at diam. Mauris gravida sapien vitae pulvinar ultricies
   </br>
 
@@ -46,16 +46,16 @@
     </thead>
     <tbody>
       {% for sample in samples %} 
-      <tr>
+      <tr contenteditable='true'>
         <th scope="row">{{sample.id_uvigo}}</th>
-        <td>{{sample.id_accession}}</td>
+        <td >{{sample.id_accession}}</td>
         <td>{{sample.original_name}}</td>
         <td>{{sample.id_region}}</td>
         <td>{{sample.edad}}</td>
         <td>{{sample.sexo}}</td>
         <td>{{sample.patient_status}}</td>
         <td>{{sample.nodo_secuenciacion}}</td>
-        <td>{{sample.fecha_muestra|date:"d-m-Y"}}</td>
+        <td>{{sample.fecha_muestra|date:"d/m/Y"}}</td>
         <td>{{sample.observaciones}}</td>
         <td>{{sample.data_path}}</td>
       </tr>

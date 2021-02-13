@@ -2,7 +2,7 @@
 
 
 {% block content %}
-
+<script src="https://code.highcharts.com/highcharts.src.js"></script>
 <style>
 
 </style>
@@ -65,10 +65,73 @@
       </div>
     </div>
     {% endfor %}
-  </div>  
+  </div>
+  
+
+
+  <div class="container pt-2 pb-4">
+    <div class="card" style="width: 100%;">
+      <div class="row">
+        <div class="col-md-5">
+          <div class="card-body">
+              <h5 class="card-title"><strong>Origins</strong></h5>
+              <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
+          </div>
+        </div>
+        <div class="col-lg-7 d-flex justify-content-center my-auto">
+            <div id="tablahospitales">
+            </div>
+        </div>
+      </div>
+    </div>  
+  </div>
+
 
 </main>
 
+<script>
+  Highcharts.chart('tablahospitales', {
+      chart: {
+          plotBackgroundColor: null,
+          plotBorderWidth: null,
+          plotShadow: false,
+          type: 'pie'
+      },
+      title: {
+          text: 'Samples by hospital'
+      },
+      tooltip: {
+          pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+      },
+      accessibility: {
+          point: {
+              valueSuffix: '%'
+          }
+      },
+      plotOptions: {
+          pie: {
+              allowPointSelect: true,
+              cursor: 'pointer',
+              dataLabels: {
+                  enabled: true,
+                  format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+              }
+          }
+      },
+      series: [{
+          name: 'Sample count',
+          colorByPoint: true,
+          data: [
+          {% for entry in hospitals %}
+          
+          { name: '{{ entry.hospital }}', y: {{entry.number}} },
+          
+          {% endfor %}
+          ]
+      }]
+  });
 
+</script>
 
 {% endblock %}
