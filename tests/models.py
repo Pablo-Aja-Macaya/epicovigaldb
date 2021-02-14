@@ -116,8 +116,10 @@ class LineagesMostCommonCountries(models.Model):
     id_uvigo = models.CharField(max_length=20, primary_key=True)
     id_process = models.CharField(max_length=40)
     date = models.DateTimeField(auto_now=True)
-
     country = models.TextField(max_length=50, default=None, blank=True)
+    
+    def __str__(self):
+        return str(self.id_uvigo + ' - ' + self.date.strftime("%m/%d/%Y, %H:%M:%S"))
 
 #############################################################################
 ### Functions ###
@@ -179,9 +181,9 @@ fields_correspondence = {
     # Pangolin # .csv
     # Muestra a partir de columna 'taxon'
     'LineagesTest':{
+        'Sequence name':'id_uvigo',
         'Lineage':'lineage',
         'Probability':'probability',
-        'Sequence name':'id_uvigo',
         'Most common countries':'most_common_countries' ### añadir a modelo
     },
 }
@@ -335,9 +337,34 @@ def upload_variants(reader, sample_name):
                 )
         row += 1
 
-def upload_lineages():
-    pass
+def upload_lineages(reader):
+    for line in reader:
+        id_uvigo = find_sample_name(line['id_uvigo'])
+        id_process = 'U-XXX'
+        lineage = line['lineage']
+        probability = line['probability']
+        countries = line['most_common_countries'].split(',')
+
+        if id_uvigo and not LineagesTest.objects.filter(id_uvigo=id_uvigo).exists():
+            _, created = LineagesTest.objects.update_or_create(
+                id_uvigo = id_uvigo,
+                id_process = id_process,
+                lineage = lineage,
+                probability = probability,
+                comments = ''
+                )
+        
+        for country in countries:
+            country = country.strip()
+            if id_uvigo and not LineagesMostCommonCountries.objects.filter(id_uvigo=id_uvigo).exists():
+                _, created = LineagesMostCommonCountries.objects.update_or_create(
+                    id_uvigo = id_uvigo,
+                    id_process = id_process,
+                    country = country
+                    )
+
 ################################
+
 def send_results_processing(file):
     data = file.read().decode('UTF-8')
     io_string = io.StringIO(data)
@@ -361,11 +388,13 @@ def send_results_processing(file):
             upload_picard(reader, sample_name)
         elif test == 'NGSstatsTest':
             upload_ngsstats(reader)
-            print('hola')
         elif test == 'NextcladeTest':
             upload_nextclade(reader)
         elif test == 'VariantsTest':
             upload_variants(reader, sample_name)
+        elif test == 'LineagesTest':
+            upload_lineages(reader)
+
     
     else:
         upload_singlecheck(io_string, str(dialect.delimiter))
