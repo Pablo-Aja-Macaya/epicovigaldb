@@ -1,7 +1,7 @@
 import re
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from .models import send_results_processing
+from .models import send_results_processing, update
 
 
 
@@ -41,4 +41,10 @@ def send_results(request):
         for file in request.FILES.getlist('documents'):
             send_results_processing(file)
         return render(request, 'tests/upload_test_results.html', {'message':'On going'})
-        
+
+@login_required(login_url="/accounts/login")
+def update_from_folder(request):
+    print('Updating')
+    print('='*50)
+    update()
+    return render(request, 'tests/upload_test_results.html', {'message':'Updated'})

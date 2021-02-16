@@ -1,6 +1,11 @@
 from django.db import models
 import io, csv
 import re
+import pathlib
+import datetime
+import glob
+import pickle
+
 
 ### Posibles tests ###
 class PicardTest(models.Model): #.picardOutputCleaned.tsv
@@ -70,8 +75,10 @@ class NextcladeTest(models.Model): #.csv
         return str(self.id_uvigo + ' - ' + self.date.strftime("%m/%d/%Y, %H:%M:%S"))
 
 class VariantsTest(models.Model): #.tsv
-    id_uvigo = models.CharField(max_length=20, primary_key=True) # a partir del nombre del archivo
-    id_process = models.CharField(max_length=40)
+    id = models.AutoField(primary_key=True)
+    id_uvigo = models.CharField(max_length=20) # a partir del nombre del archivo
+    id_process = models.CharField(max_length=41)
+    row = models.IntegerField()
 
     pos = models.IntegerField()
     ref = models.CharField(max_length=10)
@@ -85,15 +92,18 @@ class VariantsTest(models.Model): #.tsv
     date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('id_uvigo','id_process','date',)
+        # unique_together = ('id_uvigo','row','id_process','date',)
+        constraints = [
+            models.UniqueConstraint(fields=['id_uvigo','row','id_process','date'], name='unique_constraint')
+        ]
     def __str__(self):
-        return str(self.id_uvigo + ' - ' + self.date.strftime("%m/%d/%Y, %H:%M:%S"))
+        return str(self.id_uvigo + f' - {self.row}' + ' - ' + self.date.strftime("%m/%d/%Y, %H:%M:%S"))
 
-    # No sé si quieren estos
-    # frequency
-    # gene
-    # aa_position
-    # thresholds
+#     # No sé si quieren estos
+#     # frequency
+#     # gene
+#     # aa_position
+#     # thresholds
 
 class LineagesTest(models.Model): #.csv
     id_uvigo = models.CharField(max_length=20, primary_key=True) # a partir de columna 'taxon'
@@ -223,7 +233,7 @@ def upload_picard(reader, sample_name):
         pct_target_bases_10x = float(line['pct_target_bases_10x'].replace(',','.'))
         pct_target_bases_100x = float(line['pct_target_bases_100x'].replace(',','.'))
 
-        if not PicardTest.objects.filter(id_uvigo=id_uvigo).exists():
+        if id_uvigo:# and not PicardTest.objects.filter(id_uvigo=id_uvigo).exists():
             _, created = PicardTest.objects.update_or_create(
                 id_uvigo = id_uvigo,
                 id_process = id_process,
@@ -255,7 +265,7 @@ def upload_singlecheck(io_string, delimiter):
         gini_coefficient = lista[gini_coefficient_index]
         mad = lista[mad_index]      
 
-        if id_uvigo and not SingleCheckTest.objects.filter(id_uvigo=id_uvigo).exists():
+        if id_uvigo:# and not SingleCheckTest.objects.filter(id_uvigo=id_uvigo).exists():
             _, created = SingleCheckTest.objects.update_or_create(
                 id_uvigo = id_uvigo,
                 id_process = id_process,
@@ -272,7 +282,7 @@ def upload_ngsstats(reader):
         total_reads = int(line['total_reads'].replace(',','.'))
         mapped = int(line['mapped'].replace(',','.'))
         trimmed = int(line['trimmed'].replace(',','.'))
-        if id_uvigo and not NGSstatsTest.objects.filter(id_uvigo=id_uvigo).exists():
+        if id_uvigo:# and not NGSstatsTest.objects.filter(id_uvigo=id_uvigo).exists():
             _, created = NGSstatsTest.objects.update_or_create(
                 id_uvigo = id_uvigo,
                 id_process = id_process,
@@ -293,17 +303,20 @@ def upload_nextclade(reader):
         qc_snp_clusters_status = line['qc_snp_clusters_status']
         qc_mixed_sites_status = line['qc_mixed_sites_status']
 
-        if id_uvigo and not NextcladeTest.objects.filter(id_uvigo=id_uvigo).exists():
+        if id_uvigo:
             _, created = NextcladeTest.objects.update_or_create(
-                id_uvigo = id_uvigo,
-                id_process = id_process,
-                total_missing = total_missing,
-                clade = clade,
-                qc_private_mutations_status = qc_private_mutations_status,
-                qc_missing_data_status = qc_missing_data_status,
-                qc_snp_clusters_status = qc_snp_clusters_status,
-                qc_mixed_sites_status = qc_mixed_sites_status,
-                )
+                id_uvigo=id_uvigo,
+                defaults={
+                    'id_uvigo' : id_uvigo,
+                    'id_process' : id_process,
+                    'total_missing' : total_missing,
+                    'clade' : clade,
+                    'qc_private_mutations_status' : qc_private_mutations_status,
+                    'qc_missing_data_status' : qc_missing_data_status,
+                    'qc_snp_clusters_status' : qc_snp_clusters_status,
+                    'qc_mixed_sites_status' : qc_mixed_sites_status,                    
+                }
+            )
 
 def upload_variants(reader, sample_name):
     id_uvigo = sample_name
@@ -322,19 +335,24 @@ def upload_variants(reader, sample_name):
         alt_codon = line['alt_codon']
         alt_aa = line['alt_aa']
 
-        if id_uvigo and not VariantsTest.objects.filter(id_uvigo=id_uvigo+r).exists():
+        if id_uvigo:
             _, created = VariantsTest.objects.update_or_create(
-                id_uvigo = id_uvigo+r,
-                id_process = id_process,
-                pos = pos,
-                ref = ref,
-                alt = alt,
-                alt_freq = alt_freq,
-                ref_codon = ref_codon,
-                ref_aa = ref_aa,
-                alt_codon = alt_codon,
-                alt_aa = alt_aa,
-                )
+                id_uvigo=id_uvigo,
+                row=row,
+                defaults={
+                    'id_uvigo' : id_uvigo,
+                    'id_process' : id_process,
+                    'row' : row,
+                    'pos' : pos,
+                    'ref' : ref,
+                    'alt' : alt,
+                    'alt_freq' : alt_freq,
+                    'ref_codon' : ref_codon,
+                    'ref_aa' : ref_aa,
+                    'alt_codon' : alt_codon,
+                    'alt_aa' : alt_aa,                    
+                }
+            )                
         row += 1
 
 def upload_lineages(reader):
@@ -345,7 +363,7 @@ def upload_lineages(reader):
         probability = line['probability']
         countries = line['most_common_countries'].split(',')
 
-        if id_uvigo and not LineagesTest.objects.filter(id_uvigo=id_uvigo).exists():
+        if id_uvigo:# and not LineagesTest.objects.filter(id_uvigo=id_uvigo).exists():
             _, created = LineagesTest.objects.update_or_create(
                 id_uvigo = id_uvigo,
                 id_process = id_process,
@@ -356,7 +374,7 @@ def upload_lineages(reader):
         
         for country in countries:
             country = country.strip()
-            if id_uvigo and not LineagesMostCommonCountries.objects.filter(id_uvigo=id_uvigo).exists():
+            if id_uvigo:# and not LineagesMostCommonCountries.objects.filter(id_uvigo=id_uvigo).exists():
                 _, created = LineagesMostCommonCountries.objects.update_or_create(
                     id_uvigo = id_uvigo,
                     id_process = id_process,
@@ -364,6 +382,27 @@ def upload_lineages(reader):
                     )
 
 ################################
+def select_test(test, file, sample_name, fieldnames, dialect):
+    if test != 'SingleCheckTest': # este no tiene cabecera
+        # Cambio de nombres de campos a los de la base de datos
+        for i in range(len(fieldnames)):
+            substitute = fields_correspondence[test].get(fieldnames[i])
+            if substitute:
+                fieldnames[i] = substitute
+
+        reader = csv.DictReader(file, fieldnames=fieldnames, dialect=dialect)
+        if test == 'PicardTest':
+            upload_picard(reader, sample_name)
+        elif test == 'NGSstatsTest':
+            upload_ngsstats(reader)
+        elif test == 'NextcladeTest':
+            upload_nextclade(reader)
+        elif test == 'VariantsTest':
+            upload_variants(reader, sample_name)
+        elif test == 'LineagesTest':
+            upload_lineages(reader)
+    else:
+        upload_singlecheck(file, str(dialect.delimiter))
 
 def send_results_processing(file):
     data = file.read().decode('UTF-8')
@@ -375,28 +414,51 @@ def send_results_processing(file):
 
     # Detección del origen del archivo
     test = detect_file(fieldnames)
-    
-    if test != 'SingleCheckTest': # este no tiene cabecera
-        # Cambio de nombres de campos a los de la base de datos
-        for i in range(len(fieldnames)):
-            substitute = fields_correspondence[test].get(fieldnames[i])
-            if substitute:
-                fieldnames[i] = substitute
-    
-        reader = csv.DictReader(io_string, fieldnames=fieldnames, dialect=dialect)
-        if test == 'PicardTest':
-            upload_picard(reader, sample_name)
-        elif test == 'NGSstatsTest':
-            upload_ngsstats(reader)
-        elif test == 'NextcladeTest':
-            upload_nextclade(reader)
-        elif test == 'VariantsTest':
-            upload_variants(reader, sample_name)
-        elif test == 'LineagesTest':
-            upload_lineages(reader)
+    select_test(test, io_string, sample_name, fieldnames, dialect)
 
-    
+def update():
+    # Update database if there are new files in a folder or these have been modified
+    pckl = 'objs.pkl'
+    pckl_folder = '/home/pabs/MasterBioinformatica/TFM/test/'
+    folder = '/home/pabs/MasterBioinformatica/TFM/test/carpeta_prueba_inputs/'
+
+    if glob.glob(pckl_folder+'*.pkl'):
+        with open(pckl_folder+pckl, 'rb') as f:
+            file_history = pickle.load(f)
+        print(file_history)
+        files = glob.glob(folder+'*')
+        for f in files:
+            fname = pathlib.Path(f)
+            mtime = fname.stat().st_mtime # Time of most recent content modification expressed in seconds.
+
+            # Si el nombre del archivo ya se ha visto en el pasado
+            if file_history[fname.name]:
+                # Ver diferencia de tiempos respecto al valor
+                # del pickle, si son diferentes actualizar la base de datos
+                if file_history[fname.name] != mtime:
+                    with open(fname, 'rt') as fichero:
+                        dialect = csv.Sniffer().sniff(fichero.readline())
+                        fichero.seek(0)
+                        fieldnames = fichero.readline().strip().split(str(dialect.delimiter))
+                        sample_name = find_sample_name(fname.name)
+
+                        # Detección del origen del archivo
+                        test = detect_file(fieldnames)    
+
+                        select_test(test, fichero, sample_name, fieldnames, dialect)
+                        
+                    # Se guarda en el diccionario la nueva fecha de modificación
+                    file_history[fname.name] = mtime
+
+            # Si el nombre del archivo es nuevo    
+            else:
+                file_history[fname.name] = mtime
+                # insertar los datos del archivo en la base de datos
+
+        with open(pckl_folder+pckl, 'wb') as fichero:
+            pickle.dump(file_history, fichero)
+
     else:
-        upload_singlecheck(io_string, str(dialect.delimiter))
-
-
+        pass
+    # si no hay un pckl coger todos los archivos y actualziar la base de datos
+    # después hacer un pckl

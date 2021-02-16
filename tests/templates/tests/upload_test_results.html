@@ -14,7 +14,7 @@
 
   {% if message %}
     <div class="alert alert-success" role="alert">
-      {{ message }}  Check their status at the <a href="#" data-toggle="modal" data-target="#exampleModal">Jobs' status page</a>
+      {{ message }}
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -47,7 +47,7 @@
         </div>
         <div class="col-md-2 text-center my-auto">
             <div class="btn-group">
-                <button type="button" class="btn btn-primary  border border-dark " onclick="">Update</button>
+                <a href="{% url 'update' %}"><button type="button" class="btn btn-primary border border-dark" >Update</button></a>
             </div>
         </div>
       </div>

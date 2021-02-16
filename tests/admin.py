@@ -2,7 +2,8 @@ from django.contrib import admin
 
 # Register your models here.
 from .models import SingleCheckTest, NGSstatsTest, NextcladeTest
-from .models import PicardTest, VariantsTest, LineagesTest, LineagesMostCommonCountries
+from .models import PicardTest, LineagesTest, LineagesMostCommonCountries
+from .models import VariantsTest
 
 admin.site.register(PicardTest)
 admin.site.register(SingleCheckTest)
