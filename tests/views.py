@@ -46,5 +46,5 @@ def send_results(request):
 def update_from_folder(request):
     print('Updating')
     print('='*50)
-    update()
-    return render(request, 'tests/upload_test_results.html', {'message':'Updated'})
+    unchanged, updated, new = update()
+    return render(request, 'tests/upload_test_results.html', {'message':f'Updated (Unchanged: {unchanged}, Updated: {updated}, New: {new})'})
