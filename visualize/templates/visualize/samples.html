@@ -3,11 +3,12 @@
 {% block content %}
 <div class="container">
   {% include 'visualize_tabs.html' %}
-
   <h2 >Samples</h2>
   Quisque venenatis eu arcu vel dignissim. Phasellus nec pharetra turpis, at tempus urna. Ut dapibus urna quis dui pellentesque, nec blandit lectus eleifend. Mauris convallis ornare libero, at porttitor tortor eleifend ut. Nunc nec magna in justo dapibus dapibus at at diam. Mauris gravida sapien vitae pulvinar ultricies
   </br>
+</div>
 
+<div class="container">
   <div class="col-md-2 mx-auto text-center">
     <nav aria-label="...">
       {% if samples.has_other_pages %}
@@ -35,35 +36,43 @@
       {% endif %}
     </nav>
   </div>
+</div>
 
-  <table class="table table-responsive table-bordered table-hover">
-    <thead class="thead-dark">
-      <tr>
-        {% for field in sample_fields %} 
-        <th scope="col">{{field.name}}</th>
-        {% endfor %}
-      </tr>
-    </thead>
-    <tbody>
-      {% for sample in samples %} 
-      <tr contenteditable='true'>
-        <th scope="row">{{sample.id_uvigo}}</th>
-        <td >{{sample.id_accession}}</td>
-        <td>{{sample.original_name}}</td>
-        <td>{{sample.id_region}}</td>
-        <td>{{sample.edad}}</td>
-        <td>{{sample.sexo}}</td>
-        <td>{{sample.patient_status}}</td>
-        <td>{{sample.nodo_secuenciacion}}</td>
-        <td>{{sample.fecha_muestra|date:"d/m/Y"}}</td>
-        <td>{{sample.observaciones}}</td>
-        <td>{{sample.data_path}}</td>
-      </tr>
-      {% endfor %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-auto">
+      <table class="table table-responsive table-bordered table-hover">
+        <thead class="thead-dark">
+          <tr>
+            {% for field in sample_fields %} 
+            <th scope="col">{{field.name}}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for sample in samples %} 
+          <tr contenteditable='true'>
+            <th scope="row">{{sample.id_uvigo}}</th>
+            <td >{{sample.id_accession}}</td>
+            <td>{{sample.original_name}}</td>
+            <td>{{sample.id_region}}</td>
+            <td>{{sample.edad}}</td>
+            <td>{{sample.sexo}}</td>
+            <td>{{sample.patient_status}}</td>
+            <td>{{sample.nodo_secuenciacion}}</td>
+            <td>{{sample.fecha_muestra|date:"d/m/Y"}}</td>
+            <td>{{sample.observaciones}}</td>
+            <td>{{sample.data_path}}</td>
+          </tr>
+          {% endfor %}
 
-    </tbody>
-  </table>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
+<div class="container">
   <div class="col-md-2 mx-auto text-center">
     <nav aria-label="...">
       {% if samples.has_other_pages %}

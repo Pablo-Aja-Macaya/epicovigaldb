@@ -7,7 +7,9 @@
   <h2>Sample Meta Data</h2>
   Quisque venenatis eu arcu vel dignissim. Phasellus nec pharetra turpis, at tempus urna. Ut dapibus urna quis dui pellentesque, nec blandit lectus eleifend. Mauris convallis ornare libero, at porttitor tortor eleifend ut. Nunc nec magna in justo dapibus dapibus at at diam. Mauris gravida sapien vitae pulvinar ultricies
   </br>
+</div>
 
+<div class="container">
   <div class="col-md-2 mx-auto text-center">
     <nav aria-label="...">
       {% if oursamplecharacteristics.has_other_pages %}
@@ -34,9 +36,11 @@
         </ul>
       {% endif %}
     </nav>
+
   </div>
+</div>
 
-
+<div class="container-fluid">
   <div class="row justify-content-center">
     <div class="col-auto">
       <table class="table table-responsive table-bordered table-hover">
@@ -76,32 +80,35 @@
       </table>
     </div>
   </div>
+</div>
+
+<div class="container">
   <div class="col-md-2 mx-auto text-center">
-    <nav aria-label="...">
-      {% if oursamplecharacteristics.has_other_pages %}
-        <ul class="pagination pagination-sm justify-content-center">
-          {% if oursamplecharacteristics.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page={{ oursamplecharacteristics.previous_page_number }}">&lt;</a></li>
-          {% else %}
-            <li class="page-item disabled" aria-current="page"><a class="page-link"><span>&lt;</span></a></li>
-          {% endif %}
-          
-          {% for i in oursamplecharacteristics.paginator.page_range %}
-            {% if oursamplecharacteristics.number == i %}
-              <li class="page-item active"><a class="page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></a></li>
+      <nav aria-label="...">
+        {% if oursamplecharacteristics.has_other_pages %}
+          <ul class="pagination pagination-sm justify-content-center">
+            {% if oursamplecharacteristics.has_previous %}
+              <li class="page-item"><a class="page-link" href="?page={{ oursamplecharacteristics.previous_page_number }}">&lt;</a></li>
             {% else %}
-              <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+              <li class="page-item disabled" aria-current="page"><a class="page-link"><span>&lt;</span></a></li>
             {% endif %}
-          {% endfor %}
-          
-          {% if oursamplecharacteristics.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ oursamplecharacteristics.next_page_number }}">&gt;</a></li>
-          {% else %}
-            <li class="page-item disabled"><a class="page-link"><span>&gt;</span></a></li>
-          {% endif %}
-        </ul>
-      {% endif %}
-    </nav>
+            
+            {% for i in oursamplecharacteristics.paginator.page_range %}
+              {% if oursamplecharacteristics.number == i %}
+                <li class="page-item active"><a class="page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></a></li>
+              {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+              {% endif %}
+            {% endfor %}
+            
+            {% if oursamplecharacteristics.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{ oursamplecharacteristics.next_page_number }}">&gt;</a></li>
+            {% else %}
+              <li class="page-item disabled"><a class="page-link"><span>&gt;</span></a></li>
+            {% endif %}
+          </ul>
+        {% endif %}
+      </nav>
   </div>
 </div>
 {% endblock %}

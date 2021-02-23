@@ -34,6 +34,7 @@ ALLOWED_HOSTS = [#'192.168.1.40'
 # Application definition
 
 INSTALLED_APPS = [
+    'django_tables2',
     'nextstrainApp.apps.NextstrainappConfig',
     'jobstatus.apps.JobstatusConfig',
     'visualize.apps.VisualizeConfig',
@@ -68,6 +69,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.request',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -76,7 +78,6 @@ TEMPLATES = [
         },
     },
 ]
-
 WSGI_APPLICATION = 'epicovigal.wsgi.application'
 
 # REDIS related settings 

@@ -8,4 +8,5 @@ urlpatterns = [
     path('regions', views.regions, name='regions'),
     path('samples', views.samples, name='samples'),
     path('oursamplecharacteristics', views.oursamplecharacteristics, name='oursamplecharacteristics'),
+    path('pruebatabla', views.pruebatabla, name='pruebatabla'),
 ]

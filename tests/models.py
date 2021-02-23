@@ -520,4 +520,3 @@ def update():
             pickle.dump(file_history, fichero)
     
     return unchanged, updated, new
-    print(f'Unchanged: {unchanged}, Updated: {updated}, New: {new}')
