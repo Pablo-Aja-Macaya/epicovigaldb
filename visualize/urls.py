@@ -5,8 +5,15 @@ from visualize import views
 
 urlpatterns = [
     path('general', views.general, name='general'),
+    # Metadatos
     path('regions', views.regions, name='regions'),
     path('samples', views.samples, name='samples'),
-    path('oursamplecharacteristics', views.oursamplecharacteristics, name='oursamplecharacteristics'),
-    path('pruebatabla', views.pruebatabla, name='pruebatabla'),
+    path('metadata', views.oursamplecharacteristics, name='oursamplecharacteristics'),
+    # Resultados
+    path('picard', views.picard, name='picard'),
+    path('nextclade', views.nextclade, name='nextclade'),
+    path('ngsstats', views.ngsstats, name='ngsstats'),
+    path('singlecheck', views.singlecheck, name='singlecheck'),
+    path('variants', views.variants, name='variants'),
+    path('lineages', views.lineages, name='lineages'),
 ]

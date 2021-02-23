@@ -8,21 +8,23 @@
     <div class="dropdown-menu w-100 border-top-0">
       <a class="dropdown-item {% if request.resolver_match.url_name == 'samples' %}active{% endif %}" href="{% url 'samples' %}">Samples</a>
       <a class="dropdown-item {% if request.resolver_match.url_name == 'regions' %}active{% endif %}" href="{% url 'regions' %}">Regions</a>
-      <a class="dropdown-item {% if request.resolver_match.url_name == 'oursamplecharacteristics' %}active{% endif %}" href="{% url 'oursamplecharacteristics' %}">Sample meta data</a>
+      <a class="dropdown-item {% if request.resolver_match.url_name == 'metadata' %}active{% endif %}" href="{% url 'oursamplecharacteristics' %}">Sample meta data</a>
     </div>
   {% endwith %}
   </li>
   <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Test results</a>
+    {% with 'picard, nextclade, ngsstats, singlecheck, variants, lineages' as list %}
+    <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name in list %}active{% endif %}" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Test results</a>
     <div class="dropdown-menu w-100 border-top-0">
-      <a class="dropdown-item" href="#">Picard</a>
-      <a class="dropdown-item" href="#">SingleCheck</a>
-      <a class="dropdown-item" href="#">NGSStats</a>
-      <a class="dropdown-item" href="#">NextClade</a>
-      <a class="dropdown-item" href="#">iVar</a>
-      <a class="dropdown-item" href="#">Pangolin</a>
+      <a class="dropdown-item {% if request.resolver_match.url_name == 'picard' %}active{% endif %}" href="{% url 'picard' %}">Picard</a>
+      <a class="dropdown-item {% if request.resolver_match.url_name == 'singlecheck' %}active{% endif %}" href="{% url 'singlecheck' %}">SingleCheck</a>
+      <a class="dropdown-item {% if request.resolver_match.url_name == 'ngsstats' %}active{% endif %}" href="{% url 'ngsstats' %}">NGSStats</a>
+      <a class="dropdown-item {% if request.resolver_match.url_name == 'nextclade' %}active{% endif %}" href="{% url 'nextclade' %}">NextClade</a>
+      <a class="dropdown-item {% if request.resolver_match.url_name == 'variants' %}active{% endif %}" href="{% url 'variants' %}">iVar</a>
+      <a class="dropdown-item {% if request.resolver_match.url_name == 'lineages' %}active{% endif %}" href="{% url 'lineages' %}">Pangolin</a>
 
     </div>
+    {% endwith %}
   </li>
 </ul>
 </br>

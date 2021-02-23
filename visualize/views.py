@@ -1,10 +1,13 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from upload.models import Region, Sample, SampleMetaData
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from collections import Counter
-from .models import SampleTable
 from django_tables2 import RequestConfig
+
+from upload.models import Region, Sample, SampleMetaData
+from tests.models import LineagesTest, PicardTest, NextcladeTest, NGSstatsTest
+from .models import SampleTable, RegionTable, SampleMetaDataTable, SingleCheckTest, VariantsTest
+from .models import LineagesTable, PicardTable, NextcladeTable, NGSTable, VariantsTable, SingleCheckTable
+
 
 @login_required(login_url="/accounts/login") 
 def general(request):  
@@ -21,59 +24,98 @@ def general(request):
     return render(request, 'visualize/general.html', {'hospitals':queryset})
     
 
+# Para metadatos
 @login_required(login_url="/accounts/login")
 def regions(request):
-    region_fields = Region._meta.get_fields()
-    regions = Region.objects.order_by('localizacion','cp').all()
-    page = request.GET.get('page', 1)
-    paginator = Paginator(regions, 150)    
+    table = RegionTable(Region.objects.all())
+    RequestConfig(request).configure(table)
+    table.paginate(page=request.GET.get("page", 1), per_page=50)    
+    return render(request, 'visualize/regions.html', {'table':table})   
     
-    try:
-        regions = paginator.page(page)
-    except PageNotAnInteger:
-        regions = paginator.page(1)
-    except EmptyPage:
-        regions = paginator.page(paginator.num_pages)    
-    
-    return render(request, 'visualize/regions.html', {'regions':regions, 'region_fields':region_fields})
-
 @login_required(login_url="/accounts/login")
 def samples(request):
-    sample_fields = Sample._meta.get_fields()
-    samples = Sample.objects.order_by('id_uvigo').all()
-    page = request.GET.get('page', 1)
-    paginator = Paginator(samples, 150)
-    
-    try:
-        samples = paginator.page(page)
-    except PageNotAnInteger:
-        samples = paginator.page(1)
-    except EmptyPage:
-        samples = paginator.page(paginator.num_pages)    
-    
-    return render(request, 'visualize/samples.html', {'samples':samples, 'sample_fields':sample_fields})
+    table = SampleTable(Sample.objects.all())
+    RequestConfig(request).configure(table)
+    table.paginate(page=request.GET.get("page", 1), per_page=50)    
+    return render(request, 'visualize/samples.html', {'table':table})
 
 @login_required(login_url="/accounts/login")
 def oursamplecharacteristics(request):
-    oursamplecharacteristics_fields = SampleMetaData._meta.get_fields()
-    oursamplecharacteristics = SampleMetaData.objects.order_by('id_uvigo').all()
-    page = request.GET.get('page', 1)
-    paginator = Paginator(oursamplecharacteristics, 150)
+    table = SampleMetaDataTable(SampleMetaData.objects.all())
+    RequestConfig(request).configure(table)
+    table.paginate(page=request.GET.get("page", 1), per_page=50)  
     
-    try:
-        oursamplecharacteristics = paginator.page(page)
-    except PageNotAnInteger:
-        oursamplecharacteristics = paginator.page(1)
-    except EmptyPage:
-        oursamplecharacteristics = paginator.page(paginator.num_pages)    
-    
-    return render(request, 'visualize/oursamplecharacteristics.html', {'oursamplecharacteristics':oursamplecharacteristics, 'oursamplecharacteristics_fields':oursamplecharacteristics_fields})
+    return render(request, 'visualize/oursamplecharacteristics.html', {'table':table})
 
+# Para resultados
+@login_required(login_url="/accounts/login")
+def lineages(request):
+    table = LineagesTable(LineagesTest.objects.all())
+    RequestConfig(request).configure(table)
+    table.paginate(page=request.GET.get("page", 1), per_page=50)    
+    return render(request, 'visualize/lineages.html', {'table':table})
 
 @login_required(login_url="/accounts/login")
-def pruebatabla(request):
-    table = SampleTable(Sample.objects.all())
+def nextclade(request):
+    table = NextcladeTable(NextcladeTest.objects.all())
     RequestConfig(request).configure(table)
-    table.paginate(page=request.GET.get("page", 1), per_page=50)
+    table.paginate(page=request.GET.get("page", 1), per_page=50)    
+    return render(request, 'visualize/nextclade.html', {'table':table})
+
+@login_required(login_url="/accounts/login")
+def ngsstats(request):
+    table = NGSTable(NGSstatsTest.objects.all())
+    RequestConfig(request).configure(table)
+    table.paginate(page=request.GET.get("page", 1), per_page=50)    
+    return render(request, 'visualize/ngsstats.html', {'table':table})
+
+@login_required(login_url="/accounts/login")
+def picard(request):
+    table = PicardTable(PicardTest.objects.all())
+    RequestConfig(request).configure(table)
+    table.paginate(page=request.GET.get("page", 1), per_page=50)    
+    return render(request, 'visualize/picard.html', {'table':table})
+
+@login_required(login_url="/accounts/login")
+def singlecheck(request):
+    table = SingleCheckTable(SingleCheckTest.objects.all())
+    RequestConfig(request).configure(table)
+    table.paginate(page=request.GET.get("page", 1), per_page=50)    
+    return render(request, 'visualize/singlecheck.html', {'table':table})
+
+@login_required(login_url="/accounts/login")
+def variants(request):
+    table = VariantsTable(VariantsTest.objects.all())
+    RequestConfig(request).configure(table)
+    table.paginate(page=request.GET.get("page", 1), per_page=50)    
+    return render(request, 'visualize/variants.html', {'table':table})
+
+
+
+
+
+# @login_required(login_url="/accounts/login")
+# def pruebatabla(request):
+#     table = SampleTable(Sample.objects.all())
+#     RequestConfig(request).configure(table)
+#     table.paginate(page=request.GET.get("page", 1), per_page=50)
     
-    return render(request,'visualize/pruebatabla.html', {'table':table})
+#     return render(request,'visualize/pruebatabla.html', {'table':table})
+
+
+
+# @login_required(login_url="/accounts/login")
+# def samples(request):
+#     sample_fields = Sample._meta.get_fields()
+#     samples = Sample.objects.order_by('id_uvigo').all()
+#     page = request.GET.get('page', 1)
+#     paginator = Paginator(samples, 150)
+    
+#     try:
+#         samples = paginator.page(page)
+#     except PageNotAnInteger:
+#         samples = paginator.page(1)
+#     except EmptyPage:
+#         samples = paginator.page(paginator.num_pages)    
+    
+#     return render(request, 'visualize/samples.html', {'samples':samples, 'sample_fields':sample_fields})

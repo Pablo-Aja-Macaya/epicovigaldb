@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load render_table from django_tables2 %}
 
 {% block content %}
 <div class="container">
@@ -8,97 +9,11 @@
   </br>
 </div>
 
-<div class="container">
-  <div class="col-md-2 mx-auto text-center">
-    <nav aria-label="...">
-      {% if samples.has_other_pages %}
-        <ul class="pagination pagination-sm justify-content-center">
-          {% if samples.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page={{ samples.previous_page_number }}">&lt;</a></li>
-          {% else %}
-            <li class="page-item disabled" aria-current="page"><a class="page-link"><span>&lt;</span></a></li>
-          {% endif %}
-          
-          {% for i in samples.paginator.page_range %}
-            {% if samples.number == i %}
-              <li class="page-item active"><a class="page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></a></li>
-            {% else %}
-              <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
-            {% endif %}
-          {% endfor %}
-          
-          {% if samples.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ samples.next_page_number }}">&gt;</a></li>
-          {% else %}
-            <li class="page-item disabled"><a class="page-link"><span>&gt;</span></a></li>
-          {% endif %}
-        </ul>
-      {% endif %}
-    </nav>
-  </div>
-</div>
-
-<div class="container-fluid">
+<div class="container-fluid pb-4 pt-3 ">
   <div class="row justify-content-center">
     <div class="col-auto">
-      <table class="table table-responsive table-bordered table-hover">
-        <thead class="thead-dark">
-          <tr>
-            {% for field in sample_fields %} 
-            <th scope="col">{{field.name}}</th>
-            {% endfor %}
-          </tr>
-        </thead>
-        <tbody>
-          {% for sample in samples %} 
-          <tr contenteditable='true'>
-            <th scope="row">{{sample.id_uvigo}}</th>
-            <td >{{sample.id_accession}}</td>
-            <td>{{sample.original_name}}</td>
-            <td>{{sample.id_region}}</td>
-            <td>{{sample.edad}}</td>
-            <td>{{sample.sexo}}</td>
-            <td>{{sample.patient_status}}</td>
-            <td>{{sample.nodo_secuenciacion}}</td>
-            <td>{{sample.fecha_muestra|date:"d/m/Y"}}</td>
-            <td>{{sample.observaciones}}</td>
-            <td>{{sample.data_path}}</td>
-          </tr>
-          {% endfor %}
-
-        </tbody>
-      </table>
+      {% render_table table %}
     </div>
-  </div>
-</div>
-
-<div class="container">
-  <div class="col-md-2 mx-auto text-center">
-    <nav aria-label="...">
-      {% if samples.has_other_pages %}
-        <ul class="pagination pagination-sm justify-content-center">
-          {% if samples.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page={{ samples.previous_page_number }}">&laquo;</a></li>
-          {% else %}
-            <li class="page-item disabled" aria-current="page"><a class="page-link"><span>&laquo;</span></a></li>
-          {% endif %}
-          
-          {% for i in samples.paginator.page_range %}
-            {% if samples.number == i %}
-              <li class="page-item active"><a class="page-link"><span>{{ i }} <span class="sr-only">(current)</span></span></a></li>
-            {% else %}
-              <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
-            {% endif %}
-          {% endfor %}
-          
-          {% if samples.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ samples.next_page_number }}">&raquo;</a></li>
-          {% else %}
-            <li class="page-item disabled"><a class="page-link"><span>&raquo;</span></a></li>
-          {% endif %}
-        </ul>
-      {% endif %}
-    </nav>
   </div>
 </div>
 {% endblock %}
