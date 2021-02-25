@@ -8,7 +8,7 @@ urlpatterns = [
     # Metadatos
     path('regions', views.regions, name='regions'),
     path('samples', views.samples, name='samples'),
-    path('metadata', views.oursamplecharacteristics, name='oursamplecharacteristics'),
+    path('metadata', views.metadata, name='oursamplecharacteristics'),
     # Resultados
     path('picard', views.picard, name='picard'),
     path('nextclade', views.nextclade, name='nextclade'),
