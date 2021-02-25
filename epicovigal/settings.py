@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [#'192.168.1.40'
 INSTALLED_APPS = [
     'django_tables2',
     'django_filters',
+    'microreact.apps.MicroreactConfig',
     'nextstrainApp.apps.NextstrainappConfig',
     'jobstatus.apps.JobstatusConfig',
     'visualize.apps.VisualizeConfig',
@@ -152,3 +153,15 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+def FILTERS_VERBOSE_LOOKUPS():
+    from django_filters.conf import DEFAULTS
+
+    verbose_lookups = DEFAULTS['VERBOSE_LOOKUPS'].copy()
+    verbose_lookups.update({
+        'exact': 'igual a',
+        'icontains' : 'contiene',
+        'gt' : 'mayor que',
+        'lt' : 'menor que'
+    })
+    return verbose_lookups

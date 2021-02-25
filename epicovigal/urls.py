@@ -28,4 +28,5 @@ urlpatterns = [
     path('visualize/', include('visualize.urls')),
     path('jobstatus/', include('jobstatus.urls')),
     path('nextstrain/', include('nextstrainApp.urls')),
+    path('microreact/', include('microreact.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
