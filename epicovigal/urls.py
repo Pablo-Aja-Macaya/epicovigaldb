@@ -32,6 +32,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('upload/', include('upload.urls')),
     path('tests/', include('tests.urls')),
+    path('reports/', include('reports.urls')),
     path('visualize/', include('visualize.urls')),
     path('jobstatus/', include('jobstatus.urls')),
     path('nextstrain/', include('nextstrainApp.urls')),

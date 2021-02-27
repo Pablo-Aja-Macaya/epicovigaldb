@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [#'192.168.1.40'
 INSTALLED_APPS = [
     'django_tables2',
     'django_filters',
+    'reports.apps.ReportsConfig',
     'microreact.apps.MicroreactConfig',
     'nextstrainApp.apps.NextstrainappConfig',
     'jobstatus.apps.JobstatusConfig',
