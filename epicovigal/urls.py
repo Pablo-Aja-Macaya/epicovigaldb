@@ -22,6 +22,13 @@ from tasks import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name="home"),
+
+    # Gráficas
+    path('hospital_graph/', views.hospital_graph, name="hospital_graph"),
+    path('variants_line_graph/<str:fecha>/<str:variant>', views.variants_line_graph, name="variants_line_graph"),
+    path('variants_column_graph/<str:fecha>/<str:variant>', views.variants_column_graph, name="variants_column_graph"),
+
+    # Apps
     path('accounts/', include('accounts.urls')),
     path('upload/', include('upload.urls')),
     path('tests/', include('tests.urls')),

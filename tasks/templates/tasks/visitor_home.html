@@ -3,6 +3,19 @@
 
 {% block content %}
 <script src="https://code.highcharts.com/highcharts.src.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/data.js"></script>
+<script src="https://code.highcharts.com/modules/series-label.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+<!-- Additional files for the Highslide popup effect -->
+<script src="https://www.highcharts.com/samples/static/highslide-full.min.js"></script>
+<script src="https://www.highcharts.com/samples/static/highslide.config.js" charset="utf-8"></script>
+<link rel="stylesheet" type="text/css" href="https://www.highcharts.com/samples/static/highslide.css">
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <style>
 
 </style>
@@ -74,64 +87,124 @@
       <div class="row">
         <div class="col-md-5">
           <div class="card-body">
-              <h5 class="card-title"><strong>Origins</strong></h5>
+              <h5 class="card-title"><strong>Procedencia de muestras</strong></h5>
               <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
               <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
           </div>
         </div>
         <div class="col-lg-7 d-flex justify-content-center my-auto">
-            <div id="tablahospitales">
-            </div>
+          <div id="hospital_graph" data-url="{% url 'hospital_graph' %}"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>  
+
+  <div class="container pt-2 pb-3">
+    <div class="card" style="width: 100%;">
+      <div class="row">
+        <div class="container">
+          <div class="card-body">
+              <h5 class="card-title"><strong>Variantes</strong></h5>
+              <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
+
+              <div class="accordion" id="accordionExample">
+                <div class="card" >
+                  <div class="card-header" id="headingOne" >
+                    <h2 class="mb-0">
+                      <button class="btn btn-link btn-block text-left"  type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Variante S:E484
+                      </button>
+                    </h2>
+                  </div>
+              
+                  <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+                    <div class="card-body">
+                      <div class="container pt-3 pb-5">
+                        <div id="variants_line_graph" data-url="{% url 'variants_line_graph' fecha='1-2-21|28-2-21' variant='S:E484' %}"></div>
+                      </div>    
+                    </div>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="card-header" id="headingTwo" >
+                    <h2 class="mb-0">
+                      <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        Variante S:N501
+                      </button>
+                    </h2>
+                  </div>
+                  <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                    <div class="card-body">
+                      <div class="container pt-3 pb-5">
+                        <div id="variants_line_graph2" data-url="{% url 'variants_line_graph' fecha='1-2-21|28-2-21' variant='S:N501' %}"></div>
+                      </div>  
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+           
+          </div>
         </div>
       </div>
-    </div>  
-  </div>
+    </div>
+  </div>  
 
+
+  <div class="container pt-1 pb-4">
+    <div class="card" style="width: 100%;">
+      <div class="row">
+        <div class="container">
+          <div class="card-body">
+              <h5 class="card-title"><strong>Origins</strong></h5>
+              <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
+            <div class="container pt-3 pb-5">
+              <div id="variants_column_graph" data-url="{% url 'variants_column_graph' fecha='1-2-21|28-2-21' variant='20E (EU1)' %}"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> 
 
 </main>
 
 <script>
-  Highcharts.chart('tablahospitales', {
-      chart: {
-          plotBackgroundColor: null,
-          plotBorderWidth: null,
-          plotShadow: false,
-          type: 'pie'
-      },
-      title: {
-          text: 'Samples by hospital'
-      },
-      tooltip: {
-          pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-      },
-      accessibility: {
-          point: {
-              valueSuffix: '%'
-          }
-      },
-      plotOptions: {
-          pie: {
-              allowPointSelect: true,
-              cursor: 'pointer',
-              dataLabels: {
-                  enabled: true,
-                  format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-              }
-          }
-      },
-      series: [{
-          name: 'Sample count',
-          colorByPoint: true,
-          data: [
-          {% for entry in hospitals %}
-          
-          { name: '{{ entry.hospital }}', y: {{entry.number}} },
-          
-          {% endfor %}
-          ]
-      }]
+  $.ajax({
+    url: $("#hospital_graph").attr("data-url"),
+    dataType: 'json',
+    success: function (data) {
+      Highcharts.chart("hospital_graph", data);
+    }
   });
-
+</script>
+<script>
+  $.ajax({
+    url: $("#variants_line_graph").attr("data-url"),
+    dataType: 'json',
+    success: function (data) {
+      Highcharts.chart("variants_line_graph", data);
+    }
+  });
+  $.ajax({
+    url: $("#variants_line_graph2").attr("data-url"),
+    dataType: 'json',
+    success: function (data) {
+      Highcharts.chart("variants_line_graph2", data);
+    }
+  });
+</script>
+<script>
+  $.ajax({
+    url: $("#variants_column_graph").attr("data-url"),
+    dataType: 'json',
+    success: function (data) {
+      Highcharts.chart("variants_column_graph", data);
+    }
+  });
 </script>
 
 {% endblock %}
