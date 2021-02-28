@@ -3,7 +3,20 @@
 {% block content %}
 
 <div class='container pb-3'>
-    <h3 class='pb-2 pt-2 text-dark' ><strong>Lista de informes</strong> </h3>
+    <h3 class='pb-2 pt-2 text-dark' ><strong>Informe completo</strong> </h3>
+
+    <div class="list-group pb-3">
+        <a href="#" class="list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1 text-dark" ><strong>Informe general (2021)</strong></h5>
+            <small>1 days ago</small>
+        </div>
+        <p class="mb-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis,</p>
+        <small>January 1, 2021 - December 31, 2021</small>
+        </a>
+    </div>
+
+    <h3 class='pb-2 pt-2 text-dark' ><strong>Informes mensuales</strong> </h3>
     <div class="list-group">
       {% for report in data.all %}
       <a href="{% url 'report' id=report.id %}" class="list-group-item list-group-item-action">
@@ -17,4 +30,5 @@
       {% endfor %}
     </div>
   </div>
+
 {% endblock %}

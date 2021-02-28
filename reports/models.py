@@ -10,8 +10,6 @@ class Report(models.Model):
     subtitulo = models.TextField(max_length=50, default=None)
     texto = models.TextField(max_length=50, default=None, blank=True)
 
-
-
     def get_month(self):
         m = datetime.datetime.strptime(str(self.fecha_inicial), "%Y-%m-%d").strftime("%B")
         return m

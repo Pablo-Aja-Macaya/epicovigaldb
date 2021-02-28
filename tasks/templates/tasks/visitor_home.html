@@ -5,19 +5,31 @@
 
 <style>
 
+.count
+{
+  color:darkslategrey;
+  font-size:60px;
+}
+.circle {
+  height: 200px;
+  width: 200px;
+  background-color: darkslategrey;;
+  border-radius: 50%;
+}
 </style>
 <main role="main">
-  <br>
+  
+
   <div class="container">
-    <div class="card mb-3" style="max-width: 100%;">
+    <div class="card mb-3" style="max-width: 100%;background-color: rgb(242, 251, 255);">
       <div class="row no-gutters">
         <div class="col-md-4 my-auto">
           <img src="/media/images/cinbio.jpeg" alt="..." style="width:100%; " class="w-100" >
         </div>
         <div class="col-md-8">
           <div class="card-body">
-            <h4 class="card-title"><strong>Welcome to EPICOVIGAL</strong></h4>
-            <p class="card-text">This is <strong>EPICOVIGAL visualizer</strong>, here you will be able to perform certain tasks such as visualizing the data!</p>
+            <h4 class="card-title"><strong>Bienvenido a EPICOVIGAL</strong></h4>
+            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate.</p>
           </div>
         </div>
       </div>
@@ -25,23 +37,56 @@
   </div>  
 
   <div class="container pt-2 pb-4">
-    <div class="card" style="width: 100%;">
+    <div class="card" style="width: 100%; border-style: hidden;">
       <div class="row">
         <div class="col-md-8">
           <div class="card-body">
-              <h5 class="card-title"><strong>EPICOVIGAL</strong></h5>
-              <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+              <h5 class="card-title"><strong>EPICOVIGAL</strong></h5> 
               <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec non magna nec velit aliquet pretium ac a dolor. Aliquam hendrerit aliquet mauris a dignissim. </p>
               <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec non magna nec velit aliquet pretium ac a dolor. Aliquam hendrerit aliquet mauris a dignissim. </p>
           </div>
         </div>
+        
         <div class="col-md-4 d-flex justify-content-center my-auto">
           <img src="/media/images/SARS-CoV-2_without_background.png" alt="..." width="300" height="300" class="">
         </div>
       </div>
+      
     </div>  
   </div>
 
+  <div class='container'>
+    <div class="row d-flex justify-content-center pb-3">
+      <div class='col-4'>
+        <div class="card " style="border-style: hidden;">
+          <div class="card-body text-center">
+            <span class="count">{{ sample_count }} </span> 
+            <h4 style="color: darkslategrey;"><strong>Muestras</strong></h4>      
+          </div>
+        </div>
+      </div>
+      <div class='col-4'>
+        <div class="card " style="border-style: hidden;">
+          <div class="card-body text-center">
+            <span class="count">50 </span> 
+            <h4 style="color: darkslategrey;"><strong>Genomas secuenciados</strong></h4>      
+          </div>
+        </div>
+      </div>
+      <div class='col-4'>
+        <div class="card " style="border-style: hidden;">
+          <div class="card-body text-center">
+            <span class="count">10 </span> 
+            <h4 style="color: darkslategrey;"><strong>Variantes detectadas</strong></h4>      
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container pt-2 pb-2">
+    <h3 class='pb-2 pt-2 text-dark' ><strong>Visualización de resultados</strong> </h3>
+  </div>
   <div class="container pb-3">
     {% for task in tasks.all %} 
     <div class="card mb-3" style="max-width: 100%;" >
@@ -66,20 +111,22 @@
     </div>
     {% endfor %}
   </div>
-  
 
 
+  <div class="container pt-2 pb-2">
+    <h3 class='pb-2 pt-2 text-dark' ><strong>Informe general (2021) </strong> </h3>
+  </div>
   <div class="container pt-2 pb-4">
     <div class="card" style="width: 100%;">
       <div class="row">
-        <div class="col-md-5">
+        <div class="col-lg-6">
           <div class="card-body">
               <h5 class="card-title"><strong>Procedencia de muestras</strong></h5>
               <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
               <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
           </div>
         </div>
-        <div class="col-lg-7 d-flex justify-content-center my-auto">
+        <div class="col-lg-6 justify-content-center my-auto">
           <div id="hospital_graph" data-url="{% url 'hospital_graph' %}"></div>
         </div>
 
@@ -159,6 +206,19 @@
 
 </main>
 
+<script>
+  $('.count').each(function () {
+    $(this).prop('Counter',0).animate({
+        Counter: $(this).text()
+    }, {
+        duration: 1500,
+        easing: 'swing',
+        step: function (now) {
+            $(this).text(Math.ceil(now));
+        }
+    });
+});
+</script>
 <script>
   $.ajax({
     url: $("#hospital_graph").attr("data-url"),

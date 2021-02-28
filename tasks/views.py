@@ -1,47 +1,25 @@
 from django.shortcuts import render
 from .models import Task
-from django.contrib.auth.decorators import login_required
+#from django.contrib.auth.decorators import login_required
 from upload.models import Sample
-from collections import Counter
 
-def sample_origin_graph():
-    hospital_list = []
-    for i in Sample.objects.all():
-        hospital_list.append(i.hospital_id())
-    
-    queryset = []
-    hospital_count = Counter(i['id_uvigo'] for i in hospital_list)
-    for k,v in hospital_count.items():
-        queryset.append({'hospital':k, 'number':int(v)})
-    return queryset
+
 
 #@login_required(login_url="/accounts/login")
 def home(request):
+    sample_count = Sample.objects.all().count()
     if request.user.is_authenticated:
         tasks = Task.objects
         url = 'tasks/home.html'
-        return render(request, url, {'tasks':tasks})
+        return render(request, url, {'tasks':tasks, 'sample_count':sample_count})
     else:
         tasks = Task.objects.filter(show_to='all')
         url = 'tasks/visitor_home.html'
-        return render(request, url, {'tasks':tasks, 'hospitals':sample_origin_graph()})
+        return render(request, url, {'tasks':tasks, 'sample_count':sample_count})
 
 
-
-
-
-hospital_list = []
-for i in Sample.objects.all():
-    hospital_list.append(i.hospital_id())
-
-queryset = []
-hospital_count = Counter(i['id_uvigo'] for i in hospital_list)
-for k,v in hospital_count.items():
-    queryset.append({'hospital':k, 'number':int(v)})
-
-
-
-########
+##############
+## Gráficas ##
 from upload.models import SampleMetaData
 from django.http import JsonResponse
 
@@ -56,7 +34,14 @@ def hospital_graph(request):
         answer.append({'name':h, 'y':int(c)})
 
     chart = {
-        'chart': {'type': 'pie'},
+        'plotOptions': {
+            'series': {
+                'animation': 'false'
+            }
+        },    
+        'chart': {
+            'type': 'pie',
+        },
         'title': {'text': 'Origen de muestras'},
         'tooltip': {
             'pointFormat': '{series.name}: <b>{point.percentage:.1f}%</b>'
@@ -85,7 +70,6 @@ def hospital_graph(request):
     return JsonResponse(chart)
 
 def variants_line_graph(request, fecha, variant):
-
 
     #######################
     ### Esto es para generar datos de prueba
@@ -120,9 +104,8 @@ def variants_line_graph(request, fecha, variant):
         'chart': {
             'scrollablePlotArea': {
                 'minWidth': 700
-            }
+            },
         },
-
         'title': {
             'text': f'Frecuencia de variante {variant} según lugar ({fecha})'
         },
@@ -159,7 +142,6 @@ def variants_line_graph(request, fecha, variant):
     }
     return JsonResponse(chart)
 
-
 def variants_column_graph(request, fecha, variant):
     #######################
     ### Esto es para generar datos de prueba
@@ -194,7 +176,7 @@ def variants_column_graph(request, fecha, variant):
             'type':'column'
         },
         'title': {
-            'text': f'Proporción de variantes frente al total ({fecha})'
+            'text': f'Proporción de variantes ({fecha})'
         },
         'subtitle': {
             'text': 'Source: Denmark'
