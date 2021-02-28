@@ -3,32 +3,18 @@
 {% block content %}
 
 <div class='container pb-3'>
-    <h3 class='pb-2 pt-2' style="color: black;"><strong>Lista de informes</strong> </h3>
+    <h3 class='pb-2 pt-2 text-dark' ><strong>Lista de informes</strong> </h3>
     <div class="list-group">
-      <a href="#" class="list-group-item list-group-item-action">
+      {% for report in data.all %}
+      <a href="{% url 'report' id=report.id %}" class="list-group-item list-group-item-action">
         <div class="d-flex w-100 justify-content-between">
-          <h5 class="mb-1" style="color: black;"><strong>Febrero (2021)</strong></h5>
+          <h5 class="mb-1 text-dark" ><strong>{{ report.get_month }} ({{ report.get_year }})</strong></h5>
           <small>1 days ago</small>
         </div>
-        <p class="mb-1">Some placeholder content in a paragraph.</p>
-        <small>And some small print.</small>
+        <p class="mb-1">{{ report.subtitulo }}</p>
+        <small>{{ report.fecha_inicial }} - {{ report.fecha_final }}</small>
       </a>
-      <a href="#" class="list-group-item list-group-item-action">
-        <div class="d-flex w-100 justify-content-between">
-          <h5 class="mb-1" style="color: black;"><strong>Marzo (2021)</strong></h5>
-          <small class="text-muted" >2 days ago</small>
-        </div>
-        <p class="mb-1">Some placeholder content in a paragraph.</p>
-        <small class="text-muted">And some muted small print.</small>
-      </a>
-      <a href="#" class="list-group-item list-group-item-action">
-        <div class="d-flex w-100 justify-content-between">
-          <h5 class="mb-1" style="color: black;"><strong>Abril (2021)</strong></h5>
-          <small class="text-muted">3 days ago</small>
-        </div>
-        <p class="mb-1">Some placeholder content in a paragraph.</p>
-        <small class="text-muted">And some muted small print.</small>
-      </a>
+      {% endfor %}
     </div>
   </div>
 {% endblock %}
