@@ -24,6 +24,19 @@ class Task(models.Model):
             dictionary[url_list[i]] = button_list[i]
         return dictionary
 
+class Team(models.Model):
+    id_team = models.CharField(max_length=20, primary_key=True)
+    nombre = models.CharField(max_length=150, default=None, blank=True)
+    descripción = models.TextField(max_length=200, default=None, blank=True)
 
+    def __str__(self):
+        return self.id_team
 
-    
+class Team_Component(models.Model):
+    id_person = models.AutoField(primary_key=True)
+    id_team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    person = models.CharField(max_length=30, default=None, blank=True)
+
+    def __str__(self):
+        return self.person
+

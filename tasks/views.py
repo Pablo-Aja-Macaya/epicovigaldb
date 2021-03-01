@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .models import Task
 #from django.contrib.auth.decorators import login_required
 from upload.models import Sample
+from .models import Team, Team_Component
 
 
 
@@ -17,6 +18,12 @@ def home(request):
         url = 'tasks/visitor_home.html'
         return render(request, url, {'tasks':tasks, 'sample_count':sample_count})
 
+def consorcio(request):    
+    dicc = {}
+    for t in Team.objects.all().order_by('id_team'):
+        dicc[t] = Team_Component.objects.filter(id_team=t).order_by('person')
+    url = 'tasks/consorcio.html'
+    return render(request, url, {'teams':dicc})
 
 ##############
 ## Gráficas ##

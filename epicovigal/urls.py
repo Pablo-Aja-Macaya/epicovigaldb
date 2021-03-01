@@ -22,6 +22,7 @@ from tasks import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name="home"),
+    path('consorcio', views.consorcio, name="consorcio"),
 
     # Gráficas
     path('hospital_graph/', views.hospital_graph, name="hospital_graph"),
