@@ -75,23 +75,6 @@ class CompletedTestsTable(tables.Table):
     class Meta:
         template_name = "table_template.html"
 
-lista = []
-dicc = {}
-tested = 'Tested'
-not_tested = 'Not tested'
-for i in Sample.objects.only():
-    dicc = {}
-    dicc['sample'] = str(i)
-    if NextcladeTest.objects.only().filter(id_uvigo=str(i)).exists():
-        dicc['nextclade'] = tested
-    else:
-        dicc['nextclade'] = not_tested
-    
-    lista.append(dicc)
-
-for i in lista:
-    if i['nextclade'] == 1:
-        print(i)
 
 # In[4]: Filtros
 
