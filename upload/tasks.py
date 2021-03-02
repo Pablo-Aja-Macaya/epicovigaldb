@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from epicovigal.celery import app
-from .models import Region, Sample, SampleMetaData
+from upload.models import Region, Sample
+from upload.models import SampleMetaData 
 from jobstatus.models import Status
 import io, csv
 from datetime import datetime

@@ -1,7 +1,8 @@
 import io, csv
 from datetime import datetime
 import dateutil.parser
-from ..models import Region, Sample, SampleMetaData
+from ..models import Region, Sample
+from ..models import SampleMetaData
 
 def upload_sample_hospital(stream):
     fields_correspondence = {
@@ -48,31 +49,33 @@ def upload_sample_hospital(stream):
     io_string = stream
     dialect = csv.Sniffer().sniff(io_string.readline())
     io_string.seek(0)
-    fieldnames = io_string.readline().strip().split(str(dialect.delimiter))[:-1] ### CUIDADO CON ESTE [:-1] se pone para eliminar un elemento que se crea al haber un ; al final de la cabecera (columna en blanco), puede que no ocurra en todos los csvs
+    fieldnames = io_string.readline().strip().split(str(dialect.delimiter))
 
     # Cambio de nombres de campos a los de la base de datos 
     for i in range(len(fieldnames)):
-        fieldnames[i] = fields_correspondence[fieldnames[i]]
+        if fieldnames[i] != '':
+            fieldnames[i] = fields_correspondence[fieldnames[i]]
   
     reader = csv.DictReader(io_string, fieldnames=fieldnames, dialect=dialect) 
     
     repl = str.maketrans("ÁÉÍÓÚ","AEIOU") # para quitar acentos
     
     for line in reader:
-        id_linea = line['id_uvigo']
+        
+        id_uvigo = line['id_uvigo']
         id_hospital = line['id_hospital']
-        id_patient = str(line['id_paciente'])
-        envio = line['numero_envio']
-        tube = line['id_tubo']
-        id_sample = line['id_muestra']
-        hosp = line['hospitalizacion'][:1] # Para que si hay un 'Si' pille sólo la S
+        id_paciente = str(line['id_paciente'])
+        numero_envio = line['numero_envio']
+        id_tubo = line['id_tubo']
+        id_muestra = line['id_muestra']
+        hospitalizacion = line['hospitalizacion'][:1] # Para que si hay un 'Si' pille sólo la S
         uci = line['uci']
-        nodo = line['nodo_secuenciacion']
-        comentarios = line['observaciones']
-        postal_code = line['cp']
+        nodo_secuenciacion = line['nodo_secuenciacion']
+        observaciones = line['observaciones']
+        cp = line['cp']
         loc = line['localizacion']
-        sex = line['sexo']
-        age = line['edad']
+        sexo = line['sexo']
+        edad = line['edad']
         
         # Formateo de los ct (cambiar coma por puntos y cambiar espacio en blanco por 0 (quizás mejor Null?)) 
         orf1ab = line['ct_orf1ab'].replace(',','.')
@@ -95,12 +98,12 @@ def upload_sample_hospital(stream):
         ct_s = check_numbers(ct_s)       
 
         try: 
-            int(postal_code)
-        except: postal_code = 0
+            int(cp)
+        except: cp = 0
             
         try:
-            int(age)
-        except: age = 0
+            int(edad)
+        except: edad = 0
 
         # Formateo de fechas
         f_muestra = time_transform(line['fecha_muestra'])
@@ -120,51 +123,58 @@ def upload_sample_hospital(stream):
             loc = 'A ' + loc[:-4]
 
         # Insertado en la base de datos
-        if not Region.objects.filter(cp=postal_code, localizacion=loc).exists():
+        if not Region.objects.filter(cp=cp, localizacion=loc).exists():
             _, created = Region.objects.update_or_create(
-                    cp = int(postal_code),
+                    cp = int(cp),
                     localizacion = loc,
                     pais = 'SPAIN',
                     region = 'EUROPE',
                     latitud = 0,
                     longitud = 0
                 )
-            
-        if not Sample.objects.filter(id_uvigo=id_linea).exists():
+        
+        if id_uvigo:
             _, created = Sample.objects.update_or_create(
-                    id_uvigo = id_linea,
-                    id_accession = 'NULL',
-                    id_region = Region.objects.get(cp=postal_code, localizacion=loc).pk,
-                    original_name = 'NULL',
-                    edad = age,
-                    sexo = sex[:1].upper(),
-                    patient_status = hosp,
-                    nodo_secuenciacion = nodo,
-                    fecha_muestra = f_muestra,
-                    observaciones = comentarios
+                    id_uvigo = id_uvigo,
+                    defaults = {
+                        'id_uvigo' : id_uvigo,
+                        'id_accession' : 'NULL',
+                        'id_region' : Region.objects.get(cp=cp, localizacion=loc).pk,
+                        'original_name' : 'NULL',
+                        'edad' : edad,
+                        'sexo' : sexo[:1].upper(),
+                        'patient_status' : hospitalizacion,
+                        'nodo_secuenciacion' : nodo_secuenciacion,
+                        'fecha_muestra' : f_muestra,
+                        'observaciones' : observaciones                        
+                    }
+
                 )
-            
-        if not SampleMetaData.objects.filter(id_uvigo=id_linea).exists():
+            sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
             _, created = SampleMetaData.objects.update_or_create(
-                    id_uvigo = id_linea,
-                    id_paciente = id_patient,
-                    id_hospital = id_hospital,
-                    numero_envio = envio,
-                    id_tubo = tube,
-                    id_muestra = id_sample,
-                    hospitalizacion = hosp[:1], 
-                    uci = uci[:1],
-                    ct_orf1ab = orf1ab,
-                    ct_gen_e = gen_e,
-                    ct_gen_n = gen_n,
-                    ct_redrp = rdrp,
-                    ct_s = ct_s,
-                    fecha_sintomas = f_sintomas,
-                    fecha_diagnostico = f_diagnostico,
-                    fecha_entrada_uv = f_entrada_uv,
-                    fecha_envio_cdna = f_envio_cdna,
-                    fecha_run_ngs = f_run_ngs,
-                    fecha_entrada_fastq_uvigo = f_entrada_fastq_uvigo
+                    id_uvigo = sample_reference,
+                    defaults = {
+                        'id_uvigo' : sample_reference,
+                        'id_paciente' : id_paciente,
+                        'id_hospital' : id_hospital,
+                        'numero_envio' : numero_envio,
+                        'id_tubo' : id_tubo,
+                        'id_muestra' : id_muestra,
+                        'hospitalizacion' : hospitalizacion[:1], 
+                        'uci' : uci[:1],
+                        'ct_orf1ab' : orf1ab,
+                        'ct_gen_e' : gen_e,
+                        'ct_gen_n' : gen_n,
+                        'ct_redrp' : rdrp,
+                        'ct_s' : ct_s,
+                        'fecha_sintomas' : f_sintomas,
+                        'fecha_diagnostico' : f_diagnostico,
+                        'fecha_entrada_uv' : f_entrada_uv,
+                        'fecha_envio_cdna' : f_envio_cdna,
+                        'fecha_run_ngs' : f_run_ngs,
+                        'fecha_entrada_fastq_uvigo' : f_entrada_fastq_uvigo                        
+                    }
+
                 ) 
 
 

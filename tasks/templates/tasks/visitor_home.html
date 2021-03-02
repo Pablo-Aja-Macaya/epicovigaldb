@@ -10,25 +10,20 @@
   color:darkslategrey;
   font-size:60px;
 }
-.circle {
-  height: 200px;
-  width: 200px;
-  background-color: darkslategrey;;
-  border-radius: 50%;
-}
+
 </style>
 <main role="main">
   
 
   <div class="container">
-    <div class="card mb-3" style="max-width: 100%;background-color: rgb(242, 251, 255);">
+    <div class="card mb-3" style="max-width: 100%;">
       <div class="row no-gutters">
         <div class="col-md-4 my-auto">
-          <img src="/media/images/cinbio.jpeg" alt="..." style="width:100%; " class="w-100" >
+          <img class='img-fluid' src="/media/images/cinbio.jpeg" alt="..." style="width:100%; " class="w-100" >
         </div>
         <div class="col-md-8">
           <div class="card-body">
-            <h4 class="card-title"><strong>Bienvenido a EPICOVIGAL</strong></h4>
+            <h4 class="card-title"><strong>Bienvenido a EPICOVIGAL DB</strong></h4>
             <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate.</p>
           </div>
         </div>
@@ -84,10 +79,9 @@
     </div>
   </div>
 
-  <div class="container pt-2 pb-2">
-    <h3 class='pb-2 pt-2 text-dark' ><strong>Visualización de resultados</strong> </h3>
-  </div>
+
   <div class="container pb-3">
+    <h3 class='pb-2 pt-2 text-dark' ><strong>Visualización de resultados</strong> </h3>
     {% for task in tasks.all %} 
     <div class="card mb-3" style="max-width: 100%;" >
       <div class="row no-gutters pt-3 pb-3">
@@ -113,13 +107,13 @@
   </div>
 
   <div class="container pt-2 pb-2">
-    <h3 class='pb-2 pt-2 text-dark' ><strong>Equipo</strong> </h3>
+    <h3 class='pb-2 pt-2 text-dark' ><strong>Equipo y financiamiento</strong> </h3>
   </div>
   <div class="container pb-3">
     <div class="card mb-3" style="max-width: 100%;" >
       <div class="row no-gutters pt-3 pb-3">
         <div class="col-md-2 d-flex justify-content-center" >
-          <img src="/media/images/Epicovigal.icon_-1.png" alt="..." width="120" height="100" class="">
+          <img src="/media/images/Epicovigal.icon_-1.png" alt="..." width="100" height="100" class="">
         </div>
         <div class="col-md-8">
           <div class="card-body">

@@ -1,5 +1,6 @@
 from django.db import models
-from upload.models import Sample, Region, SampleMetaData
+from upload.models import Sample, Region
+from upload.models import SampleMetaData
 from tests.models import PicardTest, NextcladeTest, LineagesTest, NGSstatsTest, SingleCheckTest, VariantsTest
 import django_tables2 as tables
 import django_filters

@@ -3,7 +3,9 @@ from django.contrib.auth.decorators import login_required
 from collections import Counter
 from django_tables2 import RequestConfig
 
-from upload.models import Region, Sample, SampleMetaData
+from upload.models import Region, Sample
+from upload.models import SampleMetaData 
+
 from tests.models import LineagesTest, PicardTest, NextcladeTest, NGSstatsTest
 from .models import CompletedTestsTable, SampleTable, RegionTable, SampleMetaDataTable, SingleCheckTest, VariantsTest
 from .models import LineagesTable, PicardTable, NextcladeTable, NGSTable, VariantsTable, SingleCheckTable

@@ -33,7 +33,8 @@ class Sample(models.Model):
         return {'id_uvigo':str(self.id_uvigo.split('.')[1])}
     
 class SampleMetaData(models.Model):
-    id_uvigo = models.CharField(max_length=20, primary_key=True)
+    id = models.AutoField(primary_key=True)
+    id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE)
     id_paciente = models.CharField(max_length=20, default=None, blank=True)
     id_hospital = models.CharField(max_length=20, default=None, blank=True)
     numero_envio = models.IntegerField(default=0, blank=True)
@@ -58,3 +59,5 @@ class SampleMetaData(models.Model):
 
     def __str__(self):
         return str(self.id_uvigo)
+
+
