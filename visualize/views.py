@@ -12,33 +12,33 @@ from .models import LineagesTable, PicardTable, NextcladeTable, NGSTable, Varian
 from .models import SampleFilter, MetaDataFilter
 
 def get_completed_tests():
-    lista = []
-    dicc = {}
-    tested = 'Yes'
-    not_tested = 'No'
+    # lista = []
+    # dicc = {}
+    # tested = 'Yes'
+    # not_tested = 'No'
 
-    next = NextcladeTest.objects.only()
-    pic = PicardTest.objects.only()
-    lin = LineagesTest.objects.only()
+    # next = NextcladeTest.objects.only()
+    # pic = PicardTest.objects.only()
+    # lin = LineagesTest.objects.only()
 
-    for i in Sample.objects.only():
-        dicc = {}
-        dicc['sample'] = str(i)
-        if next.filter(id_uvigo=str(i)).exists():
-            dicc['nextclade'] = tested
-        else:
-            dicc['nextclade'] = not_tested
-        if pic.filter(id_uvigo=str(i)).exists():
-            dicc['picard'] = tested
-        else:
-            dicc['picard'] = not_tested
-        if lin.filter(id_uvigo=str(i)).exists():
-            dicc['lineages'] = tested
-        else:
-            dicc['lineages'] = not_tested
-        lista.append(dicc)
+    # for i in Sample.objects.only():
+    #     dicc = {}
+    #     dicc['sample'] = str(i)
+    #     if next.filter(id_uvigo=str(i)).exists():
+    #         dicc['nextclade'] = tested
+    #     else:
+    #         dicc['nextclade'] = not_tested
+    #     if pic.filter(id_uvigo=str(i)).exists():
+    #         dicc['picard'] = tested
+    #     else:
+    #         dicc['picard'] = not_tested
+    #     if lin.filter(id_uvigo=str(i)).exists():
+    #         dicc['lineages'] = tested
+    #     else:
+    #         dicc['lineages'] = not_tested
+    #     lista.append(dicc)
 
-    
+    lista = Sample.objects.values('id_uvigo','lineagestest','nextcladetest','ngsstatstest','picardtest','singlechecktest','variantstest')
     return lista
 
 @login_required(login_url="/accounts/login") 

@@ -18,7 +18,7 @@ class Sample(models.Model):
     id_uvigo = models.CharField(max_length=20, primary_key=True)
     id_accession = models.CharField(max_length=20, default=None, blank=True)
     original_name = models.CharField(max_length=50, default=None, blank=True)
-    id_region = models.IntegerField(default=None, blank=True)
+    id_region = models.ForeignKey(Region, on_delete=models.CASCADE)
     edad = models.IntegerField(default=0, blank=True)
     sexo = models.CharField(max_length=1, default=None, blank=True)
     patient_status = models.CharField(max_length=20, default=None, blank=True)

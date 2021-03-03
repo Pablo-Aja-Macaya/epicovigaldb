@@ -65,13 +65,13 @@ class CompletedTestsTable(tables.Table):
     #     {'sample':'epiblabla', 'picard':1, 'nextclade':0, 'ngsstats':1},
     #     {'sample':'epiblabla2', 'picard':1, 'nextclade':0, 'ngsstats':1},
     # ]
-    sample = tables.LinkColumn("home")
-    picard = tables.Column()
-    nextclade = tables.Column()
-    ngsstats = tables.Column()
-    lineages = tables.Column()
-    singlecheck = tables.Column()
-    variants = tables.Column()
+    id_uvigo = tables.LinkColumn("home")
+    picardtest = tables.Column(verbose_name='Picard')
+    nextcladetest = tables.Column(verbose_name='NextClade')
+    ngsstatstest = tables.Column(verbose_name='NGSStats')
+    lineagestest = tables.Column(verbose_name='Pangolin')
+    singlechecktest = tables.Column(verbose_name='SingleCheck')
+    variantstest = tables.Column(verbose_name='iVar')
     class Meta:
         template_name = "table_template.html"
 

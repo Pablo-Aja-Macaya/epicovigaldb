@@ -5,11 +5,12 @@ import pathlib
 import datetime
 import glob
 import pickle
-
+from upload.models import Sample
 
 ### Posibles tests ###
 class PicardTest(models.Model): #.picardOutputCleaned.tsv
-    id_uvigo = models.CharField(max_length=20, primary_key=True) # a partir del nombre del archivo
+    id = models.AutoField(primary_key=True)
+    id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE) # a partir del nombre del archivo
     id_process = models.CharField(max_length=40)
 
     mean_target_coverage = models.DecimalField(max_digits=15, decimal_places=6) 
@@ -23,10 +24,11 @@ class PicardTest(models.Model): #.picardOutputCleaned.tsv
     class Meta:
         unique_together = ('id_uvigo','id_process','date')
     def __str__(self):
-        return str(self.id_uvigo + ' - ' + self.date.strftime("%m/%d/%Y, %H:%M:%S") + ' (UTC)')
+        return str(self.id_uvigo) + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
 
 class SingleCheckTest(models.Model): #.trimmed.sorted.SingleCheck.txt
-    id_uvigo = models.CharField(max_length=20, primary_key=True) # a partir de columna (primera) (sin cabecera)
+    id = models.AutoField(primary_key=True)
+    id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE) # a partir de columna (primera) (sin cabecera)
     id_process = models.CharField(max_length=40)
 
     autocorrelation = models.DecimalField(max_digits=15, decimal_places=10) 
@@ -42,7 +44,8 @@ class SingleCheckTest(models.Model): #.trimmed.sorted.SingleCheck.txt
         return str(self.id_uvigo + ' - ' + self.date.strftime("%m/%d/%Y, %H:%M:%S") + ' (UTC)')
 
 class NGSstatsTest(models.Model): #.ngsinfo.tsv
-    id_uvigo = models.CharField(max_length=20, primary_key=True) # a partir de columna 'sampleName'
+    id = models.AutoField(primary_key=True)
+    id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE) # a partir de columna 'sampleName'
     id_process = models.CharField(max_length=40)
 
     total_reads = models.IntegerField()
@@ -57,7 +60,8 @@ class NGSstatsTest(models.Model): #.ngsinfo.tsv
         return str(self.id_uvigo + ' - ' + self.date.strftime("%m/%d/%Y, %H:%M:%S") + ' (UTC)')
 
 class NextcladeTest(models.Model): #.csv
-    id_uvigo = models.CharField(max_length=20, primary_key=True) # a partir de columna 'seqName'
+    id = models.AutoField(primary_key=True)
+    id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE) # a partir de columna 'seqName'
     id_process = models.CharField(max_length=40)
 
     total_missing = models.IntegerField()
@@ -72,11 +76,11 @@ class NextcladeTest(models.Model): #.csv
     class Meta:
         unique_together = ('id_uvigo','id_process','date')
     def __str__(self):
-        return str(self.id_uvigo + ' - ' + self.date.strftime("%m/%d/%Y, %H:%M:%S") + ' (UTC)')
+        return str(self.id_uvigo) + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
 
 class VariantsTest(models.Model): #.tsv
     id = models.AutoField(primary_key=True)
-    id_uvigo = models.CharField(max_length=20) # a partir del nombre del archivo
+    id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE) # a partir del nombre del archivo
     id_process = models.CharField(max_length=41)
     row = models.IntegerField()
 
@@ -97,16 +101,17 @@ class VariantsTest(models.Model): #.tsv
             models.UniqueConstraint(fields=['id_uvigo','row','id_process','date'], name='unique_constraint')
         ]
     def __str__(self):
-        return str(self.id_uvigo + f' - {self.row}' + ' - ' + self.date.strftime("%m/%d/%Y, %H:%M:%S") + ' (UTC)')
+        return str(self.id_uvigo) + f' - {self.row}' + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
 
-#     # No sé si quieren estos
-#     # frequency
-#     # gene
-#     # aa_position
-#     # thresholds
+# #     # No sé si quieren estos
+# #     # frequency
+# #     # gene
+# #     # aa_position
+# #     # thresholds
 
 class LineagesTest(models.Model): #.csv
-    id_uvigo = models.CharField(max_length=20, primary_key=True) # a partir de columna 'taxon'
+    id = models.AutoField(primary_key=True)
+    id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE)# a partir de columna 'taxon'
     id_process = models.CharField(max_length=40)
 
     lineage = models.CharField(max_length=10)
@@ -122,8 +127,9 @@ class LineagesTest(models.Model): #.csv
         return str(self.id_uvigo + ' - ' + self.date.strftime("%m/%d/%Y, %H:%M:%S") + ' (UTC)')
 
 class LineagesMostCommonCountries(models.Model):
-    # Esta tabla se hace porque el atributo 'most common countries' de pangolin contiene cosas tipo 'Spain,Portugal'
-    id_uvigo = models.CharField(max_length=20, primary_key=True)
+    # Esta tabla se hace porque el atributo 'most common countries' de pangolin es multivaluado 'Spain,Portugal'
+    id = models.AutoField(primary_key=True)
+    id_uvigo = models.ForeignKey(LineagesTest, on_delete=models.CASCADE)
     id_process = models.CharField(max_length=40)
     date = models.DateTimeField(auto_now=True)
     country = models.TextField(max_length=50, default=None, blank=True)
@@ -234,10 +240,11 @@ def upload_picard(reader, sample_name):
         pct_target_bases_100x = float(line['pct_target_bases_100x'].replace(',','.'))
 
         if id_uvigo:
+            sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
             _, created = PicardTest.objects.update_or_create(
-                id_uvigo=id_uvigo,
+                id_uvigo=sample_reference,
                 defaults={
-                    'id_uvigo' : id_uvigo,
+                    'id_uvigo' : sample_reference,
                     'id_process' : id_process,
                     'mean_target_coverage' : mean_target_coverage,
                     'median_target_coverage' : median_target_coverage,
@@ -268,17 +275,21 @@ def upload_singlecheck(io_string, delimiter):
         mad = lista[mad_index]      
 
         if id_uvigo:
-            _, created = SingleCheckTest.objects.update_or_create(
-                id_uvigo=id_uvigo,
-                defaults={
-                    'id_uvigo' : id_uvigo,
-                    'id_process' : id_process,
-                    'autocorrelation' : autocorrelation,
-                    'variation_coefficient' : variation_coefficient,
-                    'gini_coefficient' : gini_coefficient,
-                    'mad' : mad,                  
-                }
-            )
+            try:
+                sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
+                _, created = SingleCheckTest.objects.update_or_create(
+                    id_uvigo=sample_reference,
+                    defaults={
+                        'id_uvigo' : sample_reference,
+                        'id_process' : id_process,
+                        'autocorrelation' : autocorrelation,
+                        'variation_coefficient' : variation_coefficient,
+                        'gini_coefficient' : gini_coefficient,
+                        'mad' : mad,                  
+                    }
+                )
+            except:
+                pass
 def upload_ngsstats(reader):
     for line in reader:
         id_uvigo = line['id_uvigo'] # igual hay que poner aquí find_sample_name() también
@@ -287,16 +298,20 @@ def upload_ngsstats(reader):
         mapped = int(line['mapped'].replace(',','.'))
         trimmed = int(line['trimmed'].replace(',','.'))
         if id_uvigo:
-            _, created = NGSstatsTest.objects.update_or_create(
-                id_uvigo=id_uvigo,
-                defaults={
-                    'id_uvigo' : id_uvigo,
-                    'id_process' : id_process,
-                    'total_reads' : total_reads,
-                    'mapped' : mapped,
-                    'trimmed' : trimmed,                    
-                }
-            )
+            try:
+                sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
+                _, created = NGSstatsTest.objects.update_or_create(
+                    id_uvigo=sample_reference,
+                    defaults={
+                        'id_uvigo' : sample_reference,
+                        'id_process' : id_process,
+                        'total_reads' : total_reads,
+                        'mapped' : mapped,
+                        'trimmed' : trimmed,                    
+                    }
+                )
+            except:
+                pass
 def upload_nextclade(reader):
     for line in reader:
         id_uvigo = find_sample_name(line['id_uvigo'])
@@ -309,19 +324,23 @@ def upload_nextclade(reader):
         qc_mixed_sites_status = line['qc_mixed_sites_status']
 
         if id_uvigo:
-            _, created = NextcladeTest.objects.update_or_create(
-                id_uvigo=id_uvigo,
-                defaults={
-                    'id_uvigo' : id_uvigo,
-                    'id_process' : id_process,
-                    'total_missing' : total_missing,
-                    'clade' : clade,
-                    'qc_private_mutations_status' : qc_private_mutations_status,
-                    'qc_missing_data_status' : qc_missing_data_status,
-                    'qc_snp_clusters_status' : qc_snp_clusters_status,
-                    'qc_mixed_sites_status' : qc_mixed_sites_status,                    
-                }
-            )
+            try:
+                sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
+                _, created = NextcladeTest.objects.update_or_create(
+                    id_uvigo=sample_reference,
+                    defaults={
+                        'id_uvigo' : sample_reference,
+                        'id_process' : id_process,
+                        'total_missing' : total_missing,
+                        'clade' : clade,
+                        'qc_private_mutations_status' : qc_private_mutations_status,
+                        'qc_missing_data_status' : qc_missing_data_status,
+                        'qc_snp_clusters_status' : qc_snp_clusters_status,
+                        'qc_mixed_sites_status' : qc_mixed_sites_status,                    
+                    }
+                )
+            except:
+                pass
 
 def upload_variants(reader, sample_name):
     id_uvigo = sample_name
@@ -340,11 +359,12 @@ def upload_variants(reader, sample_name):
             alt_codon = line['alt_codon']
             alt_aa = line['alt_aa']
 
+            sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
             _, created = VariantsTest.objects.update_or_create(
-                id_uvigo=id_uvigo,
+                id_uvigo=sample_reference,
                 row=row,
                 defaults={
-                    'id_uvigo' : id_uvigo,
+                    'id_uvigo' : sample_reference,
                     'id_process' : id_process,
                     'row' : row,
                     'pos' : pos,
@@ -367,29 +387,35 @@ def upload_lineages(reader):
         probability = line['probability']
         countries = line['most_common_countries'].split(',')
 
+
         if id_uvigo:
-            _, created = LineagesTest.objects.update_or_create(
-                id_uvigo=id_uvigo,
-                defaults={
-                    'id_uvigo' : id_uvigo,
-                    'id_process' : id_process,
-                    'lineage' : lineage,
-                    'probability' : probability,
-                    'comments' : ''                
-                }
-            )          
-        for country in countries:
-            country = country.strip()
-            if id_uvigo:
-                _, created = LineagesMostCommonCountries.objects.update_or_create(
-                    id_uvigo=id_uvigo,
+            try:
+                sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
+                _, created = LineagesTest.objects.update_or_create(
+                    id_uvigo=sample_reference,
                     defaults={
-                        'id_uvigo' : id_uvigo,
+                        'id_uvigo' : sample_reference,
                         'id_process' : id_process,
-                        'country' : country,
-                
+                        'lineage' : lineage,
+                        'probability' : probability,
+                        'comments' : ''                
                     }
                 )
+                lineage_reference = LineagesTest.objects.get(id_uvigo=id_uvigo)
+                for country in countries:
+                    country = country.strip()
+                    _, created = LineagesMostCommonCountries.objects.update_or_create(
+                        id_uvigo=lineage_reference,
+                        defaults={
+                            'id_uvigo' : lineage_reference,
+                            'id_process' : id_process,
+                            'country' : country,
+                    
+                        }
+                    )
+            except:
+                print('Error: Llave en subida de linajes no existe')
+                pass
 ################################
 def select_test(test, file, sample_name, fieldnames, dialect):
     if test != 'SingleCheckTest': # este no tiene cabecera
