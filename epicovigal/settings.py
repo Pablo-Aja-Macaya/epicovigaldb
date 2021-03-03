@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '*5=a)@xbhtoyngk(yvi(1qjy_p5i)k8g8m&=iy9!g$=mu4v-6l'
+SECRET_KEY = '*5=a)@xbhtoyngk(yvi(1qjy_p5i)k8g8m&=iy9!g$=mu4v-6l5' # not the key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = TEMPLATE_DEBUG = True
@@ -29,11 +29,10 @@ ALLOWED_HOSTS = [#'*' #python manage.py runserver 0.0.0.0:8000
 
 ]
 
-
-
 # Application definition
 
 INSTALLED_APPS = [
+    'dbbackup',
     'django_tables2',
     'django_filters',
     'reports.apps.ReportsConfig',
@@ -93,14 +92,21 @@ CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'OPTIONS': {
-            'read_default_file': '/etc/mysql/my.cnf',
-        },
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'OPTIONS': {
+#             'read_default_file': '/etc/mysql/my.cnf',
+#         },
+#     }
+# }
+
+DATABASES = {}
+
+## BACKUP
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': '/home/pabs/MasterBioinformatica/TFM/backup'}
+
 
 #### QUITAR ESTO EN PRODUCCIÖN !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # Para poder manipular muchas filas en admin
@@ -166,3 +172,5 @@ def FILTERS_VERBOSE_LOOKUPS():
         'lt' : 'menor que'
     })
     return verbose_lookups
+
+from .local_settings import *
