@@ -1,20 +1,22 @@
 from django.shortcuts import render
-from .tasks import find_coords
 from django.contrib.auth.decorators import login_required
-from .utils import upload_utils
 import io
+import urllib.request
+
+from .utils import upload_utils
+from .tasks import find_coords
 
 
 # Create your views here.
 @login_required(login_url="/accounts/login")
 def upload_manual(request):
     # tasks = Task.objects
-    return render(request, 'upload/manual.html')#, {'tasks':tasks})
+    return render(request, 'upload/manual.html')
 
 @login_required(login_url="/accounts/login")
 def upload_csv(request):
     # tasks = Task.objects
-    return render(request, 'upload/csv.html')#, {'tasks':tasks})
+    return render(request, 'upload/csv.html')
 
 @login_required(login_url="/accounts/login")
 def upload(request):
@@ -27,9 +29,14 @@ def upload(request):
         io_string = io.StringIO(data)
         if request.POST.get('origin') == 'hospital':
             #upload_sample_hospital.delay(data)
-            upload_utils.upload_sample_hospital(io_string)
+            fallos = upload_utils.upload_sample_hospital(io_string)
             #find_coords.delay() # esto se hace por detrás con celery
-            return render(request, 'upload/csv.html', {'message':'Finishing coordinates in the back!'})
+
+            if fallos:
+                warning = f'Se ha producido algún fallo en la subida de {fallos}, puede que tengan fechas incorrectas o algún fallo de formato. Para el resto se está completando las coordenadas por detrás.'
+                return render(request, 'upload/csv.html', {'warning':warning})
+            else:
+                return render(request, 'upload/csv.html', {'message':'Se ha completado la actualización. Finalizando coordenadas por detrás.'})            
         else:
             return render(request, 'upload/csv.html',{'warning':'Origin not implemented yet'})
         # except Exception as e:
@@ -41,7 +48,23 @@ def upload(request):
     
 
 
+# Subida de metadatos directamente desde el GoogleSheet
+@login_required(login_url="/accounts/login")
+def update_from_google(request):
+    from epicovigal.local_settings import GS_DATA_KEY as key
+    from epicovigal.local_settings import GS_DATA_GID as gid
+    message = 'Se ha completado la actualización desde GoogleSheets'
+    enlace = f'https://docs.google.com/spreadsheets/d/{key}/export?format=tsv&gid={gid}'
+    with urllib.request.urlopen(enlace) as google_sheet:
+        data = google_sheet.read().decode('UTF-8')
+        io_string = io.StringIO(data)
+        fallos = upload_utils.upload_sample_hospital(io_string)
+        #find_coords.delay() # esto se hace por detrás con celery        
+
+    if fallos:
+        warning = f'Se ha producido algún fallo en la subida de {fallos}, puede que tengan fechas incorrectas o algún fallo de formato. Para el resto se está completando las coordenadas por detrás.'
+        return render(request, 'upload/csv.html', {'warning':warning})
+    else:
+        return render(request, 'upload/csv.html', {'message':'Se ha completado la actualización'})
 
 
-
-    

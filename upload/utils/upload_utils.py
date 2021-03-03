@@ -60,124 +60,127 @@ def upload_sample_hospital(stream):
     
     repl = str.maketrans("ÁÉÍÓÚ","AEIOU") # para quitar acentos
     
+    lista_fallos = []
     for line in reader:
-        
-        id_uvigo = line['id_uvigo']
-        id_hospital = line['id_hospital']
-        id_paciente = str(line['id_paciente'])
-        numero_envio = line['numero_envio']
-        id_tubo = line['id_tubo']
-        id_muestra = line['id_muestra']
-        hospitalizacion = line['hospitalizacion'][:1] # Para que si hay un 'Si' pille sólo la S
-        uci = line['uci']
-        nodo_secuenciacion = line['nodo_secuenciacion']
-        observaciones = line['observaciones']
-        cp = line['cp']
-        loc = line['localizacion']
-        sexo = line['sexo']
-        edad = line['edad']
-        
-        # Formateo de los ct (cambiar coma por puntos y cambiar espacio en blanco por 0 (quizás mejor Null?)) 
-        orf1ab = line['ct_orf1ab'].replace(',','.')
-        gen_e = line['ct_gen_e'].replace(',','.')
-        gen_n = line['ct_gen_n'].replace(',','.')
-        rdrp = line['ct_rdrp'].replace(',','.')
-        ct_s = line['ct_s'].replace(',','.')
-
-        def check_numbers(number):
-            try:
-                float(number)
-                return number
-            except:
-                return None
-
-        orf1ab = check_numbers(orf1ab)
-        gen_e = check_numbers(gen_e)
-        gen_n = check_numbers(gen_n)
-        rdrp = check_numbers(rdrp)
-        ct_s = check_numbers(ct_s)       
-
-        try: 
-            int(cp)
-        except: cp = 0
-            
         try:
-            int(edad)
-        except: edad = 0
+            id_uvigo = line['id_uvigo']
+            id_hospital = line['id_hospital']
+            id_paciente = str(line['id_paciente'])
+            numero_envio = line['numero_envio']
+            id_tubo = line['id_tubo']
+            id_muestra = line['id_muestra']
+            hospitalizacion = line['hospitalizacion'][:1] # Para que si hay un 'Si' pille sólo la S
+            uci = line['uci']
+            nodo_secuenciacion = line['nodo_secuenciacion']
+            observaciones = line['observaciones']
+            cp = line['cp']
+            loc = line['localizacion']
+            sexo = line['sexo']
+            edad = line['edad']
+            
+            # Formateo de los ct (cambiar coma por puntos y cambiar espacio en blanco por 0 (quizás mejor Null?)) 
+            orf1ab = line['ct_orf1ab'].replace(',','.')
+            gen_e = line['ct_gen_e'].replace(',','.')
+            gen_n = line['ct_gen_n'].replace(',','.')
+            rdrp = line['ct_rdrp'].replace(',','.')
+            ct_s = line['ct_s'].replace(',','.')
 
-        # Formateo de fechas
-        f_muestra = time_transform(line['fecha_muestra'])
-        f_sintomas = time_transform(line['fecha_sintomas'])
-        f_diagnostico = time_transform(line['fecha_diagnostico'])
-        f_entrada_uv = time_transform(line['fecha_entrada_uv'])
-        f_envio_cdna = time_transform(line['fecha_envio_cdna'])
-        f_run_ngs = time_transform(line['fecha_run_ngs'])
-        f_entrada_fastq_uvigo = time_transform(line['fecha_entrada_fastq_uvigo'])
+            def check_numbers(number):
+                try:
+                    float(number)
+                    return number
+                except:
+                    return None
 
-        # Quitar acentos y cosas raras a localización
-        loc = loc.upper().translate(repl)
-        # Algunas son 'CORUÑA (A)', lo siguiente se usa para transformarlas en A CORUÑA
-        if '(O)' in loc:
-            loc = 'O ' + loc[:-4]
-        elif '(A)' in loc:
-            loc = 'A ' + loc[:-4]
+            orf1ab = check_numbers(orf1ab)
+            gen_e = check_numbers(gen_e)
+            gen_n = check_numbers(gen_n)
+            rdrp = check_numbers(rdrp)
+            ct_s = check_numbers(ct_s)       
 
-        # Insertado en la base de datos
-        if not Region.objects.filter(cp=cp, localizacion=loc).exists():
-            _, created = Region.objects.update_or_create(
-                    cp = int(cp),
-                    localizacion = loc,
-                    pais = 'SPAIN',
-                    region = 'EUROPE',
-                    latitud = 0,
-                    longitud = 0
-                )
-        
-        if id_uvigo:
-            _, created = Sample.objects.update_or_create(
-                    id_uvigo = id_uvigo,
-                    defaults = {
-                        'id_uvigo' : id_uvigo,
-                        'id_accession' : 'NULL',
-                        'id_region' : Region.objects.get(cp=cp, localizacion=loc).pk,
-                        'original_name' : 'NULL',
-                        'edad' : edad,
-                        'sexo' : sexo[:1].upper(),
-                        'patient_status' : hospitalizacion,
-                        'nodo_secuenciacion' : nodo_secuenciacion,
-                        'fecha_muestra' : f_muestra,
-                        'observaciones' : observaciones                        
-                    }
+            try: 
+                int(cp)
+            except: cp = 0
+                
+            try:
+                int(edad)
+            except: edad = 0
 
-                )
-            sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
-            _, created = SampleMetaData.objects.update_or_create(
-                    id_uvigo = sample_reference,
-                    defaults = {
-                        'id_uvigo' : sample_reference,
-                        'id_paciente' : id_paciente,
-                        'id_hospital' : id_hospital,
-                        'numero_envio' : numero_envio,
-                        'id_tubo' : id_tubo,
-                        'id_muestra' : id_muestra,
-                        'hospitalizacion' : hospitalizacion[:1], 
-                        'uci' : uci[:1],
-                        'ct_orf1ab' : orf1ab,
-                        'ct_gen_e' : gen_e,
-                        'ct_gen_n' : gen_n,
-                        'ct_redrp' : rdrp,
-                        'ct_s' : ct_s,
-                        'fecha_sintomas' : f_sintomas,
-                        'fecha_diagnostico' : f_diagnostico,
-                        'fecha_entrada_uv' : f_entrada_uv,
-                        'fecha_envio_cdna' : f_envio_cdna,
-                        'fecha_run_ngs' : f_run_ngs,
-                        'fecha_entrada_fastq_uvigo' : f_entrada_fastq_uvigo                        
-                    }
+            # Formateo de fechas
+            f_muestra = time_transform(line['fecha_muestra'])
+            f_sintomas = time_transform(line['fecha_sintomas'])
+            f_diagnostico = time_transform(line['fecha_diagnostico'])
+            f_entrada_uv = time_transform(line['fecha_entrada_uv'])
+            f_envio_cdna = time_transform(line['fecha_envio_cdna'])
+            f_run_ngs = time_transform(line['fecha_run_ngs'])
+            f_entrada_fastq_uvigo = time_transform(line['fecha_entrada_fastq_uvigo'])
 
-                ) 
+            # Quitar acentos y cosas raras a localización
+            loc = loc.upper().translate(repl)
+            # Algunas son 'CORUÑA (A)', lo siguiente se usa para transformarlas en A CORUÑA
+            if '(O)' in loc:
+                loc = 'O ' + loc[:-4]
+            elif '(A)' in loc:
+                loc = 'A ' + loc[:-4]
 
+            # Insertado en la base de datos
+            if not Region.objects.filter(cp=cp, localizacion=loc).exists():
+                _, created = Region.objects.update_or_create(
+                        cp = int(cp),
+                        localizacion = loc,
+                        pais = 'SPAIN',
+                        region = 'EUROPE',
+                        latitud = 0,
+                        longitud = 0
+                    )
+            region_reference = Region.objects.get(cp=cp, localizacion=loc)
+            if id_uvigo:
+                _, created = Sample.objects.update_or_create(
+                        id_uvigo = id_uvigo,
+                        defaults = {
+                            'id_uvigo' : id_uvigo,
+                            'id_accession' : 'NULL',
+                            'id_region' : region_reference,
+                            'original_name' : 'NULL',
+                            'edad' : edad,
+                            'sexo' : sexo[:1].upper(),
+                            'patient_status' : hospitalizacion,
+                            'nodo_secuenciacion' : nodo_secuenciacion,
+                            'fecha_muestra' : f_muestra,
+                            'observaciones' : observaciones                        
+                        }
 
+                    )
+                sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
+                _, created = SampleMetaData.objects.update_or_create(
+                        id_uvigo = sample_reference,
+                        defaults = {
+                            'id_uvigo' : sample_reference,
+                            'id_paciente' : id_paciente,
+                            'id_hospital' : id_hospital,
+                            'numero_envio' : numero_envio,
+                            'id_tubo' : id_tubo,
+                            'id_muestra' : id_muestra,
+                            'hospitalizacion' : hospitalizacion[:1], 
+                            'uci' : uci[:1],
+                            'ct_orf1ab' : orf1ab,
+                            'ct_gen_e' : gen_e,
+                            'ct_gen_n' : gen_n,
+                            'ct_redrp' : rdrp,
+                            'ct_s' : ct_s,
+                            'fecha_sintomas' : f_sintomas,
+                            'fecha_diagnostico' : f_diagnostico,
+                            'fecha_entrada_uv' : f_entrada_uv,
+                            'fecha_envio_cdna' : f_envio_cdna,
+                            'fecha_run_ngs' : f_run_ngs,
+                            'fecha_entrada_fastq_uvigo' : f_entrada_fastq_uvigo                        
+                        }
+
+                    ) 
+        except:
+            lista_fallos.append(id_uvigo)
+    
+    return lista_fallos
 
 
 # def upload_sample_gisaid():
