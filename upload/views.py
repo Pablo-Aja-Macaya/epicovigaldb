@@ -29,11 +29,11 @@ def upload(request):
         io_string = io.StringIO(data)
         if request.POST.get('origin') == 'hospital':
             #upload_sample_hospital.delay(data)
-            fallos = upload_utils.upload_sample_hospital(io_string)
+            fallos, columnas_inesperadas = upload_utils.upload_sample_hospital(io_string)
             #find_coords.delay() # esto se hace por detrás con celery
 
             if fallos:
-                warning = f'Se ha producido algún fallo en la subida de {fallos}, puede que tengan fechas incorrectas o algún fallo de formato. Para el resto se está completando las coordenadas por detrás.'
+                warning = f'<strong>Columnas inesperadas</strong>: {columnas_inesperadas}. <strong>Error en muestras:</strong> {fallos}, puede que tengan fechas incorrectas o algún fallo de formato. Completando nuevas coordenadas por detrás.'
                 return render(request, 'upload/csv.html', {'warning':warning})
             else:
                 return render(request, 'upload/csv.html', {'message':'Se ha completado la actualización. Finalizando coordenadas por detrás.'})            
@@ -53,18 +53,19 @@ def upload(request):
 def update_from_google(request):
     from epicovigal.local_settings import GS_DATA_KEY as key
     from epicovigal.local_settings import GS_DATA_GID as gid
-    message = 'Se ha completado la actualización desde GoogleSheets'
+    
     enlace = f'https://docs.google.com/spreadsheets/d/{key}/export?format=tsv&gid={gid}'
     with urllib.request.urlopen(enlace) as google_sheet:
         data = google_sheet.read().decode('UTF-8')
         io_string = io.StringIO(data)
-        fallos = upload_utils.upload_sample_hospital(io_string)
+        fallos, columnas_inesperadas = upload_utils.upload_sample_hospital(io_string)
         #find_coords.delay() # esto se hace por detrás con celery        
 
     if fallos:
-        warning = f'Se ha producido algún fallo en la subida de {fallos}, puede que tengan fechas incorrectas o algún fallo de formato. Para el resto se está completando las coordenadas por detrás.'
+        warning = f'<strong>Columnas inesperadas</strong>: {columnas_inesperadas}. <strong>Error en muestras:</strong> {fallos}, puede que tengan fechas incorrectas o algún fallo de formato. Completando nuevas coordenadas por detrás.'
         return render(request, 'upload/csv.html', {'warning':warning})
     else:
-        return render(request, 'upload/csv.html', {'message':'Se ha completado la actualización'})
+        message = 'Se ha completado la actualización desde GoogleSheets'
+        return render(request, 'upload/csv.html', {'message':message})
 
 
