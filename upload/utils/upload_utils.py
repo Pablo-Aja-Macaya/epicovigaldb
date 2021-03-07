@@ -52,9 +52,14 @@ def upload_sample_hospital(stream):
     fieldnames = io_string.readline().strip().split(str(dialect.delimiter))
 
     # Cambio de nombres de campos a los de la base de datos 
+    lista_columnas_inesperadas = []
     for i in range(len(fieldnames)):
         if fieldnames[i] != '':
-            fieldnames[i] = fields_correspondence[fieldnames[i]]
+            try:
+                fieldnames[i] = fields_correspondence[fieldnames[i]]
+            except:
+                print(f'Columna inesperada: {fieldnames[i]}')
+                lista_columnas_inesperadas.append(fieldnames[i])
   
     reader = csv.DictReader(io_string, fieldnames=fieldnames, dialect=dialect) 
     
@@ -180,7 +185,7 @@ def upload_sample_hospital(stream):
         except:
             lista_fallos.append(id_uvigo)
     
-    return lista_fallos
+    return lista_fallos, lista_columnas_inesperadas
 
 
 # def upload_sample_gisaid():
