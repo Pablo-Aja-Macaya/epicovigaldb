@@ -19,12 +19,13 @@ class Sample(models.Model):
     id_accession = models.CharField(max_length=20, default=None, blank=True)
     original_name = models.CharField(max_length=50, default=None, blank=True)
     id_region = models.ForeignKey(Region, on_delete=models.CASCADE)
+    categoria_muestra = models.CharField(max_length=20, default=None, blank=True)
     edad = models.IntegerField(default=0, blank=True)
     sexo = models.CharField(max_length=1, default=None, blank=True)
     patient_status = models.CharField(max_length=20, default=None, blank=True)
-    nodo_secuenciacion = models.CharField(max_length=20, default=None, blank=True)
+    nodo_secuenciacion = models.CharField(max_length=50, default=None, blank=True)
     fecha_muestra = models.DateField(blank=True, null=True)
-    observaciones = models.TextField(max_length=50, default=None, blank=True)
+    observaciones = models.TextField(max_length=100, default=None, blank=True)
     data_path = models.FileField(storage=('uploads/'), default=None, blank=True)
 
     def __str__(self):
@@ -41,6 +42,7 @@ class SampleMetaData(models.Model):
     id_tubo = models.CharField(max_length=20, default=None, blank=True)
     id_muestra = models.CharField(max_length=20, default=None, blank=True)
     
+    
     hospitalizacion = models.CharField(max_length=1)
     uci = models.CharField(max_length=1)
     
@@ -52,10 +54,10 @@ class SampleMetaData(models.Model):
 
     fecha_envio_cdna = models.DateField(blank=True, null=True)
     fecha_run_ngs = models.DateField(blank=True, null=True)
-    fecha_entrada_fastq_uvigo = models.DateField(blank=True, null=True)
+    fecha_entrada_fastq = models.DateField(blank=True, null=True)
     fecha_sintomas = models.DateField(blank=True, null=True)
     fecha_diagnostico = models.DateField(blank=True, null=True)
-    fecha_entrada_uv = models.DateField(blank=True, null=True)
+    fecha_entrada = models.DateField(blank=True, null=True)
 
     def __str__(self):
         return str(self.id_uvigo)
