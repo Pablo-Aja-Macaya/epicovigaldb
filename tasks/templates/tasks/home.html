@@ -11,7 +11,7 @@
  </style>
 <main role="main">
   <br>
-  <div class="container">
+  <div class="container-lg">
     <div class="card mb-1" style="max-width: 100%;">
       <div class="row no-gutters">
         <div class="col-md-4 my-auto">
@@ -29,7 +29,7 @@
   </div>  
 
 
-  <div class='container'>
+  <div class='container-lg'>
     <div class="row d-flex justify-content-center pb-3">
       <div class='col-4'>
         <div class="card " style="border-style: hidden;">
@@ -42,7 +42,7 @@
       <div class='col-4'>
         <div class="card " style="border-style: hidden;">
           <div class="card-body text-center">
-            <span class="count">50 </span> 
+            <span class="count">{{ sequenced_count }} </span> 
             <h4 style="color: darkslategrey;"><strong>Genomas secuenciados</strong></h4>      
           </div>
         </div>
@@ -50,7 +50,7 @@
       <div class='col-4'>
         <div class="card " style="border-style: hidden;">
           <div class="card-body text-center">
-            <span class="count">10 </span> 
+            <span class="count">{{ clade_count }} </span> 
             <h4 style="color: darkslategrey;"><strong>Variantes detectadas</strong></h4>      
           </div>
         </div>
@@ -58,9 +58,9 @@
     </div>
   </div>
 
-  <div class="container">
+  <div class="container-lg">
     <div class="album pb-3">
-      <div class="container">
+      <div class="container-lg">
         <div class="row">
           {% for task in tasks.all %}      
           <div class="col-md-4 text-center mx-auto">  <!--mx-auto -->

@@ -3,20 +3,22 @@ from .models import Task
 #from django.contrib.auth.decorators import login_required
 from upload.models import Sample
 from .models import Team, Team_Component
-
+from tests.models import NextcladeTest
 
 
 #@login_required(login_url="/accounts/login")
 def home(request):
     sample_count = Sample.objects.all().count()
+    sequenced_count = SampleMetaData.objects.exclude(fecha_entrada_fastq__isnull=True).count()
+    clade_count = NextcladeTest.objects.values('clade').distinct().count()
     if request.user.is_authenticated:
         tasks = Task.objects
         url = 'tasks/home.html'
-        return render(request, url, {'tasks':tasks, 'sample_count':sample_count})
     else:
         tasks = Task.objects.filter(show_to='all')
         url = 'tasks/visitor_home.html'
-        return render(request, url, {'tasks':tasks, 'sample_count':sample_count})
+    context = {'tasks':tasks, 'sample_count':sample_count, 'sequenced_count':sequenced_count, 'clade_count':clade_count}
+    return render(request, url, context)
 
 def consorcio(request):    
     dicc = {}
@@ -29,11 +31,11 @@ def consorcio(request):
 ## Gráficas ##
 from upload.models import SampleMetaData
 from django.http import JsonResponse
+from datetime import date, datetime
 
-def hospital_graph(request):
-    hospitales = SampleMetaData.objects.values('id_hospital')
+def hospital_graph(request, fecha_inicial, fecha_final):
+    hospitales = SampleMetaData.objects.filter(id_uvigo__fecha_muestra__range=[fecha_inicial,fecha_final]).values('id_hospital')
     posibles_hospitales = hospitales.distinct()
-
     answer = []
     for i in posibles_hospitales:
         h = list(i.values())[0]
@@ -69,14 +71,14 @@ def hospital_graph(request):
             }
         },  
         'series': [{
-            'name': 'Porcentaje',
+            'name': 'Cantidad',
             'data': answer # [{ name: 'CHHUVI', y: 1 }, { name: 'CHUAC', y: 1 }]
         }]
     }
 
     return JsonResponse(chart)
 
-def variants_line_graph(request, fecha, variant):
+def variants_line_graph(request, fecha_inicial, fecha_final, variant):
 
     #######################
     ### Esto es para generar datos de prueba
@@ -107,6 +109,11 @@ def variants_line_graph(request, fecha, variant):
         dias.append(dt.strftime("%d/%m/%Y"))
     #############################
 
+    # start = datetime.datetime.strptime("2021-01-01", "%Y-%m-%d")
+    # end = datetime.datetime.strptime("2021-01-30", "%Y-%m-%d")
+    # (end-start).days
+    # date_generated = [start + datetime.timedelta(days=x) for x in range(0, (end-start).days)]
+
     chart = {
         'chart': {
             'scrollablePlotArea': {
@@ -114,7 +121,7 @@ def variants_line_graph(request, fecha, variant):
             },
         },
         'title': {
-            'text': f'Frecuencia de variante {variant} según lugar ({fecha})'
+            'text': f'Frecuencia de variante {variant} según lugar ({fecha_inicial}|{fecha_final})'
         },
         'subtitle': {
             'text': 'Source: Epicovigal'
@@ -149,7 +156,7 @@ def variants_line_graph(request, fecha, variant):
     }
     return JsonResponse(chart)
 
-def variants_column_graph(request, fecha, variant):
+def variants_column_graph(request, fecha_inicial, fecha_final, variant):
     #######################
     ### Esto es para generar datos de prueba
     import random
@@ -183,7 +190,7 @@ def variants_column_graph(request, fecha, variant):
             'type':'column'
         },
         'title': {
-            'text': f'Proporción de variantes ({fecha})'
+            'text': f'Proporción de variantes ({fecha_inicial}|{fecha_final})'
         },
         'subtitle': {
             'text': 'Source: Denmark'

@@ -3,7 +3,7 @@
 {% block content %}
 
 
-<div class="container">
+<div class="container-lg">
   <ul class="nav nav-tabs">
     <li class="nav-item">
       <a class="nav-link active" href="#">Upload CSV</a>
@@ -38,7 +38,7 @@
   {% endif %}
 
 
-  <div class="container pb-2 pt-2">
+  <div class="container-lg pb-2 pt-2">
     <div class="card mb-3" style="max-width: 100%;" >
       <div class="row no-gutters pt-3 pb-3">
         <div class="col-md-2 d-flex my-auto justify-content-center" >
@@ -63,7 +63,7 @@
 
   </br>
   <!-- Subida de datos -->
-  <div class='container'>
+  <div class='container-lg'>
     <form id="upload_csv" method="POST" enctype="multipart/form-data" action="{% url 'upload' %}">
       {% csrf_token %}
       <!-- Origen -->

@@ -15,11 +15,11 @@
 <main role="main">
   
 
-  <div class="container-lg">
+  <!-- <div class="container-lg">
     <div class="card mb-3" >
       <div class="row no-gutters">
         <div class="col-md-4 my-auto">
-          <img class='img-fluid' src="/media/images/cinbio.jpeg" alt="..." style="width:100%; " class="w-100" >
+          <img class='img-fluid w-100' src="/media/images/cinbio.jpeg" alt="..." >
         </div>
         <div class="col-md-8">
           <div class="card-body">
@@ -29,9 +29,9 @@
         </div>
       </div>
     </div>
-  </div>  
+  </div>   -->
 
-  <div class="container-lg pt-2 pb-4">
+  <div class="container-lg pt-1 pb-4">
     <div class="card" style="width: 100%; border-style: hidden;">
       <div class="row">
         <div class="col-md-8">
@@ -63,7 +63,7 @@
       <div class='col-4'>
         <div class="card " style="border-style: hidden;">
           <div class="card-body text-center">
-            <span class="count">50 </span> 
+            <span class="count">{{ sequenced_count }} </span> 
             <h4 style="color: darkslategrey;"><strong>Genomas secuenciados</strong></h4>      
           </div>
         </div>
@@ -71,7 +71,7 @@
       <div class='col-4'>
         <div class="card " style="border-style: hidden;">
           <div class="card-body text-center">
-            <span class="count">10 </span> 
+            <span class="count">{{ clade_count }} </span> 
             <h4 style="color: darkslategrey;"><strong>Variantes detectadas</strong></h4>      
           </div>
         </div>
@@ -144,13 +144,13 @@
           </div>
         </div>
         <div class="col-lg-6 justify-content-center my-auto">
-          <div id="hospital_graph" data-url="{% url 'hospital_graph' %}"></div>
+          <div id="hospital_graph" data-url="{% url 'hospital_graph' fecha_inicial='2020-01-01' fecha_final='2030-1-1' %}"></div>
         </div>
 
       </div>
     </div>
   </div>  
-
+  
   <div class="container-lg pt-2 pb-3">
     <div class="card" style="width: 100%;">
       <div class="row">
@@ -173,7 +173,7 @@
                   <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
                     <div class="card-body">
                       <div class="container-lg pt-3 pb-5">
-                        <div id="variants_line_graph" data-url="{% url 'variants_line_graph' fecha='1-2-21|28-2-21' variant='S:E484' %}"></div>
+                        <div id="variants_line_graph" data-url="{% url 'variants_line_graph' variant='S:E484' fecha_inicial='2020-01-01' fecha_final='2030-1-1' %}"></div>
                       </div>    
                     </div>
                   </div>
@@ -189,7 +189,7 @@
                   <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
                     <div class="card-body">
                       <div class="container-lg pt-3 pb-5">
-                        <div id="variants_line_graph2" data-url="{% url 'variants_line_graph' fecha='1-2-21|28-2-21' variant='S:N501' %}"></div>
+                        <div id="variants_line_graph2" data-url="{% url 'variants_line_graph' variant='S:N501' fecha_inicial='2020-01-01' fecha_final='2030-1-1'%}"></div>
                       </div>  
                     </div>
                   </div>
@@ -213,7 +213,7 @@
               <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
               <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
             <div class="container-lg pt-3 pb-5">
-              <div id="variants_column_graph" data-url="{% url 'variants_column_graph' fecha='1-2-21|28-2-21' variant='20E (EU1)' %}"></div>
+              <div id="variants_column_graph" data-url="{% url 'variants_column_graph' variant='20E (EU1)' fecha_inicial='2020-01-01' fecha_final='2030-1-1' %}"></div>
             </div>
           </div>
         </div>
