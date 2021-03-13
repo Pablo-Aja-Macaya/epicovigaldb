@@ -31,7 +31,60 @@ def consorcio(request):
 ## Gráficas ##
 from upload.models import SampleMetaData
 from django.http import JsonResponse
+from django.db.models import F
+from django.db.models import Count
 from datetime import date, datetime
+import geojson
+import random
+
+def concellos_gal_graph(request):
+    map_file = '/home/pabs/GaliciaConcellos.geojson'
+    with open(map_file) as map:
+        geojson_data = geojson.load(map)
+
+    data = []
+    # for i in geojson_data['features']:
+    #     data.append({'NomeMAY':i['properties']['NomeMAY'], 'value':random.randint(1,5000)})
+    # print(data)
+    data = list(Sample.objects.values('id_region__localizacion').filter(id_region__localizacion__gte=2).order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
+    chart = {
+        'chart':{
+            'map':geojson_data,
+        },
+        'title': {
+            'text': 'Procedencia de muestras'
+        },    
+        'colorAxis': {
+            'tickPixelInterval': 10,
+            'stops': [[0, '#ffe5e3'], [0.65, '#f04d55'], [1, '#f50a15']],
+        },
+        'tooltip': {
+          'headerFormat': '',
+          'pointFormat': '<b>{point.NomeMAY}</b><br>Muestras: {point.value}'
+        },
+        'mapNavigation': {
+            'enabled': 'true',
+            'buttonOptions': {
+                'verticalAlign': 'bottom'
+            }
+        },  
+        'series': [{
+            'data': data,
+            'keys': ['NomeMAY', 'value'],
+            'joinBy': 'NomeMAY',
+            'name': 'Muestras',
+            'states': {
+                'hover': {
+                    'color': '#a4edba'
+                }
+            },
+            'dataLabels': {
+                'enabled': 'true',
+                'format': '{point.properties.postal}'
+            }           
+        }],      
+    }
+    return JsonResponse(chart)
 
 def hospital_graph(request, fecha_inicial, fecha_final):
     hospitales = SampleMetaData.objects.filter(id_uvigo__fecha_muestra__range=[fecha_inicial,fecha_final]).values('id_hospital')

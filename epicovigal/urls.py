@@ -28,6 +28,7 @@ urlpatterns = [
     path('hospital_graph/<str:fecha_inicial>+<str:fecha_final>', views.hospital_graph, name="hospital_graph"),
     path('variants_line_graph/<str:fecha_inicial>+<str:fecha_final>/<str:variant>', views.variants_line_graph, name="variants_line_graph"),
     path('variants_column_graph/<str:fecha_inicial>+<str:fecha_final>/<str:variant>', views.variants_column_graph, name="variants_column_graph"),
+    path('concellos_gal_graph', views.concellos_gal_graph, name="concellos_gal_graph"),
 
     # Apps
     path('accounts/', include('accounts.urls')),
