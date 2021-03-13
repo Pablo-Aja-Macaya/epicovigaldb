@@ -18,11 +18,13 @@
 
 
 
-<div class="container-lg pt-2 pb-4">
-    <div class="card" style="width: 100%;">
+
+
+  <div class="container-lg pt-2 pb-4">
+    <div class="card" style="width: 100%;border-style: none;">
       <div class="row">
-        <div class="col-lg-6">
-          <div class="card-body" >
+        <div class="col-lg-6 d-flex justify-content-center my-auto">
+          <div class="card-body">
               <h5 class="card-title"><strong>Procedencia de muestras</strong></h5>
               <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
               <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
@@ -30,6 +32,24 @@
         </div>
         <div class="col-lg-6 justify-content-center my-auto">
           <div id="hospital_graph" data-url="{% url 'hospital_graph' fecha_inicial=report.fecha_inicial|date:'Y-m-d' fecha_final=report.fecha_final|date:'Y-m-d' %}"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>  
+
+  <div class="container-lg pt-2 pb-4">
+    <div class="card" style="width: 100%; border-style: none;">
+      <div class="row">
+        <div class="col-lg-6 justify-content-center my-auto">
+          <div class="card-body">
+              <h5 class="card-title"><strong>Geolocalización de muestras</strong></h5>
+              <h6 class="card-subtitle mb-2 text-muted">Mapa: Instituto Geográfico Nacional de España</h6>
+              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
+          </div>
+        </div>
+        <div class="col-lg-6 justify-content-center my-auto">
+          <div id="concellos_gal_graph" data-url="{% url 'concellos_gal_graph' fecha_inicial=report.fecha_inicial|date:'Y-m-d' fecha_final=report.fecha_final|date:'Y-m-d' %}" style="height: 700px;"></div>
         </div>
       </div>
     </div>
@@ -105,6 +125,16 @@
     </div>
   </div> 
   {% endfor %}
+
+  <script>
+    $.ajax({
+      url: $("#concellos_gal_graph").attr("data-url"),
+      dataType: 'json',
+      success: function (data) {
+        Highcharts.mapChart("concellos_gal_graph", data);
+      }
+    });
+  </script>
   <script>
     $.ajax({
       url: $("#hospital_graph").attr("data-url"),

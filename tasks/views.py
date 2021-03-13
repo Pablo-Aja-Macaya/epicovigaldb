@@ -37,22 +37,29 @@ from datetime import date, datetime
 import geojson
 import random
 
-def concellos_gal_graph(request):
-    map_file = '/home/pabs/GaliciaConcellos.geojson'
+def concellos_gal_graph(request, fecha_inicial, fecha_final):
+    map_file = '/home/pabs/GaliciaConcellos_Simple.geojson'
+    # map_file = '/home/pabs/GaliciaComarcas.geojson'
     with open(map_file) as map:
         geojson_data = geojson.load(map)
 
-    data = []
-    # for i in geojson_data['features']:
-    #     data.append({'NomeMAY':i['properties']['NomeMAY'], 'value':random.randint(1,5000)})
-    # print(data)
-    data = list(Sample.objects.values('id_region__localizacion').filter(id_region__localizacion__gte=2).order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
+
+    # data = list(Sample.objects.values('id_region__localizacion').filter(id_region__localizacion__gte=2).order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
+    data = list(Sample.objects.values('id_region__localizacion')\
+            .filter(id_region__localizacion__gte=2)\
+            .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
+            .order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
+
     chart = {
         'chart':{
             'map':geojson_data,
         },
+        'boost': {
+            'seriesThreshold': 1,
+            'useGPUTranslations': 'true'
+        },
         'title': {
-            'text': 'Procedencia de muestras'
+            'text': ''
         },    
         'colorAxis': {
             'tickPixelInterval': 10,
@@ -60,14 +67,15 @@ def concellos_gal_graph(request):
         },
         'tooltip': {
           'headerFormat': '',
-          'pointFormat': '<b>{point.NomeMAY}</b><br>Muestras: {point.value}'
+          'pointFormat': '<b>{point.NomeMAY}</b><br>Total: {point.value}<br>Variante 1: 80%<br>Variante 2: 20%'
         },
         'mapNavigation': {
             'enabled': 'true',
             'buttonOptions': {
                 'verticalAlign': 'bottom'
             }
-        },  
+        },
+
         'series': [{
             'data': data,
             'keys': ['NomeMAY', 'value'],
