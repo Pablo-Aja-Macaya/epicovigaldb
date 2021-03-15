@@ -581,6 +581,20 @@ def send_results_processing(file):
     
 #     return unchanged, updated, new
 
+
+def update_database(fichero, fname):
+    dialect = csv.Sniffer().sniff(fichero.readline())
+    fichero.seek(0)
+    fieldnames = fichero.readline().strip().split(str(dialect.delimiter))
+    sample_name = find_sample_name(fname.name)
+
+    # Detección del origen del archivo
+    test = detect_file(fieldnames)    
+
+    # Actualizar/Insertar en base de datos
+    select_test(test, fichero, sample_name, fieldnames, dialect)
+
+
 def update():
     # Update database if there are new files in a folder or these have been modified
     pckl = 'objs.pkl'
@@ -614,48 +628,32 @@ def update():
             for f in files:
                 fname = pathlib.Path(f)
                 mtime = fname.stat().st_mtime # Time of most recent content modification expressed in seconds.
+                try:
+                    # Si el nombre del archivo ya se ha visto en el pasado
+                    if file_history.get(fname.name):
+                        # Ver diferencia de tiempos respecto al valor
+                        # del pickle, si son diferentes actualizar la base de datos
+                        if file_history[fname.name] != mtime:
+                            with open(fname, 'rt') as fichero:
+                                update_database(fichero, fname)
 
-                # Si el nombre del archivo ya se ha visto en el pasado
-                if file_history.get(fname.name):
-                    # Ver diferencia de tiempos respecto al valor
-                    # del pickle, si son diferentes actualizar la base de datos
-                    if file_history[fname.name] != mtime:
-                        with open(fname, 'rt') as fichero:
-                            dialect = csv.Sniffer().sniff(fichero.readline())
-                            fichero.seek(0)
-                            fieldnames = fichero.readline().strip().split(str(dialect.delimiter))
-                            sample_name = find_sample_name(fname.name)
+                            # Se guarda en el diccionario la nueva fecha de modificación
+                            file_history[fname.name] = mtime
+                            updated += 1
 
-                            # Detección del origen del archivo
-                            test = detect_file(fieldnames)    
+                        else:
+                            unchanged += 1
 
-                            # Actualizar base de datos
-                            select_test(test, fichero, sample_name, fieldnames, dialect)
-
-                        # Se guarda en el diccionario la nueva fecha de modificación
-                        file_history[fname.name] = mtime
-                        updated += 1
-
+                    # Si el nombre del archivo es nuevo    
                     else:
-                        unchanged += 1
-
-                # Si el nombre del archivo es nuevo    
-                else:
-                    file_history[fname.name] = mtime
-                    # insertar los datos del archivo en la base de datos
-                    with open(fname, 'rt') as fichero:
-                        dialect = csv.Sniffer().sniff(fichero.readline())
-                        fichero.seek(0)
-                        fieldnames = fichero.readline().strip().split(str(dialect.delimiter))
-                        sample_name = find_sample_name(fname.name)
-
-                        # Detección del origen del archivo
-                        test = detect_file(fieldnames)    
-
-                        # Insertar en base de datos
-                        select_test(test, fichero, sample_name, fieldnames, dialect)
-                    
-                    new += 1
+                        file_history[fname.name] = mtime
+                        # insertar los datos del archivo en la base de datos
+                        with open(fname, 'rt') as fichero:
+                            update_database(fichero, fname)
+                        
+                        new += 1
+                except:
+                    print(f'Existe algún error en el archivo: {fname}')
 
             with open(pckl_folder+pckl, 'wb') as fichero:
                 pickle.dump(file_history, fichero)
@@ -671,26 +669,15 @@ def update():
             for f in files:
                 fname = pathlib.Path(f)
                 mtime = fname.stat().st_mtime # Time of most recent content modification expressed in seconds.
+                try:
+                    with open(fname, 'rt') as fichero:
+                        update_database(fichero, fname)
+                    # Se guarda en el diccionario fecha de modificación
+                    file_history[fname.name] = mtime
+                    new += 1
 
-                with open(fname, 'rt') as fichero:
-                    cab = fichero.readline()
-                    print(cab)
-                    dialect = csv.Sniffer().sniff(cab)
-                    print(cab)
-                    fichero.seek(0)
-                    fieldnames = fichero.readline().strip().split(str(dialect.delimiter))
-                    sample_name = find_sample_name(fname.name)
-
-                    # Detección del origen del archivo
-                    test = detect_file(fieldnames)    
-
-                    # Insertar en base de datos
-                    select_test(test, fichero, sample_name, fieldnames, dialect)
-
-                # Se guarda en el diccionario fecha de modificación
-                file_history[fname.name] = mtime
-            
-            new += 1
+                except:
+                    print(f'Existe algún error en el archivo: {fname}')
 
             with open(pckl_folder+pckl, 'wb') as fichero:
                 pickle.dump(file_history, fichero)
