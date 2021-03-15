@@ -574,10 +574,15 @@ def send_results_processing(file):
 def update():
     # Update database if there are new files in a folder or these have been modified
     pckl = 'objs.pkl'
+
+    # en local
     pckl_folder = '/home/pabs/MasterBioinformatica/TFM/test/'
-    
     folder_base = '/home/pabs/MasterBioinformatica/TFM/test/testcesga/'
-    
+
+    # en cesga
+    # pckl_folder = '/root/epicovigal/data/'
+    # folder_base = '/root/epicovigal/data/tests/'
+
     subfolders = []
     target_folders = ['picard','nextclade','pangolin','ngs','variants']
     for i in target_folders:
