@@ -1,7 +1,7 @@
 {% load django_tables2 %}
 {% load i18n %}
 {% block table-wrapper %}
-<div class="table table-hover table-striped">
+<div class="table table-hover table-striped table-responsive">
     {% block pagination_top %}
         {% if table.page and table.paginator.num_pages > 1 %}
         <ul class="pagination pagination-sm justify-content-center pt-3">
@@ -54,7 +54,7 @@
         {% endif %}
     {% endblock pagination_top %}
     {% block table %}
-        <table {% render_attrs table.attrs %}>
+        <table {% render_attrs table.attrs %} class="table-sortable  mx-auto w-auto">
             {% block table.thead %}
             {% if table.show_header %}
                 <thead {{ table.attrs.thead.as_html }}>
