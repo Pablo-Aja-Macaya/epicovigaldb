@@ -208,15 +208,36 @@ def detect_file(header):
     # Aproximación mala a una detección del origen de cada archivo
     # Si cambia el número de columnas no funciona
     # Igual es mejor comprobar que todos los campos que se quieren están en el archivo
-    header_length_correspondence = {
-        43:'NextcladeTest',
-        6:'NGSstatsTest',
-        53:'PicardTest',
-        12:'SingleCheckTest', # este puede dar problemas, igual son 13 columnas
-        19:'VariantsTest',
-        7:'LineagesTest',
+    # header_length_correspondence = {
+    #     43:'NextcladeTest',
+    #     6:'NGSstatsTest',
+    #     53:'PicardTest',
+    #     12:'SingleCheckTest', # este puede dar problemas, igual son 13 columnas
+    #     19:'VariantsTest',
+    #     7:'LineagesTest',
+    # }
+    # return header_length_correspondence.get(len(header))
+
+    # Este diccionario llevará la cuenta de cuántos campos del archivo se han encontrado para cada test
+    # Se hace en caso de que haya atributos comunes en los archivos
+    probs = {
+        'NextcladeTest':0,
+        'NGSstatsTest':0,
+        'PicardTest':0,
+        'SingleCheckTest':0, 
+        'VariantsTest':0,
+        'LineagesTest':0,
     }
-    return header_length_correspondence.get(len(header))
+    for test,fields in fields_correspondence.items():
+        for name_org, name_db in fields.items():
+            if name_org in header:
+                #print(True, test)
+                probs[test] += 1
+    
+    return max(probs, key=probs.get)
+                
+
+
 
 def find_sample_name(string):
     # Encontrar si una cadena contiene 'EPI.*.X', si es así ese será el nombre de la muestra
