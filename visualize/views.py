@@ -12,34 +12,21 @@ from .models import LineagesTable, PicardTable, NextcladeTable, NGSTable, Varian
 from .models import SampleFilter, MetaDataFilter
 
 def get_completed_tests():
-    # lista = []
-    # dicc = {}
-    # tested = 'Yes'
-    # not_tested = 'No'
-
-    # next = NextcladeTest.objects.only()
-    # pic = PicardTest.objects.only()
-    # lin = LineagesTest.objects.only()
-
-    # for i in Sample.objects.only():
-    #     dicc = {}
-    #     dicc['sample'] = str(i)
-    #     if next.filter(id_uvigo=str(i)).exists():
-    #         dicc['nextclade'] = tested
-    #     else:
-    #         dicc['nextclade'] = not_tested
-    #     if pic.filter(id_uvigo=str(i)).exists():
-    #         dicc['picard'] = tested
-    #     else:
-    #         dicc['picard'] = not_tested
-    #     if lin.filter(id_uvigo=str(i)).exists():
-    #         dicc['lineages'] = tested
-    #     else:
-    #         dicc['lineages'] = not_tested
-    #     lista.append(dicc)
-
+    '''
+    Devuelve para cada muestra si se ha hecho cada test
+    '''
     lista = Sample.objects.values('id_uvigo','lineagestest','nextcladetest','ngsstatstest','picardtest','singlechecktest','variantstest')
-    return lista
+    lista2 = []
+    for i in lista:
+        fields = ['lineagestest','nextcladetest','ngsstatstest','picardtest','singlechecktest','variantstest']
+        for f in fields:
+            try:
+                int(i[f])
+                i[f] = 1
+            except:
+                pass
+        lista2.append(i)
+    return lista2
 
 @login_required(login_url="/accounts/login") 
 def general(request):  

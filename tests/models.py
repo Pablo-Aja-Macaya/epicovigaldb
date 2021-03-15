@@ -226,9 +226,37 @@ def find_sample_name(string):
     else:
         return None
 
+
+def comprobar_existencia(id_uvigo):
+    '''
+    Comprobación de la existencia de la muestra en la base de datos
+    Si no existe se crea la entrada
+    '''
+    try:
+        sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
+    except:
+        _, created = Sample.objects.update_or_create(
+                id_uvigo = id_uvigo,
+                defaults = {
+                    'id_uvigo' : id_uvigo,
+                    'id_accession' : None,
+                    'id_region' : None,
+                    'original_name' : None,
+                    'categoria_muestra':None,
+                    'edad' : None,
+                    'sexo' : None,
+                    'patient_status' : None,
+                    'nodo_secuenciacion' : None,
+                    'fecha_muestra' : None,
+                    'observaciones' : None                        
+                }
+            )
+        sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
+    
+    return sample_reference
+    
 ###################################
 ### Subida según test #####
-
 def upload_picard(reader, sample_name):
     for line in reader:
         id_uvigo = sample_name
@@ -240,7 +268,7 @@ def upload_picard(reader, sample_name):
         pct_target_bases_100x = float(line['pct_target_bases_100x'].replace(',','.'))
 
         if id_uvigo:
-            sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
+            sample_reference = comprobar_existencia(id_uvigo)
             _, created = PicardTest.objects.update_or_create(
                 id_uvigo=sample_reference,
                 defaults={
@@ -275,21 +303,19 @@ def upload_singlecheck(io_string, delimiter):
         mad = lista[mad_index]      
 
         if id_uvigo:
-            try:
-                sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
-                _, created = SingleCheckTest.objects.update_or_create(
-                    id_uvigo=sample_reference,
-                    defaults={
-                        'id_uvigo' : sample_reference,
-                        'id_process' : id_process,
-                        'autocorrelation' : autocorrelation,
-                        'variation_coefficient' : variation_coefficient,
-                        'gini_coefficient' : gini_coefficient,
-                        'mad' : mad,                  
-                    }
-                )
-            except:
-                pass
+            sample_reference = comprobar_existencia(id_uvigo)
+            _, created = SingleCheckTest.objects.update_or_create(
+                id_uvigo=sample_reference,
+                defaults={
+                    'id_uvigo' : sample_reference,
+                    'id_process' : id_process,
+                    'autocorrelation' : autocorrelation,
+                    'variation_coefficient' : variation_coefficient,
+                    'gini_coefficient' : gini_coefficient,
+                    'mad' : mad,                  
+                }
+            )
+
 def upload_ngsstats(reader):
     for line in reader:
         id_uvigo = line['id_uvigo'] # igual hay que poner aquí find_sample_name() también
@@ -298,20 +324,18 @@ def upload_ngsstats(reader):
         mapped = int(line['mapped'].replace(',','.'))
         trimmed = int(line['trimmed'].replace(',','.'))
         if id_uvigo:
-            try:
-                sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
-                _, created = NGSstatsTest.objects.update_or_create(
-                    id_uvigo=sample_reference,
-                    defaults={
-                        'id_uvigo' : sample_reference,
-                        'id_process' : id_process,
-                        'total_reads' : total_reads,
-                        'mapped' : mapped,
-                        'trimmed' : trimmed,                    
-                    }
-                )
-            except:
-                pass
+            sample_reference = comprobar_existencia(id_uvigo)
+            _, created = NGSstatsTest.objects.update_or_create(
+                id_uvigo=sample_reference,
+                defaults={
+                    'id_uvigo' : sample_reference,
+                    'id_process' : id_process,
+                    'total_reads' : total_reads,
+                    'mapped' : mapped,
+                    'trimmed' : trimmed,                    
+                }
+            )
+
 def upload_nextclade(reader):
     for line in reader:
         id_uvigo = find_sample_name(line['id_uvigo'])
@@ -324,23 +348,21 @@ def upload_nextclade(reader):
         qc_mixed_sites_status = line['qc_mixed_sites_status']
 
         if id_uvigo:
-            try:
-                sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
-                _, created = NextcladeTest.objects.update_or_create(
-                    id_uvigo=sample_reference,
-                    defaults={
-                        'id_uvigo' : sample_reference,
-                        'id_process' : id_process,
-                        'total_missing' : total_missing,
-                        'clade' : clade,
-                        'qc_private_mutations_status' : qc_private_mutations_status,
-                        'qc_missing_data_status' : qc_missing_data_status,
-                        'qc_snp_clusters_status' : qc_snp_clusters_status,
-                        'qc_mixed_sites_status' : qc_mixed_sites_status,                    
-                    }
-                )
-            except:
-                pass
+            sample_reference = comprobar_existencia(id_uvigo)
+            _, created = NextcladeTest.objects.update_or_create(
+                id_uvigo=sample_reference,
+                defaults={
+                    'id_uvigo' : sample_reference,
+                    'id_process' : id_process,
+                    'total_missing' : total_missing,
+                    'clade' : clade,
+                    'qc_private_mutations_status' : qc_private_mutations_status,
+                    'qc_missing_data_status' : qc_missing_data_status,
+                    'qc_snp_clusters_status' : qc_snp_clusters_status,
+                    'qc_mixed_sites_status' : qc_mixed_sites_status,                    
+                }
+            )
+
 
 def upload_variants(reader, sample_name):
     id_uvigo = sample_name
@@ -359,7 +381,7 @@ def upload_variants(reader, sample_name):
             alt_codon = line['alt_codon']
             alt_aa = line['alt_aa']
 
-            sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
+            sample_reference = comprobar_existencia(id_uvigo)
             _, created = VariantsTest.objects.update_or_create(
                 id_uvigo=sample_reference,
                 row=row,
@@ -389,33 +411,30 @@ def upload_lineages(reader):
 
 
         if id_uvigo:
-            try:
-                sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
-                _, created = LineagesTest.objects.update_or_create(
-                    id_uvigo=sample_reference,
+            sample_reference = comprobar_existencia(id_uvigo)
+            _, created = LineagesTest.objects.update_or_create(
+                id_uvigo=sample_reference,
+                defaults={
+                    'id_uvigo' : sample_reference,
+                    'id_process' : id_process,
+                    'lineage' : lineage,
+                    'probability' : probability,
+                    'comments' : ''                
+                }
+            )
+            lineage_reference = LineagesTest.objects.get(id_uvigo=id_uvigo)
+            for country in countries:
+                country = country.strip()
+                _, created = LineagesMostCommonCountries.objects.update_or_create(
+                    id_uvigo=lineage_reference,
                     defaults={
-                        'id_uvigo' : sample_reference,
+                        'id_uvigo' : lineage_reference,
                         'id_process' : id_process,
-                        'lineage' : lineage,
-                        'probability' : probability,
-                        'comments' : ''                
+                        'country' : country,
+                
                     }
                 )
-                lineage_reference = LineagesTest.objects.get(id_uvigo=id_uvigo)
-                for country in countries:
-                    country = country.strip()
-                    _, created = LineagesMostCommonCountries.objects.update_or_create(
-                        id_uvigo=lineage_reference,
-                        defaults={
-                            'id_uvigo' : lineage_reference,
-                            'id_process' : id_process,
-                            'country' : country,
-                    
-                        }
-                    )
-            except:
-                print('Error: Llave en subida de linajes no existe')
-                pass
+
 ################################
 def select_test(test, file, sample_name, fieldnames, dialect):
     if test != 'SingleCheckTest': # este no tiene cabecera
@@ -451,6 +470,9 @@ def send_results_processing(file):
     test = detect_file(fieldnames)
     select_test(test, io_string, sample_name, fieldnames, dialect)
 
+
+#######################################
+### Actualización desde carpeta
 def update():
     # Update database if there are new files in a folder or these have been modified
     pckl = 'objs.pkl'

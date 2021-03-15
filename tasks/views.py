@@ -41,10 +41,12 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
     map_file = '/home/pabs/GaliciaConcellos_Simple.geojson'
     # map_file = '/home/pabs/GaliciaComarcas.geojson'
     with open(map_file) as map:
-        geojson_data = geojson.load(map)
+        geojson_data = geojson.load(map) # mapa
 
 
     # data = list(Sample.objects.values('id_region__localizacion').filter(id_region__localizacion__gte=2).order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
+    
+    # Datos: [{'NomeMAY':'A CORUÑA', 'value':10}, {'NomeMAY':'SANTIAGO', 'value':15}...]
     data = list(Sample.objects.values('id_region__localizacion')\
             .filter(id_region__localizacion__gte=2)\
             .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
@@ -62,19 +64,22 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
             'text': ''
         },    
         'colorAxis': {
-            'tickPixelInterval': 10,
+            'tickPixelInterval': 100,
             'stops': [[0, '#ffe5e3'], [0.65, '#f04d55'], [1, '#f50a15']],
+            # 'labels':{
+            #     'format':'{value} x'
+            # }
         },
         'tooltip': {
           'headerFormat': '',
           'pointFormat': '<b>{point.NomeMAY}</b><br>Total: {point.value}<br>Variante 1: 80%<br>Variante 2: 20%'
         },
-        'mapNavigation': {
-            'enabled': 'true',
-            'buttonOptions': {
-                'verticalAlign': 'bottom'
-            }
-        },
+        # 'mapNavigation': {
+        #     'enabled': 'true',
+        #     'buttonOptions': {
+        #         'verticalAlign': 'bottom'
+        #     }
+        # },
 
         'series': [{
             'data': data,

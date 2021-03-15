@@ -34,23 +34,20 @@
 
   
 
-  
   <div class="container-lg pt-1 pb-4">
     <div class="card" style="width: 100%; border-style: hidden;">
       <div class="row">
         <div class="col-md-8 ">
           <div class="card-body">
-              <h5 class="card-title"><strong>EPICOVIGAL</strong></h5> 
+            <h3 class='pb-2 pt-2 text-dark' ><strong>Proyecto EPICOVIGAL </strong> </h3>
               <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec non magna nec velit aliquet pretium ac a dolor. Aliquam hendrerit aliquet mauris a dignissim. </p>
               <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec non magna nec velit aliquet pretium ac a dolor. Aliquam hendrerit aliquet mauris a dignissim. </p>
           </div>
         </div>
-        
         <div class="col-md-4 d-flex justify-content-center my-auto">
           <img src="/media/images/SARS-CoV-2_without_background.png" alt="..." width="300" height="300" class="">
         </div>
       </div>
-      
     </div>  
   </div>
 
@@ -101,7 +98,7 @@
         <div class="col-md-2 text-center my-auto">
             <div class="btn-group">
                 {% for k,v in task.url_button_dict.items %}
-                <button type="button" class="btn btn-primary  border border-dark " onclick="window.location='{% url k %}';" style="cursor: pointer;">{{v}}</button>
+                <a href="{% url k %}"><button type="button" class="btn btn-primary  border border-dark "  style="cursor: pointer;">{{v}}</button></a>
                 {% endfor %}
             </div>
         </div>
@@ -127,7 +124,7 @@
         </div>
         <div class="col-md-2 text-center my-auto">
             <div class="btn-group">
-                <button type="button" onclick="window.location='{% url 'consorcio' %}';" class="btn btn-primary  border border-dark "  style="cursor: pointer;">Go</button>
+                <a href="{% url 'consorcio' %}"><button type="button"  class="btn btn-primary  border border-dark "  style="cursor: pointer;">Go</button></a>
             </div>
         </div>
       </div>
@@ -135,7 +132,7 @@
   </div>
 
   <div class="container-lg pt-2 pb-2">
-    <h3 class='pb-2 pt-2 text-dark' ><strong>Informe general (2021) </strong> </h3>
+    <h3 class='pb-2 pt-2 text-dark' ><strong>Informe general (2020-2021) </strong> </h3>
   </div>
   <div class="container-lg pt-2 pb-4">
     <div class="card" style="width: 100%;border-style: none;">
