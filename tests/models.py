@@ -205,18 +205,7 @@ fields_correspondence = {
 }
 
 def detect_file(header):
-    # Aproximación mala a una detección del origen de cada archivo
-    # Si cambia el número de columnas no funciona
-    # Igual es mejor comprobar que todos los campos que se quieren están en el archivo
-    # header_length_correspondence = {
-    #     43:'NextcladeTest',
-    #     6:'NGSstatsTest',
-    #     53:'PicardTest',
-    #     12:'SingleCheckTest', # este puede dar problemas, igual son 13 columnas
-    #     19:'VariantsTest',
-    #     7:'LineagesTest',
-    # }
-    # return header_length_correspondence.get(len(header))
+    # Detección del tipo de archivo 
 
     # Este diccionario llevará la cuenta de cuántos campos del archivo se han encontrado para cada test
     # Se hace en caso de que haya atributos comunes en los archivos
@@ -684,7 +673,10 @@ def update():
                 mtime = fname.stat().st_mtime # Time of most recent content modification expressed in seconds.
 
                 with open(fname, 'rt') as fichero:
-                    dialect = csv.Sniffer().sniff(fichero.readline())
+                    cab = fichero.readline()
+                    print(cab)
+                    dialect = csv.Sniffer().sniff(cab)
+                    print(cab)
                     fichero.seek(0)
                     fieldnames = fichero.readline().strip().split(str(dialect.delimiter))
                     sample_name = find_sample_name(fname.name)
