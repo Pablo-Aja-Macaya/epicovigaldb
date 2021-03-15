@@ -604,8 +604,8 @@ def update():
     folder_base = '/home/pabs/MasterBioinformatica/TFM/test/testcesga/'
 
     # en cesga
-    # pckl_folder = '/root/epicovigal/data/'
-    # folder_base = '/root/epicovigal/data/tests/'
+    pckl_folder = '/root/epicovigal/data/'
+    folder_base = '/root/epicovigal/data/tests/'
 
     subfolders = []
     target_folders = ['picard','nextclade','pangolin','ngs','variants']
@@ -652,8 +652,9 @@ def update():
                             update_database(fichero, fname)
                         
                         new += 1
-                except:
+                except Exception as e:
                     print(f'Existe algún error en el archivo: {fname}')
+                    print(e)
 
             with open(pckl_folder+pckl, 'wb') as fichero:
                 pickle.dump(file_history, fichero)
@@ -676,8 +677,9 @@ def update():
                     file_history[fname.name] = mtime
                     new += 1
 
-                except:
+                except Exception as e:
                     print(f'Existe algún error en el archivo: {fname}')
+                    print(e)
 
             with open(pckl_folder+pckl, 'wb') as fichero:
                 pickle.dump(file_history, fichero)
