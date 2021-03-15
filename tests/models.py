@@ -6,6 +6,7 @@ import datetime
 import glob
 import pickle
 from upload.models import Sample
+import traceback
 
 ### Posibles tests ###
 class PicardTest(models.Model): #.picardOutputCleaned.tsv
@@ -654,7 +655,7 @@ def update():
                         new += 1
                 except Exception as e:
                     print(f'Existe algún error en el archivo: {fname}')
-                    print(e)
+                    print(traceback.print_exc())
 
             with open(pckl_folder+pckl, 'wb') as fichero:
                 pickle.dump(file_history, fichero)
@@ -679,7 +680,7 @@ def update():
 
                 except Exception as e:
                     print(f'Existe algún error en el archivo: {fname}')
-                    print(e)
+                    print(traceback.print_exc())
 
             with open(pckl_folder+pckl, 'wb') as fichero:
                 pickle.dump(file_history, fichero)
