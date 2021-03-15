@@ -2,32 +2,73 @@
 
 {% block content %}
 
-{% if error %}
-<div class="alert alert-danger" role="alert">
-  {{ error }}
-</div>
-<br />
-{% endif %}
+
 
 <body>
-  <div class="container">
+  <!-- <div class="container">
+    {% if error %}
+    <div class='row-12'>
+      <div class="alert alert-danger" role="alert">
+        {{ error }}
+      </div>      
+    </div>
+
+    {% endif %}
+  
     <div class="row justify-content-center align-items-center text-center" style="height:700px;">
         <div class="col">
           <h3><img src="/media/images/Epicovigal.icon_-1.png" alt="..." width="65" height="65"> <strong style="font-family: Georgia, 'Times New Roman', Times, serif;">EPICOVIGAL DB</strong></h3>
           <form method="POST" action="{% url 'login' %}">
               {% csrf_token %}
               <br />
-              <input type="text" name="username"  placeholder="User"/>
+              <input type="text" name="username"  placeholder="Usuario" id="validationServer03"/>
+              <div id="validationServer03Feedback" class="invalid-feedback">
+                Please provide a valid city.
+              </div>
               <br />
               <br />
-              <input type="password" name="password" placeholder="Password" />
+              <input type="password" name="password" placeholder="Contraseña" />
               <br />
               <br />
               <input class="btn btn-primary" type="submit" value="Login" />
           </form>
         </div>
     </div>
+  </div> -->
+
+
+  <div class="jumbotron d-flex align-items-center" style="height:700px; background-color: white;">
+    <div class="container">
+      <div class="row justify-content-center align-items-center text-center" style="height:700px;">
+        <div class="col">
+          {% if error %}
+          <div class="container" style="width: 25rem;">
+            <div class="alert alert-danger " role="alert" >
+              {{ error }}
+            </div>              
+          </div>
+    
+          {% endif %} 
+          <h3><img src="/media/images/Epicovigal.icon_-1.png" alt="..." width="65" height="65"> <strong style="font-family: Georgia, 'Times New Roman', Times, serif;">EPICOVIGAL DB</strong></h3>
+          <form method="POST" action="{% url 'login' %}">
+              {% csrf_token %}
+              <br />
+              <input type="text" name="username"  placeholder="Usuario" id="validationServer03"/>
+              <div id="validationServer03Feedback" class="invalid-feedback">
+                Please provide a valid city.
+              </div>
+              <br />
+              <br />
+              <input type="password" name="password" placeholder="Contraseña" />
+              <br />
+              <br />
+              <input class="btn btn-primary" type="submit" value="Login" />
+          </form>
+        </div>
+    </div>
+    </div>
   </div>
+  
 </body>
 
 

@@ -9,7 +9,7 @@
         <a href="#" class="list-group-item list-group-item-action">
         <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1 text-dark" ><strong>Informe general (2021)</strong></h5>
-            <small>1 days ago</small>
+            <small>Hace 2 días</small>
         </div>
         <p class="mb-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis,</p>
         <small>January 1, 2021 - December 31, 2021</small>
@@ -22,7 +22,7 @@
       <a href="{% url 'report' id=report.id %}" class="list-group-item list-group-item-action">
         <div class="d-flex w-100 justify-content-between">
           <h5 class="mb-1 text-dark" ><strong>{{ report.get_month }} ({{ report.get_year }})</strong></h5>
-          <small>1 days ago</small>
+          <small>Hace 2 días</small>
         </div>
         <p class="mb-1">{{ report.subtitulo }}</p>
         <small>{{ report.fecha_inicial }} - {{ report.fecha_final }}</small>

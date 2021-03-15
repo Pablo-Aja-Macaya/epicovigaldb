@@ -16,6 +16,7 @@ def upload_test_results(request):
 
 @login_required(login_url="/accounts/login")
 def send_selection(request):
+    
     if request.method == 'POST':
         test_list = ['Picard','SingleCheck', 'NGSStats', 'NextClade', 'iVar', 'Lineages']
         selected_tests = {}
@@ -29,22 +30,23 @@ def send_selection(request):
         # prueba() # celery
 
         if 1 in selected_tests.values():
-          return render(request, 'tests/selection.html', {'message':'The tests are running!'})
+          return render(request, 'tests/selection.html', {'message':'Tests corriendo!'})
         else:
-          return render(request, 'tests/selection.html', {'warning':'No test selected'})
+          return render(request, 'tests/selection.html', {'warning':'Ningún test seleccionado.'})
         
 @login_required(login_url="/accounts/login")
 def send_results(request):
+    # Apartado de subida de archivos de resultados
     def check_file(): # TO-DO
         pass   
     if request.method == 'POST':
         for file in request.FILES.getlist('documents'):
             send_results_processing(file)
-        return render(request, 'tests/upload_test_results.html', {'message':'On going'})
+        return render(request, 'tests/upload_test_results.html', {'message':'Archivos subidos a la base de datos!'})
 
 @login_required(login_url="/accounts/login")
 def update_from_folder(request):
     print('Updating')
     print('='*50)
     unchanged, updated, new = update()
-    return render(request, 'tests/upload_test_results.html', {'message':f'Updated (Unchanged: {unchanged}, Updated: {updated}, New: {new})'})
+    return render(request, 'tests/upload_test_results.html', {'message':f'Actualización completa (Sin cambios: {unchanged}, Actualizados: {updated}, Nuevos: {new})'})

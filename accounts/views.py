@@ -25,7 +25,7 @@ def login(request):
             auth.login(request, user)
             return redirect('home')
         else:
-            return render(request, 'accounts/login.html', {'error':'Username or password is incorrect.'})
+            return render(request, 'accounts/login.html', {'error':'Usuario y/o contraseña incorrectos'})
     else:
         return render(request, 'accounts/login.html')
 

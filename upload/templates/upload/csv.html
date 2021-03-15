@@ -6,10 +6,10 @@
 <div class="container-lg">
   <ul class="nav nav-tabs">
     <li class="nav-item">
-      <a class="nav-link active" href="#">Upload CSV</a>
+      <a class="nav-link active" href="#">Subir archivo CSV/TSV</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="manual">Upload manually</a>
+      <a class="nav-link" href="manual">Subida manual</a>
     </li>
   </ul>
   <p></p>
@@ -69,18 +69,18 @@
       <!-- Origen -->
       <fieldset class="form-group">
         <div class="row">
-          <legend class="col-form-label col-sm-2 pt-0">Origin</legend>
+          <legend class="col-form-label col-sm-2 pt-0">Origen</legend>
           <div class="col-sm-10">
             <div class="form-check">
               <input class="form-check-input" type="radio" name="origin" id="gridRadios1" value="hospital" checked>
               <label class="form-check-label" for="gridRadios1">
-                Hospital samples
+                Muestras de hospital
               </label>
             </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="origin" id="gridRadios2" value="gisaid">
+            <div class="form-check " >
+              <input class="form-check-input" type="radio" name="origin" id="gridRadios2" value="gisaid" disabled>
               <label class="form-check-label" for="gridRadios2">
-                GISAID samples
+                Muestras de GISAID
               </label>
             </div>
             <div class="form-check disabled">
@@ -93,31 +93,31 @@
         </div>
       </fieldset>
       <div class="form-group row">
-        <div class="col-sm-2">Other option</div>
+        <div class="col-sm-2">Otra opción</div>
         <div class="col-sm-10">
           <div class="form-check">
             <input class="form-check-input" type="checkbox" id="gridCheck1">
             <label class="form-check-label" for="gridCheck1">
-              Other option
+              Otra opción
             </label>
           </div>
         </div>
       </div>
       <!-- Archivo -->
       <div class="form-group row">
-        <div class="col-sm-2">Select file</div>
+        <div class="col-sm-2">Archivo</div>
         <div class="col-sm-10">
           <div class="custom-file ">
             <input type="file" class="custom-file-input" name="document" id="inputGroupFile02" >
-            <label class="custom-file-label" for="inputGroupFile04">Choose file</label>
+            <label class="custom-file-label" for="inputGroupFile04">Seleccionar archivo</label>
             <small id="inputHelpBlock" class="form-text text-muted">
-              The csv must have the same structure as the <a href="#" data-toggle="modal" data-target="#exampleModal"><strong>example</strong></a>.
+              El archivo debe tener la misma estructura que este <a href="#" data-toggle="modal" data-target="#exampleModal"><strong>ejemplo</strong></a>.
             </small>
           </div>
         </div>
       </div>  
       <div class="form-group row justify-content-center">
-          <a href="javascript:{document.getElementById('upload_csv').submit()}"><button type="submit" class="btn btn-primary" data-toggle="collapse" data-target="#collapseLoading" aria-expanded="false" aria-controls="collapseExample">Upload</button></a>
+          <a href="javascript:{document.getElementById('upload_csv').submit()}"><button type="submit" class="btn btn-primary" data-toggle="collapse" data-target="#collapseLoading" aria-expanded="false" aria-controls="collapseExample">Subir archivo</button></a>
       </div>
     </form>
   </div>
@@ -127,22 +127,25 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title" id="exampleModalLabel">CSV structure</h4>
+          <h4 class="modal-title" id="exampleModalLabel">Estructura de archivo</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <p><strong>IMPORTANT NOTE:</strong> The header format does not matter, it just has to keep the same order.</p>
+          <div class="alert alert-info" role="alert">
+            <p><strong>IMPORTANTE:</strong> El orden de la cabecera no importa, pero debe mantener los mismos nombres</p>
+          </div>
+          
           <hr></hr>
           <h6><strong>Hospital CSVs</strong> </h6>
-          <p>'id_uvigo; fecha_entrada_uv; id_hospital; numero_envio; id_tube; id_sample; collection_date; id_patient; gender; age; location; cp; ct_orf1ab; ct_gen_e; ct_gen_n; ct_rdrp; hospitalizacion; uci; fecha_sintomas; fecha_diagnostico; observaciones'</p>
+          <p>'Código UVIGO;	Entrada muestra UVIGO;	Hospital extracción;	Nº Envío;	ID tubo;	ID muestra;	Fecha toma muestra (DD/MM/AAAA);	ID paciente;	Sexo paciente (H/M);	Edad paciente (años);	Ciudad residencia paciente;	Código postal residencia paciente;	Ct ORF1ab;	Ct gen E;	Ct gen N;	Ct RdRP;	Ct S;	Hospitalización paciente (S/N);	UCI paciente (S/N);	Fecha inicio síntomas (DD/MM/AAAA);	Fecha diagnóstico (DD/MM/AAAA);	Fecha envío cDNA;	Nodo de secuenciación;	Fecha run NGS;	Entrada FASTQ UVIGO;	Observaciones;'</p>
           <hr></hr>
           <h6><strong>GISAID CSVs</strong> </h6>
-          <p>blablabla</p>
+          <p>Placeholder</p>
           <hr></hr>
           <h6><strong>TRANSMIT CSVs</strong> </h6>
-          <p>blablabla</p>
+          <p>Placeholder</p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
@@ -156,11 +159,11 @@
     <div class="card card-body border-0">  
       <div class="d-flex justify-content-center text-center">
         <div class="spinner-border text-primary" style="width: 5rem; height: 5rem;" role="status">
-          <span class="sr-only">Loading...</span>   
+          <span class="sr-only">Cargando...</span>   
         </div>   
       </div>
       <div class="d-flex justify-content-center text-center pt-3">   
-      <strong>Loading</strong>
+      <strong>Cargando</strong>
       </div>  
     </div>
   </div>

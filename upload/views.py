@@ -38,13 +38,13 @@ def upload(request):
             else:
                 return render(request, 'upload/csv.html', {'message':'Se ha completado la actualización. Finalizando coordenadas por detrás.'})            
         else:
-            return render(request, 'upload/csv.html',{'warning':'Origin not implemented yet'})
+            return render(request, 'upload/csv.html',{'warning':'Origen no implementado.'})
         # except Exception as e:
         #     print(e)
-        #     return render(request, 'upload/csv.html',{'warning':'Something went wrong (1).'})
+        #     return render(request, 'upload/csv.html',{'warning':'Algo ha ido mal (1).'})
 
     else:
-        return render(request, 'upload/csv.html',{'message':'Something went wrong (2).'})
+        return render(request, 'upload/csv.html',{'message':'Algo ha ido mal (2).'})
     
 
 
