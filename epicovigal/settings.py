@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,6 +33,13 @@ ALLOWED_HOSTS = ['*' #python manage.py runserver 0.0.0.0:8000
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'axes', # limitador de logins
     'dbbackup',
     'django_tables2',
     'django_filters',
@@ -44,12 +52,6 @@ INSTALLED_APPS = [
     'upload.apps.UploadConfig',
     'accounts.apps.AccountsConfig',
     'tasks.apps.TasksConfig',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
 ]
 
 MIDDLEWARE = [
@@ -60,7 +62,22 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'axes.middleware.AxesMiddleware' # este tiene que ir de último
 ]
+
+
+# AXE
+AUTHENTICATION_BACKENDS = [
+    # AxesBackend should be the first backend in the AUTHENTICATION_BACKENDS list.
+    'axes.backends.AxesBackend',
+
+    # Django ModelBackend is the default authentication backend.
+    'django.contrib.auth.backends.ModelBackend',
+]
+AXES_COOLOFF_TIME = timedelta(minutes=10)
+AXES_RESET_ON_SUCCESS = True
+AXES_FAILURE_LIMIT = 5
+AXES_LOCKOUT_TEMPLATE = 'accounts/lockout.html'
 
 ROOT_URLCONF = 'epicovigal.urls'
 

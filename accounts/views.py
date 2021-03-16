@@ -20,12 +20,12 @@ from django.contrib import auth
 
 def login(request):
     if request.method == 'POST':
-        user = auth.authenticate(username=request.POST['username'], password=request.POST['password'])
+        user = auth.authenticate(request=request, username=request.POST['username'], password=request.POST['password'])
         if user is not None:
             auth.login(request, user)
             return redirect('home')
         else:
-            return render(request, 'accounts/login.html', {'error':'Usuario y/o contraseña incorrectos'})
+            return render(request, 'accounts/login.html', {'error':'Usuario y/o contraseña incorrectos. Si se falla 5 veces su dirección IP será bloqueada durante cierto tiempo.'})
     else:
         return render(request, 'accounts/login.html')
 
