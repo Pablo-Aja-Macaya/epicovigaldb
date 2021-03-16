@@ -6,13 +6,13 @@
     <h3 class='pb-2 pt-2 text-dark' ><strong>Informe completo</strong> </h3>
 
     <div class="list-group pb-3">
-        <a href="#" class="list-group-item list-group-item-action">
-        <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1 text-dark" ><strong>Informe general (2021)</strong></h5>
-            <small>Hace 2 días</small>
-        </div>
-        <p class="mb-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis,</p>
-        <small>January 1, 2021 - December 31, 2021</small>
+        <a href="{% url 'general_report' fecha_inicial='2020-03-01' fecha_final='2021-12-31'%}" class="list-group-item list-group-item-action">
+          <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1 text-dark" ><strong>Informe completo (2020-2021)</strong></h5>
+              <small>Hace 2 días</small>
+          </div>
+          <p class="mb-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis,</p>
+          <small>January 1, 2021 - December 31, 2021</small>
         </a>
     </div>
 

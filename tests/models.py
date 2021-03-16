@@ -605,8 +605,8 @@ def update():
     folder_base = '/home/pabs/MasterBioinformatica/TFM/test/testcesga/'
 
     # en cesga
-    pckl_folder = '/root/epicovigal/data/'
-    folder_base = '/root/epicovigal/data/tests/'
+    # pckl_folder = '/root/epicovigal/data/'
+    # folder_base = '/root/epicovigal/data/tests/'
 
     subfolders = []
     target_folders = ['picard','nextclade','pangolin','ngs','variants']
