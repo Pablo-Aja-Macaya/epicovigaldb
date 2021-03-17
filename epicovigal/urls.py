@@ -18,12 +18,14 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from tasks import views
-
+from django.views.static import serve
+from django.conf.urls import url
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name="home"),
     path('consorcio', views.consorcio, name="consorcio"),
-
+    url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT, }),
+    
     # Gráficas
     path('hospital_graph/<str:fecha_inicial>+<str:fecha_final>', views.hospital_graph, name="hospital_graph"),
     path('variants_line_graph/<str:fecha_inicial>+<str:fecha_final>/<str:variant>', views.variants_line_graph, name="variants_line_graph"),
@@ -39,4 +41,4 @@ urlpatterns = [
     path('jobstatus/', include('jobstatus.urls')),
     path('nextstrain/', include('nextstrainApp.urls')),
     path('microreact/', include('microreact.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -4,7 +4,7 @@ class Task(models.Model):
     title = models.CharField(max_length=50)
     urls = models.TextField() # escribir posibles urls separadas por ;
     buttons = models.TextField() # escribir posibles botones separados por ;
-    image = models.ImageField(upload_to='images/')
+    image = models.ImageField(upload_to='tasks')
     body = models.TextField(max_length=300)
     show_to = models.TextField(max_length=10, default=None, blank=True)
 

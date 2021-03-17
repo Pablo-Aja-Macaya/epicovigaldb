@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '*5=a)@xbhtoyngk(yvi(1qjy_p5i)k8g8m&=iy9!g$=mu4v-6l5' # not the key
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = TEMPLATE_DEBUG = True
+DEBUG = TEMPLATE_DEBUG = False
 
 ALLOWED_HOSTS = ['*' #python manage.py runserver 0.0.0.0:8000
 
@@ -168,15 +168,18 @@ USE_TZ = True
 
 import os
 
+
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'epicovigal/static/')
+    os.path.join(BASE_DIR, 'epicovigal/static/'),
+    os.path.join(BASE_DIR, 'tasks/static')
 ]
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 def FILTERS_VERBOSE_LOOKUPS():
     from django_filters.conf import DEFAULTS
