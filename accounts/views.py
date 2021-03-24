@@ -25,7 +25,7 @@ def login(request):
             auth.login(request, user)
             return redirect('home')
         else:
-            return render(request, 'accounts/login.html', {'error':'Usuario y/o contraseña incorrectos. Si se falla 5 veces su dirección IP será bloqueada durante cierto tiempo.'})
+            return render(request, 'accounts/login.html', {'error':'Usuario y/o contraseña incorrectos. Si se falla 3 veces su dirección IP será bloqueada durante cierto tiempo.'})
     else:
         return render(request, 'accounts/login.html')
 
