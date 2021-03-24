@@ -148,11 +148,11 @@ fields_correspondence = {
     # Picard #.picardOutputCleaned.tsv
     # Muestra a partir del nombre del archivo
     'PicardTest':{
-        'MEAN_TARGET_COVERAGE':'mean_target_coverage',
-        'MEDIAN_TARGET_COVERAGE':'median_target_coverage',
-        'PCT_TARGET_BASES_1X':'pct_target_bases_1x',
-        'PCT_TARGET_BASES_10X':'pct_target_bases_10x',
-        'PCT_TARGET_BASES_100X':'pct_target_bases_100x',
+        'mean_target_coverage':'mean_target_coverage',
+        'median_target_coverage':'median_target_coverage',
+        'pct_target_bases_1x':'pct_target_bases_1x',
+        'pct_target_bases_10x':'pct_target_bases_10x',
+        'pct_target_bases_100x':'pct_target_bases_100x',
     },
     # SingleCheck #.trimmed.sorted.SingleCheck.txt
     # Este no tiene cabecera así que se usa el índice de la columna
@@ -167,41 +167,46 @@ fields_correspondence = {
     # NGSStats #.ngsinfo.tsv
     # Muestra # a partir de columna 'sampleName'
     'NGSstatsTest':{
-        'sampleName':'id_uvigo',
-        'totalReads':'total_reads',
+        'samplename':'id_uvigo',
+        'totalreads':'total_reads',
         'mapped':'mapped',
         'trimmed':'trimmed',       
     },
     # Nextclade # .csv
     # Muestra a partir de columna 'seqName'
     'NextcladeTest':{
-        'seqName':'id_uvigo',
-        'totalMissing':'total_missing',
+        'seqname':'id_uvigo',
+        'totalmissing':'total_missing',
         'clade':'clade',
-        'qc.privateMutations.status':'qc_private_mutations_status',
-        'qc.missingData.status':'qc_missing_data_status',
-        'qc.snpClusters.status':'qc_snp_clusters_status',
-        'qc.mixedSites.status':'qc_mixed_sites_status',   
+        'qc.privatemutations.status':'qc_private_mutations_status',
+        'qc.missingdata.status':'qc_missing_data_status',
+        'qc.snpclusters.status':'qc_snp_clusters_status',
+        'qc.mixedsites.status':'qc_mixed_sites_status',   
     },
     # iVar #.tsv
     # Muestra a partir del nombre del archivo
     'VariantsTest':{
-        'POS':'pos',
-        'REF':'ref',
-        'ALT':'alt',
-        'ALT_FREQ':'alt_freq', 
-        'REF_CODON':'ref_codon',
-        'REF_AA':'ref_aa',
-        'ALT_CODON':'alt_codon',
-        'ALT_AA':'alt_aa',           
+        'pos':'pos',
+        'ref':'ref',
+        'alt':'alt',
+        'alt_freq':'alt_freq', 
+        'ref_codon':'ref_codon',
+        'ref_aa':'ref_aa',
+        'alt_codon':'alt_codon',
+        'alt_aa':'alt_aa',           
     },
     # Pangolin # .csv
     # Muestra a partir de columna 'taxon'
     'LineagesTest':{
-        'Sequence name':'id_uvigo',
-        'Lineage':'lineage',
-        'Probability':'probability',
-        'Most common countries':'most_common_countries' ### añadir a modelo
+        'sequence name':'id_uvigo',
+        'taxon':'id_uvigo',
+        'lineage':'lineage',
+        'probability':'probability',
+        'most common countries':'most_common_countries',
+        # Extras de versión de herramienta local:
+        'pangolearn_version':'pangolearn_version',
+        'note':'comments'
+
     },
 }
 
@@ -219,7 +224,7 @@ def detect_file(header):
         'LineagesTest':0,
     }
     for test,fields in fields_correspondence.items():
-        for name_org, name_db in fields.items():
+        for name_org in fields.keys():
             if name_org in header:
                 #print(True, test)
                 probs[test] += 1
@@ -272,11 +277,11 @@ def upload_picard(reader, sample_name):
     for line in reader:
         id_uvigo = sample_name
         id_process = 'U-XXX'
-        mean_target_coverage = float(line['mean_target_coverage'].replace(',','.'))
-        median_target_coverage = float(line['median_target_coverage'].replace(',','.'))
-        pct_target_bases_1x = float(line['pct_target_bases_1x'].replace(',','.'))
-        pct_target_bases_10x = float(line['pct_target_bases_10x'].replace(',','.'))
-        pct_target_bases_100x = float(line['pct_target_bases_100x'].replace(',','.'))
+        mean_target_coverage = float(line.get('mean_target_coverage','').replace(',','.'))
+        median_target_coverage = float(line.get('median_target_coverage','').replace(',','.'))
+        pct_target_bases_1x = float(line.get('pct_target_bases_1x','').replace(',','.'))
+        pct_target_bases_10x = float(line.get('pct_target_bases_10x','').replace(',','.'))
+        pct_target_bases_100x = float(line.get('pct_target_bases_100x','').replace(',','.'))
 
         if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
@@ -297,6 +302,7 @@ def upload_singlecheck(io_string, delimiter):
     io_string.seek(0)
 
     # TO-DO: usar diccionario fields_correspondence
+    # Esto nos da la posición de la linea donde se encuentra el valor para cada tributo
     id_uvigo_index = fields_correspondence['SingleCheckTest']['id_uvigo']
     autocorrelation_index = fields_correspondence['SingleCheckTest']['autocorrelation']
     variation_coefficient_index = fields_correspondence['SingleCheckTest']['variation_coefficient']
@@ -329,11 +335,11 @@ def upload_singlecheck(io_string, delimiter):
 
 def upload_ngsstats(reader):
     for line in reader:
-        id_uvigo = line['id_uvigo'] # igual hay que poner aquí find_sample_name() también
+        id_uvigo = line.get('id_uvigo') # igual hay que poner aquí find_sample_name() también
         id_process = 'U-XXX'
-        total_reads = int(line['total_reads'].replace(',','.'))
-        mapped = int(line['mapped'].replace(',','.'))
-        trimmed = int(line['trimmed'].replace(',','.'))
+        total_reads = int(line.get('total_reads','').replace(',','.'))
+        mapped = int(line.get('mapped','').replace(',','.'))
+        trimmed = int(line.get('trimmed','').replace(',','.'))
         if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
             _, created = NGSstatsTest.objects.update_or_create(
@@ -349,14 +355,14 @@ def upload_ngsstats(reader):
 
 def upload_nextclade(reader):
     for line in reader:
-        id_uvigo = find_sample_name(line['id_uvigo'])
+        id_uvigo = find_sample_name(line.get('id_uvigo'))
         id_process = 'U-XXX'
-        total_missing = int(line['total_missing'].replace(',','.'))
-        clade = line['clade']
-        qc_private_mutations_status = line['qc_private_mutations_status']
-        qc_missing_data_status = line['qc_missing_data_status']
-        qc_snp_clusters_status = line['qc_snp_clusters_status']
-        qc_mixed_sites_status = line['qc_mixed_sites_status']
+        total_missing = int(line.get('total_missing','').replace(',','.'))
+        clade = line.get('clade')
+        qc_private_mutations_status = line.get('qc_private_mutations_status')
+        qc_missing_data_status = line.get('qc_missing_data_status')
+        qc_snp_clusters_status = line.get('qc_snp_clusters_status')
+        qc_mixed_sites_status = line.get('qc_mixed_sites_status')
 
         if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
@@ -383,14 +389,14 @@ def upload_variants(reader, sample_name):
     ## HABRA QUE HACER LLAVE PRIMARIA DE id_uvigo y cada fila?
     if id_uvigo:
         for line in reader:
-            pos = line['pos']
-            ref = line['ref']
-            alt = line['alt']
-            alt_freq = line['alt_freq']
-            ref_codon = line['ref_codon']
-            ref_aa = line['ref_aa']
-            alt_codon = line['alt_codon']
-            alt_aa = line['alt_aa']
+            pos = line.get('pos')
+            ref = line.get('ref')
+            alt = line.get('alt')
+            alt_freq = line.get('alt_freq')
+            ref_codon = line.get('ref_codon')
+            ref_aa = line.get('ref_aa')
+            alt_codon = line.get('alt_codon')
+            alt_aa = line.get('alt_aa')
 
             sample_reference = comprobar_existencia(id_uvigo)
             _, created = VariantsTest.objects.update_or_create(
@@ -414,11 +420,11 @@ def upload_variants(reader, sample_name):
 
 def upload_lineages(reader):
     for line in reader:
-        id_uvigo = find_sample_name(line['id_uvigo'])
+        id_uvigo = find_sample_name(line.get('id_uvigo'))
         id_process = 'U-XXX'
-        lineage = line['lineage']
-        probability = line['probability']
-        countries = line['most_common_countries'].split(',')
+        lineage = line.get('lineage')
+        probability = line.get('probability')
+        countries = line.get('most_common_countries','').split(',')
 
 
         if id_uvigo:
@@ -474,7 +480,8 @@ def send_results_processing(file):
     io_string = io.StringIO(data)
     dialect = csv.Sniffer().sniff(io_string.readline())
     io_string.seek(0)
-    fieldnames = io_string.readline().strip().split(str(dialect.delimiter))
+    fieldnames = io_string.readline().strip().lower().split(str(dialect.delimiter))
+    # sin lo de lower: io_string.readline().strip().split(str(dialect.delimiter))
     sample_name = find_sample_name(file.name)
 
     # Detección del origen del archivo
@@ -484,109 +491,10 @@ def send_results_processing(file):
 
 #######################################
 ### Actualización desde carpeta
-# def update():
-#     # Update database if there are new files in a folder or these have been modified
-#     pckl = 'objs.pkl'
-#     pckl_folder = '/home/pabs/MasterBioinformatica/TFM/test/'
-#     folder = '/home/pabs/MasterBioinformatica/TFM/test/carpeta_prueba_inputs/'
-
-
-
-#     updated = 0
-#     unchanged = 0
-#     new = 0
-
-#     # Si se ha hecho previamente un pckl con los archivos y sus fechas
-#     if glob.glob(pckl_folder+'*.pkl'):
-#         with open(pckl_folder+pckl, 'rb') as f:
-#             file_history = pickle.load(f)
-#         files = glob.glob(folder+'*')
-#         for f in files:
-#             fname = pathlib.Path(f)
-#             mtime = fname.stat().st_mtime # Time of most recent content modification expressed in seconds.
-
-#             # Si el nombre del archivo ya se ha visto en el pasado
-#             if file_history.get(fname.name):
-#                 # Ver diferencia de tiempos respecto al valor
-#                 # del pickle, si son diferentes actualizar la base de datos
-#                 if file_history[fname.name] != mtime:
-#                     with open(fname, 'rt') as fichero:
-#                         dialect = csv.Sniffer().sniff(fichero.readline())
-#                         fichero.seek(0)
-#                         fieldnames = fichero.readline().strip().split(str(dialect.delimiter))
-#                         sample_name = find_sample_name(fname.name)
-
-#                         # Detección del origen del archivo
-#                         test = detect_file(fieldnames)    
-
-#                         # Actualizar base de datos
-#                         select_test(test, fichero, sample_name, fieldnames, dialect)
-
-#                     # Se guarda en el diccionario la nueva fecha de modificación
-#                     file_history[fname.name] = mtime
-#                     updated += 1
-
-#                 else:
-#                     unchanged += 1
-
-#             # Si el nombre del archivo es nuevo    
-#             else:
-#                 file_history[fname.name] = mtime
-#                 # insertar los datos del archivo en la base de datos
-#                 with open(fname, 'rt') as fichero:
-#                     dialect = csv.Sniffer().sniff(fichero.readline())
-#                     fichero.seek(0)
-#                     fieldnames = fichero.readline().strip().split(str(dialect.delimiter))
-#                     sample_name = find_sample_name(fname.name)
-
-#                     # Detección del origen del archivo
-#                     test = detect_file(fieldnames)    
-
-#                     # Insertar en base de datos
-#                     select_test(test, fichero, sample_name, fieldnames, dialect)
-                
-#                 new += 1
-
-#         with open(pckl_folder+pckl, 'wb') as fichero:
-#             pickle.dump(file_history, fichero)
-    
-#     # Si no hay un pckl coger todos los archivos y actualziar la base de datos
-#     # después hacer un pckl
-#     # Esto es para la primera vez    
-#     else:
-#         file_history = {}
-#         files = glob.glob(folder+'*')
-#         for f in files:
-#             fname = pathlib.Path(f)
-#             mtime = fname.stat().st_mtime # Time of most recent content modification expressed in seconds.
-
-#             with open(fname, 'rt') as fichero:
-#                 dialect = csv.Sniffer().sniff(fichero.readline())
-#                 fichero.seek(0)
-#                 fieldnames = fichero.readline().strip().split(str(dialect.delimiter))
-#                 sample_name = find_sample_name(fname.name)
-
-#                 # Detección del origen del archivo
-#                 test = detect_file(fieldnames)    
-
-#                 # Insertar en base de datos
-#                 select_test(test, fichero, sample_name, fieldnames, dialect)
-
-#             # Se guarda en el diccionario fecha de modificación
-#             file_history[fname.name] = mtime
-        
-#         new += 1
-
-#         with open(pckl_folder+pckl, 'wb') as fichero:
-#             pickle.dump(file_history, fichero)
-    
-#     return unchanged, updated, new
-
-
 def update_database(fichero, fname):
     dialect = csv.Sniffer().sniff(fichero.readline())
     fichero.seek(0)
-    fieldnames = fichero.readline().strip().split(str(dialect.delimiter))
+    fieldnames = fichero.readline().strip().lower().split(str(dialect.delimiter))
     sample_name = find_sample_name(fname.name)
 
     # Detección del origen del archivo
@@ -686,3 +594,103 @@ def update():
                 pickle.dump(file_history, fichero)
     
     return unchanged, updated, new
+
+
+
+# def update():
+#     # Update database if there are new files in a folder or these have been modified
+#     pckl = 'objs.pkl'
+#     pckl_folder = '/home/pabs/MasterBioinformatica/TFM/test/'
+#     folder = '/home/pabs/MasterBioinformatica/TFM/test/carpeta_prueba_inputs/'
+
+
+
+#     updated = 0
+#     unchanged = 0
+#     new = 0
+
+#     # Si se ha hecho previamente un pckl con los archivos y sus fechas
+#     if glob.glob(pckl_folder+'*.pkl'):
+#         with open(pckl_folder+pckl, 'rb') as f:
+#             file_history = pickle.load(f)
+#         files = glob.glob(folder+'*')
+#         for f in files:
+#             fname = pathlib.Path(f)
+#             mtime = fname.stat().st_mtime # Time of most recent content modification expressed in seconds.
+
+#             # Si el nombre del archivo ya se ha visto en el pasado
+#             if file_history.get(fname.name):
+#                 # Ver diferencia de tiempos respecto al valor
+#                 # del pickle, si son diferentes actualizar la base de datos
+#                 if file_history[fname.name] != mtime:
+#                     with open(fname, 'rt') as fichero:
+#                         dialect = csv.Sniffer().sniff(fichero.readline())
+#                         fichero.seek(0)
+#                         fieldnames = fichero.readline().strip().split(str(dialect.delimiter))
+#                         sample_name = find_sample_name(fname.name)
+
+#                         # Detección del origen del archivo
+#                         test = detect_file(fieldnames)    
+
+#                         # Actualizar base de datos
+#                         select_test(test, fichero, sample_name, fieldnames, dialect)
+
+#                     # Se guarda en el diccionario la nueva fecha de modificación
+#                     file_history[fname.name] = mtime
+#                     updated += 1
+
+#                 else:
+#                     unchanged += 1
+
+#             # Si el nombre del archivo es nuevo    
+#             else:
+#                 file_history[fname.name] = mtime
+#                 # insertar los datos del archivo en la base de datos
+#                 with open(fname, 'rt') as fichero:
+#                     dialect = csv.Sniffer().sniff(fichero.readline())
+#                     fichero.seek(0)
+#                     fieldnames = fichero.readline().strip().split(str(dialect.delimiter))
+#                     sample_name = find_sample_name(fname.name)
+
+#                     # Detección del origen del archivo
+#                     test = detect_file(fieldnames)    
+
+#                     # Insertar en base de datos
+#                     select_test(test, fichero, sample_name, fieldnames, dialect)
+                
+#                 new += 1
+
+#         with open(pckl_folder+pckl, 'wb') as fichero:
+#             pickle.dump(file_history, fichero)
+    
+#     # Si no hay un pckl coger todos los archivos y actualziar la base de datos
+#     # después hacer un pckl
+#     # Esto es para la primera vez    
+#     else:
+#         file_history = {}
+#         files = glob.glob(folder+'*')
+#         for f in files:
+#             fname = pathlib.Path(f)
+#             mtime = fname.stat().st_mtime # Time of most recent content modification expressed in seconds.
+
+#             with open(fname, 'rt') as fichero:
+#                 dialect = csv.Sniffer().sniff(fichero.readline())
+#                 fichero.seek(0)
+#                 fieldnames = fichero.readline().strip().split(str(dialect.delimiter))
+#                 sample_name = find_sample_name(fname.name)
+
+#                 # Detección del origen del archivo
+#                 test = detect_file(fieldnames)    
+
+#                 # Insertar en base de datos
+#                 select_test(test, fichero, sample_name, fieldnames, dialect)
+
+#             # Se guarda en el diccionario fecha de modificación
+#             file_history[fname.name] = mtime
+        
+#         new += 1
+
+#         with open(pckl_folder+pckl, 'wb') as fichero:
+#             pickle.dump(file_history, fichero)
+    
+#     return unchanged, updated, new
