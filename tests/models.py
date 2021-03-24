@@ -425,7 +425,7 @@ def upload_lineages(reader):
         lineage = line.get('lineage')
         probability = line.get('probability')
         countries = line.get('most_common_countries','').split(',')
-
+        pangolearn_version = line.get('pangolearn_version')
 
         if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
@@ -436,7 +436,8 @@ def upload_lineages(reader):
                     'id_process' : id_process,
                     'lineage' : lineage,
                     'probability' : probability,
-                    'comments' : ''                
+                    'comments' : '',
+                    'pangolearn_version':pangolearn_version             
                 }
             )
             lineage_reference = LineagesTest.objects.get(id_uvigo=id_uvigo)
