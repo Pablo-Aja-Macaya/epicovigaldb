@@ -21,10 +21,10 @@ from tasks import views
 from django.views.static import serve
 from django.conf.urls import url
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('8x6zzpj$3gmgqmj0rezb/admin/', admin.site.urls),
     path('', views.home, name="home"),
     path('consorcio', views.consorcio, name="consorcio"),
-    url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT, }),
+    #url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT, }),
     
     # Gráficas
     path('hospital_graph/<str:fecha_inicial>+<str:fecha_final>', views.hospital_graph, name="hospital_graph"),
