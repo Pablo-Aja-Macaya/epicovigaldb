@@ -42,7 +42,7 @@ class SingleCheckTest(models.Model): #.trimmed.sorted.SingleCheck.txt
     class Meta:
         unique_together = ('id_uvigo','id_process','date')
     def __str__(self):
-        return str(self.id_uvigo + ' - ' + self.date.strftime("%m/%d/%Y, %H:%M:%S") + ' (UTC)')
+        return str(self.id_uvigo) + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
 
 class NGSstatsTest(models.Model): #.ngsinfo.tsv
     id = models.AutoField(primary_key=True)
@@ -58,7 +58,7 @@ class NGSstatsTest(models.Model): #.ngsinfo.tsv
     class Meta:
         unique_together = ('id_uvigo','id_process','date')
     def __str__(self):
-        return str(self.id_uvigo + ' - ' + self.date.strftime("%m/%d/%Y, %H:%M:%S") + ' (UTC)')
+        return str(self.id_uvigo) + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
 
 class NextcladeTest(models.Model): #.csv
     id = models.AutoField(primary_key=True)
@@ -125,7 +125,7 @@ class LineagesTest(models.Model): #.csv
     class Meta:
         unique_together = ('id_uvigo','id_process','date')
     def __str__(self):
-        return str(self.id_uvigo + ' - ' + self.date.strftime("%m/%d/%Y, %H:%M:%S") + ' (UTC)')
+        return str(self.id_uvigo) + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
 
 class LineagesMostCommonCountries(models.Model):
     # Esta tabla se hace porque el atributo 'most common countries' de pangolin es multivaluado 'Spain,Portugal'
@@ -506,16 +506,13 @@ def update_database(fichero, fname):
 
 
 def update():
+    from epicovigal.local_settings import TESTS_PCKL_FOLDER, TESTS_FOLDER_BASE
     # Update database if there are new files in a folder or these have been modified
     pckl = 'objs.pkl'
 
     # en local
-    pckl_folder = '/home/pabs/MasterBioinformatica/TFM/test/'
-    folder_base = '/home/pabs/MasterBioinformatica/TFM/test/testcesga/'
-
-    # en cesga
-    # pckl_folder = '/root/epicovigal/data/'
-    # folder_base = '/root/epicovigal/data/tests/'
+    pckl_folder = TESTS_PCKL_FOLDER
+    folder_base = TESTS_FOLDER_BASE
 
     subfolders = []
     target_folders = ['picard','nextclade','pangolin','ngs','variants']
