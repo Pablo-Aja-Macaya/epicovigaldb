@@ -3,21 +3,22 @@ from .models import Task
 #from django.contrib.auth.decorators import login_required
 from upload.models import Sample
 from .models import Team, Team_Component
-from tests.models import NextcladeTest
+from tests.models import NextcladeTest, LineagesTest
 
 
 #@login_required(login_url="/accounts/login")
 def home(request):
     sample_count = Sample.objects.all().count()
     sequenced_count = SampleMetaData.objects.exclude(fecha_entrada_fastq__isnull=True).count()
-    clade_count = NextcladeTest.objects.values('clade').distinct().count()
+    #clade_count = NextcladeTest.objects.values('clade').distinct().count()
+    lineage_count = LineagesTest.objects.values('lineage').distinct().count()
     if request.user.is_authenticated:
         tasks = Task.objects
         url = 'tasks/home.html'
     else:
         tasks = Task.objects.filter(show_to='all')
         url = 'tasks/visitor_home.html'
-    context = {'tasks':tasks, 'sample_count':sample_count, 'sequenced_count':sequenced_count, 'clade_count':clade_count}
+    context = {'tasks':tasks, 'sample_count':sample_count, 'sequenced_count':sequenced_count, 'lineage_count':lineage_count}
     return render(request, url, context)
 
 def consorcio(request):    
