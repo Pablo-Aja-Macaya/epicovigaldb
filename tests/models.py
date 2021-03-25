@@ -515,13 +515,14 @@ def update():
     folder_base = TESTS_FOLDER_BASE
 
     subfolders = []
-    target_folders = ['picard','nextclade','pangolin','ngs','variants']
+    target_folders = ['picard','nextclade','pangolin','ngs','variants','singlecheck']
     for i in target_folders:
         subfolders.append(folder_base + i +'/') # cada uno es un /path/to/target_folder/ ... ej: /path/to/nextclade/
     
     updated = 0
     unchanged = 0
     new = 0
+    errors = 0
 
     # Si se ha hecho previamente un pckl con los archivos y sus fechas
     if glob.glob(pckl_folder+pckl):
@@ -562,6 +563,7 @@ def update():
                 except Exception as e:
                     print(f'Existe algún error en el archivo: {fname}')
                     print(traceback.print_exc())
+                    errors += 1
 
             with open(pckl_folder+pckl, 'wb') as fichero:
                 pickle.dump(file_history, fichero)
@@ -587,11 +589,12 @@ def update():
                 except Exception as e:
                     print(f'Existe algún error en el archivo: {fname}')
                     print(traceback.print_exc())
+                    errors += 1
 
             with open(pckl_folder+pckl, 'wb') as fichero:
                 pickle.dump(file_history, fichero)
     
-    return unchanged, updated, new
+    return unchanged, updated, new, errors
 
 
 

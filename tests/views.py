@@ -48,5 +48,6 @@ def send_results(request):
 def update_from_folder(request):
     print('Updating')
     print('='*50)
-    unchanged, updated, new = update()
-    return render(request, 'tests/upload_test_results.html', {'message':f'Actualización completa (Sin cambios: {unchanged}, Actualizados: {updated}, Nuevos: {new})'})
+    unchanged, updated, new, errors = update()
+    context = {'message':f'Actualización completa (Sin cambios: {unchanged}, Actualizados: {updated}, Nuevos: {new}, Errores: {errors})'}
+    return render(request, 'tests/upload_test_results.html', context)
