@@ -5,6 +5,7 @@ from visualize import views
 
 urlpatterns = [
     path('general', views.general, name='general'),
+    path('sample/<str:id_uvigo>', views.specific_sample, name='specific_sample'),
     # Metadatos
     path('regions', views.regions, name='regions'),
     path('samples', views.samples, name='samples'),

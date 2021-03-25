@@ -122,7 +122,42 @@ def variants(request):
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
     return render(request, 'visualize/variants.html', {'table':table})
 
+@login_required(login_url="/accounts/login")
+def specific_sample(request, id_uvigo): 
+    # Datos generales
+    lineage, clade, fecha_muestra, localizacion = Sample.objects.filter(id_uvigo=id_uvigo).values('lineagestest__lineage','nextcladetest__clade','fecha_muestra', 'id_region__localizacion')[0].values()
+    
+    # Tablas
+    sample_table = SampleTable(Sample.objects.filter(id_uvigo=id_uvigo))
+    samplemetadata_table = SampleMetaDataTable(SampleMetaData.objects.filter(id_uvigo=id_uvigo))
 
+    variants_table = VariantsTable(VariantsTest.objects.filter(id_uvigo=id_uvigo))
+    singlecheck_table = SingleCheckTable(SingleCheckTest.objects.filter(id_uvigo=id_uvigo))
+    picard_table = PicardTable(PicardTest.objects.filter(id_uvigo=id_uvigo))
+    ngs_table = NGSTable(NGSstatsTest.objects.filter(id_uvigo=id_uvigo))
+    nextclade_table = NextcladeTable(NextcladeTest.objects.filter(id_uvigo=id_uvigo))
+    lineages_table = LineagesTable(LineagesTest.objects.filter(id_uvigo=id_uvigo))
+    
+    context = {
+        # Datos generales
+        'id_uvigo':id_uvigo, 
+        'lineage':lineage, 
+        'clade':clade,
+        'fecha_muestra':fecha_muestra,
+        'localizacion':localizacion,
+        # Tablas
+        'tablas':{
+            'Metadatos comunes':sample_table,
+            'Metadatos extra':samplemetadata_table,
+            'SingleCheck':singlecheck_table,
+            'Picard':picard_table,
+            'NGSStats':ngs_table,
+            'Nextclade':nextclade_table,
+            'Pangolin':lineages_table,
+            'iVar':variants_table,
+            },
+        }
+    return render(request, 'visualize/sample_profile.html', context)
 
 
 

@@ -4,51 +4,61 @@ from upload.models import SampleMetaData
 from tests.models import PicardTest, NextcladeTest, LineagesTest, NGSstatsTest, SingleCheckTest, VariantsTest
 import django_tables2 as tables
 import django_filters
+from django_tables2.utils import A
 # Create your models here.
 
 # In[1]: Tablas de metadatos
 class SampleTable(tables.Table):
+    id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
     class Meta:
         model = Sample
         template_name = "table_template.html"
 
 class RegionTable(tables.Table):
+    id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
     class Meta:
         model = Region
         template_name = "table_template.html"
 
 class SampleMetaDataTable(tables.Table):
+    id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
     class Meta:
         model = SampleMetaData
         template_name = "table_template.html"
 
 # In[2]: Tablas de resultados
 class LineagesTable(tables.Table):
+    id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
     class Meta:
         model = LineagesTest
         template_name = "table_template.html"
 
 class PicardTable(tables.Table):
+    id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
     class Meta:
         model = PicardTest
         template_name = "table_template.html"
         
 class NextcladeTable(tables.Table):
+    id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
     class Meta:
         model = NextcladeTest
         template_name = "table_template.html"
 
 class NGSTable(tables.Table):
+    id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
     class Meta:
         model = NGSstatsTest
         template_name = "table_template.html"
 
 class VariantsTable(tables.Table):
+    id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
     class Meta:
         model = VariantsTest
         template_name = "table_template.html"
 
 class SingleCheckTable(tables.Table):
+    id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
     class Meta:
         model = SingleCheckTest
         template_name = "table_template.html"
@@ -65,7 +75,8 @@ class CompletedTestsTable(tables.Table):
     #     {'sample':'epiblabla', 'picard':1, 'nextclade':0, 'ngsstats':1},
     #     {'sample':'epiblabla2', 'picard':1, 'nextclade':0, 'ngsstats':1},
     # ]
-    id_uvigo = tables.LinkColumn("home")
+
+    id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
     picardtest = tables.Column(verbose_name='Picard')
     nextcladetest = tables.Column(verbose_name='NextClade')
     ngsstatstest = tables.Column(verbose_name='NGSStats')
