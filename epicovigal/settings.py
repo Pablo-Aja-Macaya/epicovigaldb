@@ -39,10 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Appas añadidas
     'axes', # limitador de logins
     'dbbackup',
     'django_tables2',
     'django_filters',
+    # Apps propias
     'reports.apps.ReportsConfig',
     'microreact.apps.MicroreactConfig',
     'nextstrainApp.apps.NextstrainappConfig',

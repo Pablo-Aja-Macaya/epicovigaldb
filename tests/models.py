@@ -138,9 +138,18 @@ class LineagesMostCommonCountries(models.Model):
     def __str__(self):
         return str(self.id_uvigo + ' - ' + self.date.strftime("%m/%d/%Y, %H:%M:%S") + ' (UTC)')
 
+
+# class ModeloPrueba(models.Model):
+#     id_uvigo = models.IntegerField(primary_key=True)
+#     atr1 = models.CharField(max_length=10)
+
+
+
 #############################################################################
 ### Functions ###
 # from tests.tasks import check_status
+import time
+
 
 # def prueba():
 #     check_status.delay()
@@ -366,6 +375,7 @@ def upload_nextclade(reader):
 
         if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
+
             _, created = NextcladeTest.objects.update_or_create(
                 id_uvigo=sample_reference,
                 defaults={
@@ -388,6 +398,9 @@ def upload_variants(reader, sample_name):
     ## HAY QUE ARREGLAR ESTA SUBIDA
     ## HABRA QUE HACER LLAVE PRIMARIA DE id_uvigo y cada fila?
     if id_uvigo:
+        #### METODO 1 - MAS RAPIDO QUE EL update_or_create, se reduce el tiempo al 30% en principio
+        lista_objs_update = []
+        lista_objs_create = []
         for line in reader:
             pos = line.get('pos')
             ref = line.get('ref')
@@ -399,24 +412,90 @@ def upload_variants(reader, sample_name):
             alt_aa = line.get('alt_aa')
 
             sample_reference = comprobar_existencia(id_uvigo)
-            _, created = VariantsTest.objects.update_or_create(
-                id_uvigo=sample_reference,
-                row=row,
-                defaults={
-                    'id_uvigo' : sample_reference,
-                    'id_process' : id_process,
-                    'row' : row,
-                    'pos' : pos,
-                    'ref' : ref,
-                    'alt' : alt,
-                    'alt_freq' : alt_freq,
-                    'ref_codon' : ref_codon,
-                    'ref_aa' : ref_aa,
-                    'alt_codon' : alt_codon,
-                    'alt_aa' : alt_aa,                    
-                }
-            )                
+            pk = VariantsTest.objects.filter(id_uvigo=id_uvigo,row=row).values('pk')
+            if pk:
+                obj = VariantsTest(
+                    id = pk,
+                    id_uvigo = sample_reference,
+                    id_process = id_process,
+                    row = row,
+                    pos = pos,
+                    ref = ref,
+                    alt = alt,
+                    alt_freq = alt_freq,
+                    ref_codon = ref_codon,
+                    ref_aa = ref_aa,
+                    alt_codon = alt_codon,
+                    alt_aa = alt_aa,                  
+                )
+                lista_objs_update.append(obj)
+            else:
+                obj = VariantsTest(
+                    id_uvigo = sample_reference,
+                    id_process = id_process,
+                    row = row,
+                    pos = pos,
+                    ref = ref,
+                    alt = alt,
+                    alt_freq = alt_freq,
+                    ref_codon = ref_codon,
+                    ref_aa = ref_aa,
+                    alt_codon = alt_codon,
+                    alt_aa = alt_aa,                  
+                )
+                lista_objs_create.append(obj)
+            
             row += 1
+
+        try:
+            VariantsTest.objects.bulk_update(lista_objs_update,['id_uvigo',
+                                                        'id_process',
+                                                        'row',
+                                                        'pos',
+                                                        'ref',
+                                                        'alt',
+                                                        'alt_freq',
+                                                        'ref_codon',
+                                                        'ref_aa',
+                                                        'alt_codon',
+                                                        'alt_aa'])
+        except:
+            pass
+        VariantsTest.objects.bulk_create(lista_objs_create, batch_size=100, ignore_conflicts=True)         
+            
+        ### METODO 2 - MAS LENTO EN PRINCIPIO
+        # start = time.time()
+        # for line in reader:
+        #     pos = line.get('pos')
+        #     ref = line.get('ref')
+        #     alt = line.get('alt')
+        #     alt_freq = line.get('alt_freq')
+        #     ref_codon = line.get('ref_codon')
+        #     ref_aa = line.get('ref_aa')
+        #     alt_codon = line.get('alt_codon')
+        #     alt_aa = line.get('alt_aa')
+
+        #     sample_reference = comprobar_existencia(id_uvigo)
+        #     _, created = VariantsTest.objects.update_or_create(
+        #         id_uvigo=sample_reference,
+        #         row=row,
+        #         defaults={
+        #             'id_uvigo' : sample_reference,
+        #             'id_process' : id_process,
+        #             'row' : row,
+        #             'pos' : pos,
+        #             'ref' : ref,
+        #             'alt' : alt,
+        #             'alt_freq' : alt_freq,
+        #             'ref_codon' : ref_codon,
+        #             'ref_aa' : ref_aa,
+        #             'alt_codon' : alt_codon,
+        #             'alt_aa' : alt_aa,                    
+        #         }
+        #     )           
+        #     row += 1
+        # end = time.time()
+        # print('Total variantes',end-start)     
 
 def upload_lineages(reader):
     for line in reader:
@@ -476,6 +555,7 @@ def select_test(test, file, sample_name, fieldnames, dialect):
     else:
         upload_singlecheck(file, str(dialect.delimiter))
 
+
 def send_results_processing(file):
     data = file.read().decode('UTF-8')
     io_string = io.StringIO(data)
@@ -483,6 +563,7 @@ def send_results_processing(file):
     io_string.seek(0)
     fieldnames = io_string.readline().strip().lower().split(str(dialect.delimiter))
     # sin lo de lower: io_string.readline().strip().split(str(dialect.delimiter))
+
     sample_name = find_sample_name(file.name)
 
     # Detección del origen del archivo
@@ -596,102 +677,3 @@ def update():
     
     return unchanged, updated, new, errors
 
-
-
-# def update():
-#     # Update database if there are new files in a folder or these have been modified
-#     pckl = 'objs.pkl'
-#     pckl_folder = '/home/pabs/MasterBioinformatica/TFM/test/'
-#     folder = '/home/pabs/MasterBioinformatica/TFM/test/carpeta_prueba_inputs/'
-
-
-
-#     updated = 0
-#     unchanged = 0
-#     new = 0
-
-#     # Si se ha hecho previamente un pckl con los archivos y sus fechas
-#     if glob.glob(pckl_folder+'*.pkl'):
-#         with open(pckl_folder+pckl, 'rb') as f:
-#             file_history = pickle.load(f)
-#         files = glob.glob(folder+'*')
-#         for f in files:
-#             fname = pathlib.Path(f)
-#             mtime = fname.stat().st_mtime # Time of most recent content modification expressed in seconds.
-
-#             # Si el nombre del archivo ya se ha visto en el pasado
-#             if file_history.get(fname.name):
-#                 # Ver diferencia de tiempos respecto al valor
-#                 # del pickle, si son diferentes actualizar la base de datos
-#                 if file_history[fname.name] != mtime:
-#                     with open(fname, 'rt') as fichero:
-#                         dialect = csv.Sniffer().sniff(fichero.readline())
-#                         fichero.seek(0)
-#                         fieldnames = fichero.readline().strip().split(str(dialect.delimiter))
-#                         sample_name = find_sample_name(fname.name)
-
-#                         # Detección del origen del archivo
-#                         test = detect_file(fieldnames)    
-
-#                         # Actualizar base de datos
-#                         select_test(test, fichero, sample_name, fieldnames, dialect)
-
-#                     # Se guarda en el diccionario la nueva fecha de modificación
-#                     file_history[fname.name] = mtime
-#                     updated += 1
-
-#                 else:
-#                     unchanged += 1
-
-#             # Si el nombre del archivo es nuevo    
-#             else:
-#                 file_history[fname.name] = mtime
-#                 # insertar los datos del archivo en la base de datos
-#                 with open(fname, 'rt') as fichero:
-#                     dialect = csv.Sniffer().sniff(fichero.readline())
-#                     fichero.seek(0)
-#                     fieldnames = fichero.readline().strip().split(str(dialect.delimiter))
-#                     sample_name = find_sample_name(fname.name)
-
-#                     # Detección del origen del archivo
-#                     test = detect_file(fieldnames)    
-
-#                     # Insertar en base de datos
-#                     select_test(test, fichero, sample_name, fieldnames, dialect)
-                
-#                 new += 1
-
-#         with open(pckl_folder+pckl, 'wb') as fichero:
-#             pickle.dump(file_history, fichero)
-    
-#     # Si no hay un pckl coger todos los archivos y actualziar la base de datos
-#     # después hacer un pckl
-#     # Esto es para la primera vez    
-#     else:
-#         file_history = {}
-#         files = glob.glob(folder+'*')
-#         for f in files:
-#             fname = pathlib.Path(f)
-#             mtime = fname.stat().st_mtime # Time of most recent content modification expressed in seconds.
-
-#             with open(fname, 'rt') as fichero:
-#                 dialect = csv.Sniffer().sniff(fichero.readline())
-#                 fichero.seek(0)
-#                 fieldnames = fichero.readline().strip().split(str(dialect.delimiter))
-#                 sample_name = find_sample_name(fname.name)
-
-#                 # Detección del origen del archivo
-#                 test = detect_file(fieldnames)    
-
-#                 # Insertar en base de datos
-#                 select_test(test, fichero, sample_name, fieldnames, dialect)
-
-#             # Se guarda en el diccionario fecha de modificación
-#             file_history[fname.name] = mtime
-        
-#         new += 1
-
-#         with open(pckl_folder+pckl, 'wb') as fichero:
-#             pickle.dump(file_history, fichero)
-    
-#     return unchanged, updated, new

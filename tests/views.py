@@ -36,12 +36,16 @@ def send_selection(request):
         
 @login_required(login_url="/accounts/login")
 def send_results(request):
+    import time
     # Apartado de subida de archivos de resultados
     def check_file(): # TO-DO
         pass   
     if request.method == 'POST':
         for file in request.FILES.getlist('documents'):
+            start = time.time()
             send_results_processing(file)
+            end = time.time()
+            print('Tiempo para archivo:', end-start)
         return render(request, 'tests/upload_test_results.html', {'message':'Archivos subidos a la base de datos!'})
 
 @login_required(login_url="/accounts/login")
