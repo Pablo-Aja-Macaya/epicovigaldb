@@ -12,7 +12,7 @@ import traceback
 class PicardTest(models.Model): #.picardOutputCleaned.tsv
     id = models.AutoField(primary_key=True)
     id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE) # a partir del nombre del archivo
-    id_process = models.CharField(max_length=40)
+    # id_process = models.CharField(max_length=40)
 
     mean_target_coverage = models.DecimalField(max_digits=15, decimal_places=6) 
     median_target_coverage = models.DecimalField(max_digits=15, decimal_places=6) 
@@ -23,14 +23,14 @@ class PicardTest(models.Model): #.picardOutputCleaned.tsv
     date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('id_uvigo','id_process','date')
+        unique_together = ('id_uvigo','date')
     def __str__(self):
         return str(self.id_uvigo) + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
 
 class SingleCheckTest(models.Model): #.trimmed.sorted.SingleCheck.txt
     id = models.AutoField(primary_key=True)
     id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE) # a partir de columna (primera) (sin cabecera)
-    id_process = models.CharField(max_length=40)
+    # id_process = models.CharField(max_length=40)
 
     autocorrelation = models.DecimalField(max_digits=15, decimal_places=10) 
     variation_coefficient = models.DecimalField(max_digits=15, decimal_places=10) 
@@ -40,14 +40,14 @@ class SingleCheckTest(models.Model): #.trimmed.sorted.SingleCheck.txt
     date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('id_uvigo','id_process','date')
+        unique_together = ('id_uvigo','date')
     def __str__(self):
         return str(self.id_uvigo) + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
 
 class NGSstatsTest(models.Model): #.ngsinfo.tsv
     id = models.AutoField(primary_key=True)
     id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE) # a partir de columna 'sampleName'
-    id_process = models.CharField(max_length=40)
+    # id_process = models.CharField(max_length=40)
 
     total_reads = models.IntegerField()
     mapped = models.IntegerField()
@@ -56,14 +56,14 @@ class NGSstatsTest(models.Model): #.ngsinfo.tsv
     date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('id_uvigo','id_process','date')
+        unique_together = ('id_uvigo','date')
     def __str__(self):
         return str(self.id_uvigo) + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
 
 class NextcladeTest(models.Model): #.csv
     id = models.AutoField(primary_key=True)
     id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE) # a partir de columna 'seqName'
-    id_process = models.CharField(max_length=40)
+    # id_process = models.CharField(max_length=40)
 
     total_missing = models.IntegerField()
     clade = models.TextField()
@@ -75,14 +75,14 @@ class NextcladeTest(models.Model): #.csv
     date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('id_uvigo','id_process','date')
+        unique_together = ('id_uvigo','date')
     def __str__(self):
         return str(self.id_uvigo) + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
 
 class VariantsTest(models.Model): #.tsv
     id = models.AutoField(primary_key=True)
     id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE) # a partir del nombre del archivo
-    id_process = models.CharField(max_length=41)
+    # id_process = models.CharField(max_length=41)
     row = models.IntegerField()
 
     pos = models.IntegerField()
@@ -99,7 +99,7 @@ class VariantsTest(models.Model): #.tsv
     class Meta:
         # unique_together = ('id_uvigo','row','id_process','date',)
         constraints = [
-            models.UniqueConstraint(fields=['id_uvigo','row','id_process','date'], name='unique_constraint')
+            models.UniqueConstraint(fields=['id_uvigo','row','date'], name='unique_constraint')
         ]
     def __str__(self):
         return str(self.id_uvigo) + f' - {self.row}' + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
@@ -113,7 +113,7 @@ class VariantsTest(models.Model): #.tsv
 class LineagesTest(models.Model): #.csv
     id = models.AutoField(primary_key=True)
     id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE)# a partir de columna 'taxon'
-    id_process = models.CharField(max_length=40)
+    # id_process = models.CharField(max_length=40)
 
     lineage = models.CharField(max_length=10)
     probability = models.DecimalField(max_digits=7, decimal_places=6) 
@@ -123,7 +123,7 @@ class LineagesTest(models.Model): #.csv
     date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('id_uvigo','id_process','date')
+        unique_together = ('id_uvigo','date')
     def __str__(self):
         return str(self.id_uvigo) + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
 
@@ -131,7 +131,7 @@ class LineagesMostCommonCountries(models.Model):
     # Esta tabla se hace porque el atributo 'most common countries' de pangolin es multivaluado 'Spain,Portugal'
     id = models.AutoField(primary_key=True)
     id_uvigo = models.ForeignKey(LineagesTest, on_delete=models.CASCADE)
-    id_process = models.CharField(max_length=40)
+    # id_process = models.CharField(max_length=40)
     date = models.DateTimeField(auto_now=True)
     country = models.TextField(max_length=50, default=None, blank=True)
     
@@ -285,7 +285,7 @@ def comprobar_existencia(id_uvigo):
 def upload_picard(reader, sample_name):
     for line in reader:
         id_uvigo = sample_name
-        id_process = 'U-XXX'
+        # id_process = 'U-XXX'
         mean_target_coverage = float(line.get('mean_target_coverage','').replace(',','.'))
         median_target_coverage = float(line.get('median_target_coverage','').replace(',','.'))
         pct_target_bases_1x = float(line.get('pct_target_bases_1x','').replace(',','.'))
@@ -298,7 +298,7 @@ def upload_picard(reader, sample_name):
                 id_uvigo=sample_reference,
                 defaults={
                     'id_uvigo' : sample_reference,
-                    'id_process' : id_process,
+                    # 'id_process' : id_process,
                     'mean_target_coverage' : mean_target_coverage,
                     'median_target_coverage' : median_target_coverage,
                     'pct_target_bases_1x' : pct_target_bases_1x,
@@ -322,7 +322,7 @@ def upload_singlecheck(io_string, delimiter):
         lista = line.strip().split(delimiter)
 
         id_uvigo = find_sample_name(lista[id_uvigo_index])
-        id_process = 'U-XX'
+        # id_process = 'U-XX'
         autocorrelation = lista[autocorrelation_index]
         variation_coefficient = lista[variation_coefficient_index]
         gini_coefficient = lista[gini_coefficient_index]
@@ -334,7 +334,7 @@ def upload_singlecheck(io_string, delimiter):
                 id_uvigo=sample_reference,
                 defaults={
                     'id_uvigo' : sample_reference,
-                    'id_process' : id_process,
+                    # 'id_process' : id_process,
                     'autocorrelation' : autocorrelation,
                     'variation_coefficient' : variation_coefficient,
                     'gini_coefficient' : gini_coefficient,
@@ -345,7 +345,7 @@ def upload_singlecheck(io_string, delimiter):
 def upload_ngsstats(reader):
     for line in reader:
         id_uvigo = line.get('id_uvigo') # igual hay que poner aquí find_sample_name() también
-        id_process = 'U-XXX'
+        # id_process = 'U-XXX'
         total_reads = int(line.get('total_reads','').replace(',','.'))
         mapped = int(line.get('mapped','').replace(',','.'))
         trimmed = int(line.get('trimmed','').replace(',','.'))
@@ -355,7 +355,7 @@ def upload_ngsstats(reader):
                 id_uvigo=sample_reference,
                 defaults={
                     'id_uvigo' : sample_reference,
-                    'id_process' : id_process,
+                    # 'id_process' : id_process,
                     'total_reads' : total_reads,
                     'mapped' : mapped,
                     'trimmed' : trimmed,                    
@@ -365,7 +365,7 @@ def upload_ngsstats(reader):
 def upload_nextclade(reader):
     for line in reader:
         id_uvigo = find_sample_name(line.get('id_uvigo'))
-        id_process = 'U-XXX'
+        # id_process = 'U-XXX'
         total_missing = int(line.get('total_missing','').replace(',','.'))
         clade = line.get('clade')
         qc_private_mutations_status = line.get('qc_private_mutations_status')
@@ -380,7 +380,7 @@ def upload_nextclade(reader):
                 id_uvigo=sample_reference,
                 defaults={
                     'id_uvigo' : sample_reference,
-                    'id_process' : id_process,
+                    # 'id_process' : id_process,
                     'total_missing' : total_missing,
                     'clade' : clade,
                     'qc_private_mutations_status' : qc_private_mutations_status,
@@ -393,7 +393,7 @@ def upload_nextclade(reader):
 
 def upload_variants(reader, sample_name):
     id_uvigo = sample_name
-    id_process = 'U-XXX'
+    # id_process = 'U-XXX'
     row = 0
     ## HAY QUE ARREGLAR ESTA SUBIDA
     ## HABRA QUE HACER LLAVE PRIMARIA DE id_uvigo y cada fila?
@@ -401,6 +401,8 @@ def upload_variants(reader, sample_name):
         #### METODO 1 - MAS RAPIDO QUE EL update_or_create, se reduce el tiempo al 30% en principio
         lista_objs_update = []
         lista_objs_create = []
+        import time
+        start = time.time()
         for line in reader:
             pos = line.get('pos')
             ref = line.get('ref')
@@ -412,27 +414,26 @@ def upload_variants(reader, sample_name):
             alt_aa = line.get('alt_aa')
 
             sample_reference = comprobar_existencia(id_uvigo)
-            pk = VariantsTest.objects.filter(id_uvigo=id_uvigo,row=row).values('pk')
+            pk = VariantsTest.objects.values('pk').filter(id_uvigo=id_uvigo,row=row)
             if pk:
-                obj = VariantsTest(
-                    id = pk,
-                    id_uvigo = sample_reference,
-                    id_process = id_process,
-                    row = row,
-                    pos = pos,
-                    ref = ref,
-                    alt = alt,
-                    alt_freq = alt_freq,
-                    ref_codon = ref_codon,
-                    ref_aa = ref_aa,
-                    alt_codon = alt_codon,
-                    alt_aa = alt_aa,                  
-                )
+                # Llave primaria ya existe --> Actualización
+                obj = VariantsTest.objects.get(id_uvigo=id_uvigo,row=row)
+                obj.id_uvigo = sample_reference
+                # obj.id_process = id_process
+                obj.pos = pos
+                obj.ref = ref
+                obj.alt = alt
+                obj.alt_freq = alt_freq
+                obj.ref_codon = ref_codon
+                obj.ref_aa = ref_aa
+                obj.alt_codon = alt_codon
+                obj.alt_aa = alt_aa                 
                 lista_objs_update.append(obj)
             else:
+                # Llave primaria no existe --> Creación
                 obj = VariantsTest(
                     id_uvigo = sample_reference,
-                    id_process = id_process,
+                    # id_process = id_process,
                     row = row,
                     pos = pos,
                     ref = ref,
@@ -447,22 +448,15 @@ def upload_variants(reader, sample_name):
             
             row += 1
 
-        try:
-            VariantsTest.objects.bulk_update(lista_objs_update,['id_uvigo',
-                                                        'id_process',
-                                                        'row',
-                                                        'pos',
-                                                        'ref',
-                                                        'alt',
-                                                        'alt_freq',
-                                                        'ref_codon',
-                                                        'ref_aa',
-                                                        'alt_codon',
-                                                        'alt_aa'])
-        except:
-            pass
+        # BULK UPDATE
+        update_fields = ['id_uvigo','pos','ref','alt','alt_freq','ref_codon','ref_aa','alt_codon','alt_aa']
+        VariantsTest.objects.bulk_update(lista_objs_update, update_fields, batch_size=100)
+        
+        # BULK CREATE
         VariantsTest.objects.bulk_create(lista_objs_create, batch_size=100, ignore_conflicts=True)         
-            
+        
+        end = time.time()
+        print('Tiempo:',end-start)
         ### METODO 2 - MAS LENTO EN PRINCIPIO
         # start = time.time()
         # for line in reader:
@@ -500,7 +494,7 @@ def upload_variants(reader, sample_name):
 def upload_lineages(reader):
     for line in reader:
         id_uvigo = find_sample_name(line.get('id_uvigo'))
-        id_process = 'U-XXX'
+        # id_process = 'U-XXX'
         lineage = line.get('lineage')
         probability = line.get('probability')
         countries = line.get('most_common_countries','').split(',')
@@ -512,7 +506,7 @@ def upload_lineages(reader):
                 id_uvigo=sample_reference,
                 defaults={
                     'id_uvigo' : sample_reference,
-                    'id_process' : id_process,
+                    # 'id_process' : id_process,
                     'lineage' : lineage,
                     'probability' : probability,
                     'comments' : '',
@@ -526,7 +520,7 @@ def upload_lineages(reader):
                     id_uvigo=lineage_reference,
                     defaults={
                         'id_uvigo' : lineage_reference,
-                        'id_process' : id_process,
+                        # 'id_process' : id_process,
                         'country' : country,
                 
                     }

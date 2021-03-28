@@ -1,10 +1,10 @@
-import io, csv
+import io, csv, itertools
 from datetime import datetime
 import dateutil.parser
 from ..models import Region, Sample
 from ..models import SampleMetaData
 
-def upload_sample_hospital(stream, option='update_and_new'):
+def upload_sample_hospital(stream):
     fields_correspondence = {
         'Código UVIGO':'id_uvigo',
         'Categoría muestra':'categoria_muestra',
@@ -39,6 +39,10 @@ def upload_sample_hospital(stream, option='update_and_new'):
         # Funciona tanto si el año es xx como xxxx
         try:
             transformed = dateutil.parser.parse(date, dayfirst=True,).strftime('%Y-%m-%d')
+            if len(transformed) != 10: 
+                # algunas fechas si están mal resultan en '202-12-23' (9 caracteres), inválido para SQL
+                # Obligando a que sean de 10 caracteres se soluciona esto
+                transformed = None
         except:
             transformed = None
         return transformed
@@ -140,103 +144,55 @@ def upload_sample_hospital(stream, option='update_and_new'):
                         latitud = 0,
                         longitud = 0
                     )
-            
-            if option=='new':
-                if not Sample.objects.filter(id_uvigo=id_uvigo).exists():
-                    region_reference = Region.objects.get(cp=cp, localizacion=loc)
-                    if id_uvigo:
-                        _, created = Sample.objects.update_or_create(
-                                id_uvigo = id_uvigo,
-                                defaults = {
-                                    'id_uvigo' : id_uvigo,
-                                    'id_accession' : 'NULL',
-                                    'id_region' : region_reference,
-                                    'original_name' : 'NULL',
-                                    'categoria_muestra':categoria_muestra,
-                                    'edad' : edad,
-                                    'sexo' : sexo[:1].upper(),
-                                    'patient_status' : hospitalizacion,
-                                    'nodo_secuenciacion' : nodo_secuenciacion,
-                                    'fecha_muestra' : f_muestra,
-                                    'observaciones' : observaciones                        
-                                }
 
-                            )
-                        sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
-                        _, created = SampleMetaData.objects.update_or_create(
-                                id_uvigo = sample_reference,
-                                defaults = {
-                                    'id_uvigo' : sample_reference,
-                                    'id_paciente' : id_paciente,
-                                    'id_hospital' : id_hospital,
-                                    'numero_envio' : numero_envio,
-                                    'id_tubo' : id_tubo,
-                                    'id_muestra' : id_muestra,
-                                    'hospitalizacion' : hospitalizacion[:1], 
-                                    'uci' : uci[:1],
-                                    'ct_orf1ab' : orf1ab,
-                                    'ct_gen_e' : gen_e,
-                                    'ct_gen_n' : gen_n,
-                                    'ct_redrp' : rdrp,
-                                    'ct_s' : ct_s,
-                                    'fecha_sintomas' : f_sintomas,
-                                    'fecha_diagnostico' : f_diagnostico,
-                                    'fecha_entrada' : f_entrada_uv,
-                                    'fecha_envio_cdna' : f_envio_cdna,
-                                    'fecha_run_ngs' : f_run_ngs,
-                                    'fecha_entrada_fastq' : f_entrada_fastq                        
-                                }
+            region_reference = Region.objects.get(cp=cp, localizacion=loc)
+            if id_uvigo:
+                _, created = Sample.objects.update_or_create(
+                        id_uvigo = id_uvigo,
+                        defaults = {
+                            'id_uvigo' : id_uvigo,
+                            'id_accession' : 'NULL',
+                            'id_region' : region_reference,
+                            'original_name' : 'NULL',
+                            'categoria_muestra':categoria_muestra,
+                            'edad' : edad,
+                            'sexo' : sexo[:1].upper(),
+                            'patient_status' : hospitalizacion,
+                            'nodo_secuenciacion' : nodo_secuenciacion,
+                            'fecha_muestra' : f_muestra,
+                            'observaciones' : observaciones                        
+                        }
 
-                            ) 
-            elif option=='update_and_new':
-                region_reference = Region.objects.get(cp=cp, localizacion=loc)
-                if id_uvigo:
-                    _, created = Sample.objects.update_or_create(
-                            id_uvigo = id_uvigo,
-                            defaults = {
-                                'id_uvigo' : id_uvigo,
-                                'id_accession' : 'NULL',
-                                'id_region' : region_reference,
-                                'original_name' : 'NULL',
-                                'categoria_muestra':categoria_muestra,
-                                'edad' : edad,
-                                'sexo' : sexo[:1].upper(),
-                                'patient_status' : hospitalizacion,
-                                'nodo_secuenciacion' : nodo_secuenciacion,
-                                'fecha_muestra' : f_muestra,
-                                'observaciones' : observaciones                        
-                            }
+                    )
+                sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
+                _, created = SampleMetaData.objects.update_or_create(
+                        id_uvigo = sample_reference,
+                        defaults = {
+                            'id_uvigo' : sample_reference,
+                            'id_paciente' : id_paciente,
+                            'id_hospital' : id_hospital,
+                            'numero_envio' : numero_envio,
+                            'id_tubo' : id_tubo,
+                            'id_muestra' : id_muestra,
+                            'hospitalizacion' : hospitalizacion[:1], 
+                            'uci' : uci[:1],
+                            'ct_orf1ab' : orf1ab,
+                            'ct_gen_e' : gen_e,
+                            'ct_gen_n' : gen_n,
+                            'ct_redrp' : rdrp,
+                            'ct_s' : ct_s,
+                            'fecha_sintomas' : f_sintomas,
+                            'fecha_diagnostico' : f_diagnostico,
+                            'fecha_entrada' : f_entrada_uv,
+                            'fecha_envio_cdna' : f_envio_cdna,
+                            'fecha_run_ngs' : f_run_ngs,
+                            'fecha_entrada_fastq' : f_entrada_fastq                        
+                        }
 
-                        )
-                    sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
-                    _, created = SampleMetaData.objects.update_or_create(
-                            id_uvigo = sample_reference,
-                            defaults = {
-                                'id_uvigo' : sample_reference,
-                                'id_paciente' : id_paciente,
-                                'id_hospital' : id_hospital,
-                                'numero_envio' : numero_envio,
-                                'id_tubo' : id_tubo,
-                                'id_muestra' : id_muestra,
-                                'hospitalizacion' : hospitalizacion[:1], 
-                                'uci' : uci[:1],
-                                'ct_orf1ab' : orf1ab,
-                                'ct_gen_e' : gen_e,
-                                'ct_gen_n' : gen_n,
-                                'ct_redrp' : rdrp,
-                                'ct_s' : ct_s,
-                                'fecha_sintomas' : f_sintomas,
-                                'fecha_diagnostico' : f_diagnostico,
-                                'fecha_entrada' : f_entrada_uv,
-                                'fecha_envio_cdna' : f_envio_cdna,
-                                'fecha_run_ngs' : f_run_ngs,
-                                'fecha_entrada_fastq' : f_entrada_fastq                        
-                            }
-
-                        ) 
+                    ) 
         except:
             lista_fallos.append(id_uvigo)
-    
+
     return lista_fallos, lista_columnas_inesperadas
 
 
