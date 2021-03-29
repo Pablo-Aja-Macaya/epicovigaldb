@@ -15,7 +15,6 @@ class SampleTable(tables.Table):
         template_name = "table_template.html"
 
 class RegionTable(tables.Table):
-    id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
     class Meta:
         model = Region
         template_name = "table_template.html"
