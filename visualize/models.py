@@ -10,6 +10,7 @@ from django_tables2.utils import A
 # In[1]: Tablas de metadatos
 class SampleTable(tables.Table):
     id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
+    fecha_muestra = tables.DateTimeColumn(format ='d/m/Y')
     class Meta:
         model = Sample
         template_name = "table_template.html"
@@ -21,6 +22,12 @@ class RegionTable(tables.Table):
 
 class SampleMetaDataTable(tables.Table):
     id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
+    fecha_envio_cdna = tables.DateTimeColumn(format ='d/m/Y')
+    fecha_run_ngs = tables.DateTimeColumn(format ='d/m/Y')
+    fecha_entrada_fastq = tables.DateTimeColumn(format ='d/m/Y')
+    fecha_sintomas = tables.DateTimeColumn(format ='d/m/Y')
+    fecha_diagnostico = tables.DateTimeColumn(format ='d/m/Y')
+    fecha_entrada = tables.DateTimeColumn(format ='d/m/Y')
     class Meta:
         model = SampleMetaData
         template_name = "table_template.html"
@@ -28,36 +35,42 @@ class SampleMetaDataTable(tables.Table):
 # In[2]: Tablas de resultados
 class LineagesTable(tables.Table):
     id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
+    date = tables.DateTimeColumn(format ='d/m/Y, h:i A')
     class Meta:
         model = LineagesTest
         template_name = "table_template.html"
 
 class PicardTable(tables.Table):
     id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
+    date = tables.DateTimeColumn(format ='d/m/Y, h:i A')
     class Meta:
         model = PicardTest
         template_name = "table_template.html"
         
 class NextcladeTable(tables.Table):
     id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
+    date = tables.DateTimeColumn(format ='d/m/Y, h:i A')
     class Meta:
         model = NextcladeTest
         template_name = "table_template.html"
 
 class NGSTable(tables.Table):
     id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
+    date = tables.DateTimeColumn(format ='d/m/Y, h:i A')
     class Meta:
         model = NGSstatsTest
         template_name = "table_template.html"
 
 class VariantsTable(tables.Table):
     id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
+    date = tables.DateTimeColumn(format ='d/m/Y, h:i A')
     class Meta:
         model = VariantsTest
         template_name = "table_template.html"
 
 class SingleCheckTable(tables.Table):
     id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
+    date = tables.DateTimeColumn(format ='d/m/Y, h:i A')
     class Meta:
         model = SingleCheckTest
         template_name = "table_template.html"
