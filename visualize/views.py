@@ -170,22 +170,76 @@ from datetime import date, datetime
 import geojson
 import random
 
-def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
-    pass
+def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
+    chart = {
+        'chart': {
+            # 'height': 300,
+            'type': 'bar'
+        },
+        'title': {
+            'text': f'Variantes en Galicia (22-28 feb)' # ({fecha_inicial} | {fecha_final})
+        },
+        'subtitle': {
+            'text': 'Muestras aleatorias de la semana 8 (22-28 feb) de 2021.'
+        },
+        'xAxis': {
+            'categories': ['B.1.499', 'B.1.177', 'B.1.160', 'B.1.1.7', 'B.1.1.222', 'B.1'],
+            'title': {
+                'text': ''
+            },
+            'labels': {
+                'style': {
+                    'fontWeight': 'bold',
+                    # 'color': 'red'
+                }
+            }
+        },
+        'yAxis': {
+            'min': 0,
+            'title': {
+                'text': 'Cantidad',
+                'align': 'middle'
+            },
+            'labels': {
+                'overflow': 'justify'
+            }
+        },
+        'plotOptions': {
+            'bar': {
+                'dataLabels': {
+                    'enabled': True
+                }
+            },
+            'series': {
+                'pointWidth': 8,
+                'animation': False
+            }
+        },
+        'credits': {
+            'enabled': False
+        },
+        'series': [{
+            'showInLegend': False, 
+            'data': [1.5,2.3,1.3,91.8,0.7,2.4]
+        }
+        ]
+    }
+    return JsonResponse(chart)
 
+def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
     chart = {
         'chart': {
             'height': 700,
             'type': 'bar'
         },
         'title': {
-            'text': f'Variantes por hospital' # ({fecha_inicial} | {fecha_final})
+            'text': f'Variantes por hospital (22-28 feb)' # ({fecha_inicial} | {fecha_final})
         },
         'subtitle': {
             'text': 'Muestras aleatorias de la semana 8 (22-28 feb) de 2021.'
         },
         'xAxis': {
-            'categories': ['<strong>CHOP</strong>', 'CHUO', 'CHUAC', 'CHUF', 'CHUS', 'CHUVI', 'HULA'],
+            'categories': ['CHOP', 'CHUO', 'CHUAC', 'CHUF', 'CHUS', 'CHUVI', 'HULA'],
             'title': {
                 'text': None
             },
