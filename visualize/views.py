@@ -194,10 +194,13 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
                 }
             }
         },
+        'tooltip': {
+            'valueSuffix': ' %'
+        },
         'yAxis': {
             'min': 0,
             'title': {
-                'text': 'Cantidad',
+                'text': 'Porcentaje',
                 'align': 'middle'
             },
             'labels': {
@@ -219,6 +222,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
             'enabled': False
         },
         'series': [{
+            'name':'Porcentaje',
             'showInLegend': False, 
             'data': [1.5,2.3,1.3,91.8,0.7,2.4]
         }
