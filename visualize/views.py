@@ -170,6 +170,105 @@ from datetime import date, datetime
 import geojson
 import random
 
+def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
+    pass
+
+    chart = {
+        'chart': {
+            'height': 700,
+            'type': 'bar'
+        },
+        'title': {
+            'text': f'Variantes por hospital' # ({fecha_inicial} | {fecha_final})
+        },
+        'subtitle': {
+            'text': 'Muestras aleatorias de la semana 8 (22-28 feb) de 2021.'
+        },
+        'xAxis': {
+            'categories': ['<strong>CHOP</strong>', 'CHUO', 'CHUAC', 'CHUF', 'CHUS', 'CHUVI', 'HULA'],
+            'title': {
+                'text': None
+            },
+            'labels': {
+                'style': {
+                    'fontWeight': 'bold',
+                    # 'color': 'red'
+                }
+            }
+        },
+        'yAxis': {
+            'min': 0,
+            'title': {
+                'text': 'Cantidad',
+                'align': 'middle'
+            },
+            'labels': {
+                'overflow': 'justify'
+            }
+        },
+        # 'tooltip': {
+        #     'valueSuffix': ' sufijo'
+        # },
+        'plotOptions': {
+            'bar': {
+                'dataLabels': {
+                    'enabled': True
+                }
+            },
+            'series': {
+                'pointPadding': 1,
+                'pointWidth': 8,
+                'animation': False
+            }
+        },
+        'legend': {
+            'layout': 'vertical',
+            'align': 'right',
+            'verticalAlign': 'top',
+            'x': 0,
+            'y': 50,
+            'floating': True,
+            'borderWidth': 0.5,
+            # 'shadow': True
+        },
+        'credits': {
+            'enabled': True
+        },
+        # 'CHOP', 'CHUO', 'CHUAC', 'CHUF', 'CHUS', 'CHUVI', 'HULA'
+        'series': [{
+            'name': 'B.1.499',
+            'data': [None,None,None,None,None,None,2]
+        }, {
+            'name': 'B.1.177',
+            'data': [None,2,None,2,None,None,None]
+        }, {
+            'name': 'B.1.160',
+            'data': [None,None,None,None,None,1,None]
+        }, {
+            'name': 'B.1.1.7',
+            'data': [12,9,18,10,15,20,10]
+        }, {
+            'name': 'B.1.1.222',
+            'data': [None,1,None,None,None,None,None]
+        }, {
+            'name': 'B.1',
+            'data': [None,None,None,None,None,1,None]
+        },
+        {
+            'name': 'Error B.1',
+            'type': 'errorbar',
+            'yAxis': 0,
+            'data': [[None,None], [None,None], [None,None], [None,None], [None,None], [0.5,1.5], [None,None]],
+            # 'tooltip': {
+            #     'pointFormat': 'Rango error: {point.low}-{point.high}'
+            # },
+            'stemWidth': 1,
+            'whiskerLength': 5
+        },
+        ]
+    }
+    return JsonResponse(chart)
+
 
 def concellos_gal_graph(request, fecha_inicial, fecha_final):
     map_file = './mapas_galicia/GaliciaConcellos_Simple.geojson'
@@ -193,7 +292,7 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
         },
         'boost': {
             'seriesThreshold': 1,
-            'useGPUTranslations': 'true'
+            'useGPUTranslations': True
         },
         'title': {
             'text': ''
@@ -215,7 +314,11 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
         #         'verticalAlign': 'bottom'
         #     }
         # },
-
+        'plotOptions': {
+            'series': {
+                'animation': False
+            }
+        },
         'series': [{
             'data': data,
             'keys': ['NomeMAY', 'value'],
@@ -227,7 +330,7 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
                 }
             },
             'dataLabels': {
-                'enabled': 'true',
+                'enabled': True,
                 'format': '{point.properties.postal}'
             }           
         }],      
@@ -244,11 +347,6 @@ def hospital_graph(request, fecha_inicial, fecha_final):
         answer.append({'name':h, 'y':int(c)})
 
     chart = {
-        'plotOptions': {
-            'series': {
-                'animation': 'false'
-            }
-        },    
         'chart': {
             'type': 'pie',
         },
@@ -263,12 +361,15 @@ def hospital_graph(request, fecha_inicial, fecha_final):
         },
         'plotOptions': {
             'pie': {
-                'allowPointSelect': 'true',
+                'allowPointSelect': True,
                 'cursor': 'pointer',
                 'dataLabels': {
-                    'enabled': 'true',
+                    'enabled': True,
                     'format': '<b>{point.name}</b>: {point.percentage:.1f} %'
                 }
+            },
+            'series': {
+                'animation': False
             }
         },  
         'series': [{
@@ -328,8 +429,8 @@ def variants_line_graph(request, fecha_inicial, fecha_final, variant):
             'text': 'Source: Epicovigal'
         },
         'tooltip': {
-            'shared': 'true',
-            'crosshairs': 'true'
+            'shared': True,
+            'crosshairs': True
         },
         'xAxis': {
             'categories': dias
@@ -339,6 +440,11 @@ def variants_line_graph(request, fecha_inicial, fecha_final, variant):
             'verticalAlign': 'top',
             'borderWidth': 0
         },
+        'plotOptions': {
+            'series': {
+                'animation': False
+            }
+        },  
         'series': [{
             'name': 'Spain',
             'data': dicc[variantes[0]]
@@ -397,8 +503,8 @@ def variants_column_graph(request, fecha_inicial, fecha_final, variant):
             'text': 'Source: Denmark'
         },
         'tooltip': {
-            'shared': 'true',
-            'crosshairs': 'true'
+            'shared': True,
+            'crosshairs': True
         },
         'xAxis': {
             'categories': dias
@@ -416,8 +522,11 @@ def variants_column_graph(request, fecha_inicial, fecha_final, variant):
             'column': {
                 'stacking': 'normal',
                 'dataLabels': {
-                    'enabled': 'true'
+                    'enabled': True
                 }
+            },
+            'series': {
+                'animation': False
             }
         },
         'series': [{

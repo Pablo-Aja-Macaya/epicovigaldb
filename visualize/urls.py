@@ -22,5 +22,5 @@ urlpatterns = [
     path('variants_line_graph/<str:fecha_inicial>+<str:fecha_final>/<str:variant>', views.variants_line_graph, name="variants_line_graph"),
     path('variants_column_graph/<str:fecha_inicial>+<str:fecha_final>/<str:variant>', views.variants_column_graph, name="variants_column_graph"),
     path('concellos_gal_graph/<str:fecha_inicial>+<str:fecha_final>', views.concellos_gal_graph, name="concellos_gal_graph"),
-
+    path('linajes_hospitales_graph/<str:fecha_inicial>+<str:fecha_final>', views.linajes_hospitales_graph, name="linajes_hospitales_graph"),
 ]
