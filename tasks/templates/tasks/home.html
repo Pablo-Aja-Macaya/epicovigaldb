@@ -3,12 +3,7 @@
 
 {% block content %}
 
-<style>
-   .count{
-      color:darkslategrey;
-      font-size:50px;
-    }
- </style>
+
 <main role="main">
   <br>
   <div class="container-lg">
@@ -31,29 +26,17 @@
 
   <div class='container-lg'>
     <div class="row d-flex justify-content-center pb-3">
-      <div class='col-4'>
-        <div class="card " style="border-style: hidden;">
-          <div class="card-body text-center">
-            <span class="count">{{ sample_count }} </span> 
-            <h4 style="color: darkslategrey;"><strong>Muestras</strong></h4>      
-          </div>
-        </div>
+      <div class='col-4 text-center'>
+          <span class="count">{{ sample_count }} </span> 
+          <h4 style="color: darkslategrey;"><strong>Muestras</strong></h4>      
       </div>
-      <div class='col-4'>
-        <div class="card " style="border-style: hidden;">
-          <div class="card-body text-center">
-            <span class="count">{{ sequenced_count }} </span> 
-            <h4 style="color: darkslategrey;"><strong>Genomas secuenciados</strong></h4>      
-          </div>
-        </div>
+      <div class='col-4 text-center'>
+          <span class="count">{{ sequenced_count }} </span> 
+          <h4 style="color: darkslategrey;"><strong>Genomas</strong></h4>  
       </div>
-      <div class='col-4'>
-        <div class="card " style="border-style: hidden;">
-          <div class="card-body text-center">
-            <span class="count">{{ lineage_count }} </span> 
-            <h4 style="color: darkslategrey;"><strong>Linajes detectados</strong></h4>      
-          </div>
-        </div>
+      <div class='col-4 text-center'>
+          <span class="count">{{ lineage_count }} </span> 
+          <h4 style="color: darkslategrey;"><strong>Linajes</strong></h4>      
       </div>
     </div>
   </div>

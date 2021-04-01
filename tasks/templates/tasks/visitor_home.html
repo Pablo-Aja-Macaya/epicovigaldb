@@ -2,15 +2,7 @@
 
 {% block content %}
 
-<style>
 
-.count
-{
-  color:darkslategrey;
-  font-size:60px;
-}
-
-</style>
 
 <main role="main">
 
@@ -48,25 +40,42 @@
   </div>
 
   <div class='container-lg'>
+    <div class="row justify-content-center pb-3">
+      <div class='col-4 text-center'>
+          <span class="count">{{ sample_count }} </span> 
+          <h4 style="color: darkslategrey;"><strong>Muestras</strong></h4>      
+      </div>
+      <div class='col-4 text-center'>
+          <span class="count">{{ sequenced_count }} </span> 
+          <h4 style="color: darkslategrey;"><strong>Genomas</strong></h4>  
+      </div>
+      <div class='col-4 text-center'>
+          <span class="count">{{ lineage_count }} </span> 
+          <h4 style="color: darkslategrey;"><strong>Linajes</strong></h4>      
+      </div>
+    </div>
+  </div>
+
+  <!-- <div class='container-lg'>
     <div class="row d-flex justify-content-center pb-3">
       <div class='col-4'>
-        <div class="card " style="border-style: hidden;">
+        <div class="card " style="width: 100%;">
           <div class="card-body text-center">
             <span class="count">{{ sample_count }} </span> 
-            <h4 style="color: darkslategrey;"><strong>Muestras</strong></h4>      
+            <p style="color: darkslategrey;"><strong>Muestras</strong></p>      
           </div>
         </div>
       </div>
       <div class='col-4'>
-        <div class="card " style="border-style: hidden;">
+        <div class="card " style="width: 100%; ">
           <div class="card-body text-center">
             <span class="count">{{ sequenced_count }} </span> 
-            <h4 style="color: darkslategrey;"><strong>Genomas secuenciados</strong></h4>      
+            <h5 style="color: darkslategrey;"><strong>Genomas secuenciados</strong></h5>      
           </div>
         </div>
       </div>
       <div class='col-4'>
-        <div class="card " style="border-style: hidden;">
+        <div class="card " style="width: 100%; border-style: hidden;">
           <div class="card-body text-center">
             <span class="count">{{ lineage_count }} </span> 
             <h4 style="color: darkslategrey;"><strong>Linajes detectados</strong></h4>      
@@ -74,7 +83,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
 
   <div class="container-lg pb-3">
@@ -151,10 +160,10 @@
     <div class="card" style="width: 100%;border-style: none;">
       <div class="row">
         <div class="col-lg-5 d-flex justify-content-center my-auto">
-          <div class="card-body">
-              <h5 class="card-title"><strong>Variantes por hospital (22-28 feb)</strong></h5>
-              <h6 class="card-subtitle mb-2 text-muted">Muestras aleatorias de la semana 8 (22-28 feb) de 2021</h6>
-              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
+          <div class="card-body" >
+              <h5 class="card-title" ><strong>Variantes por hospital (22-28 feb)</strong></h5>
+              <h6 class="card-subtitle mb-2 text-muted" >Muestras aleatorias de la semana 8 (22-28 feb) de 2021</h6>
+              <p class="card-text" >Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
           </div>
         </div>
         <div class="col-lg-7 justify-content-center my-auto" >
