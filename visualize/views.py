@@ -330,6 +330,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
 
 def concellos_gal_graph(request, fecha_inicial, fecha_final):
     map_file = './mapas_galicia/GaliciaConcellos_Simple.geojson'
+    map_file = './mapas_galicia/GaliciaConcellos_reduccion.geojson'
     
     # map_file = '/home/pabs/GaliciaComarcas.geojson'
     with open(map_file) as map:
