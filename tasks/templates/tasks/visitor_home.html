@@ -89,52 +89,46 @@
   <div class="container-lg pb-3">
     <h3 class='pb-2 pt-2 text-dark' ><strong>Visualización de resultados</strong> </h3>
     {% for task in tasks.all %} 
-    <div class="card mb-3" style="max-width: 100%;" >
-      <div class="row no-gutters pt-3 pb-3">
-        <div class="col-md-2 d-flex justify-content-center" >
-          <img src="{{ task.image.url }}" alt="..." width="100" height="100" class="">
+    <div class="card mb-3" >
+      <div class="row no-gutters justify-content-start pt-3 pb-3">
+        <div class="col-3 d-flex justify-content-center my-auto" >
+          <img src="{{ task.image.url }}" alt="..." style="height: 9vh; width: 9vh;">
         </div>
-        <div class="col-md-8">
+        <div class="col-8 my-auto">
           <div class="card-body">
-            <h4 class="card-title"><strong>{{ task.title }}</strong></h4>
+            {% for k,v in task.url_button_dict.items %}
+            <h4 class="card-title"><strong><a href="{% url k %}">{{ task.title }}</a></strong></h4>
+            {% endfor %}
             <p class="card-text">{{ task.summary }}</p>
           </div>
-        </div>
-        <div class="col-md-2 text-center my-auto">
-            <div class="btn-group">
-                {% for k,v in task.url_button_dict.items %}
-                <a href="{% url k %}"><button type="button" class="btn btn-primary  border border-dark "  style="cursor: pointer;">{{v}}</button></a>
-                {% endfor %}
-            </div>
         </div>
       </div>
     </div>
     {% endfor %}
   </div>
-
+    
   <div class="container-lg pt-2 pb-2">
     <h3 class='pb-2 pt-2 text-dark' ><strong>Equipo y financiamiento</strong> </h3>
   </div>
   <div class="container-lg pb-3">
-    <div class="card mb-3" style="max-width: 100%;" >
-      <div class="row no-gutters pt-3 pb-3">
-        <div class="col-md-2 d-flex justify-content-center" >
-          <img src="/media/images/Epicovigal.icon_-1.png" alt="..." width="100" height="100" class="">
+    <div class="card mb-3"  >
+      <div class="row no-gutters justify-content-start pt-3 pb-3">
+        <div class="col-3 d-flex justify-content-center my-auto" >
+          <img src="/media/images/Epicovigal.icon_-1.png"  alt="..." style="height: 9vh; width: 9vh;">
         </div>
-        <div class="col-md-8">
+        <div class="col-9 my-auto">
           <div class="card-body">
-            <h4 class="card-title"><strong>Consorcio EPICOVIGAL</strong></h4>
+            <h4 class="card-title"><strong><a href="{% url 'consorcio' %}">Consorcio EPICOVIGAL</a></strong></h4>
             <p class="card-text">Instituciones y componentes del consorcio EPICOVIGAL.</p>
           </div>
         </div>
-        <div class="col-md-2 text-center my-auto">
-            <div class="btn-group">
-                <a href="{% url 'consorcio' %}"><button type="button"  class="btn btn-primary  border border-dark "  style="cursor: pointer;">Go</button></a>
-            </div>
-        </div>
+
       </div>
     </div>
   </div>
+
+
+
 
   <div class="container-lg pt-2 pb-2">
     <h3 class='pb-2 pt-2 text-dark' ><strong>Informe general (2020-2021) </strong> </h3>

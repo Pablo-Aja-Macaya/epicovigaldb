@@ -174,6 +174,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
     linajes_count = Sample.objects.filter(categoria_muestra='aleatoria',fecha_muestra__range=[fecha_inicial, fecha_final])\
         .values('lineagestest__lineage')\
         .exclude(lineagestest__lineage__isnull=True)\
+        .order_by('lineagestest__lineage')\
         .annotate(Count('lineagestest__lineage'))\
         .exclude(lineagestest__lineage='None')
 
@@ -209,7 +210,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
             }
         },
         'tooltip': {
-            'valueSuffix': ' %'
+            'valueSuffix': ''
         },
         'yAxis': {
             'min': 0,
@@ -236,7 +237,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
             'enabled': False
         },
         'series': [{
-            'name':'Porcentaje',
+            'name':'Cantidad',
             'showInLegend': False, 
             'data': lista_valores
         }
@@ -244,17 +245,57 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
     }
     return JsonResponse(chart)
 
+
+# linajes_count = Sample.objects.filter(fecha_muestra__range=[fecha_inicial, fecha_final]).values('lineagestest__lineage','samplemetadata__id_hospital').exclude(lineagestest__lineage__isnull=True).order_by('lineagestest__lineage', 'samplemetadata__id_hospital').annotate(Count('lineagestest__lineage')).exclude(lineagestest__lineage='None')
+# lista_hospitales = []
+# series_dicc = {}
+# for i in linajes_count:
+#     hosp = i['samplemetadata__id_hospital']
+#     linaje = i['lineagestest__lineage']
+#     count = i['lineagestest__lineage__count']
+    
+#     if hosp not in lista_hospitales:
+#         lista_hospitales.append(hosp)
+    
+#     if linaje not in series_dicc.keys():
+#         series_dicc[linaje] = {
+#             'name':linaje,
+#             'data':{hosp:count}
+#         }
+#     else:
+#         if series_dicc[linaje]['data'].get(hosp):
+#             series_dicc[linaje]['data'][hosp] += count
+
+# dicc = {
+#     'linaje1':{
+#         'name':'linaje1',
+#         'data':{
+#             'hosp1':10,
+#             'hosp2':2
+#         }
+#     },
+#     'linaje2':{
+#         'name':'linaje2',
+#         'data':{
+#             'hosp1':10,
+#             'hosp2':2
+#         }
+#     }
+# }
+
 def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
+
+
     chart = {
         'chart': {
             'height': 700,
             'type': 'bar'
         },
         'title': {
-            'text': f'Variantes por hospital (22-28 feb)' # ({fecha_inicial} | {fecha_final})
+            'text': f'Variantes por hospital ({fecha_inicial} | {fecha_final})' # ({fecha_inicial} | {fecha_final})
         },
         'subtitle': {
-            'text': 'Muestras aleatorias de la semana 8 (22-28 feb) de 2021.'
+            'text': f'Muestras aleatorias ({fecha_inicial} | {fecha_final})'
         },
         'xAxis': {
             'categories': ['CHOP', 'CHUO', 'CHUAC', 'CHUF', 'CHUS', 'CHUVI', 'HULA'],
