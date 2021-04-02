@@ -26,7 +26,11 @@ class Report(models.Model):
     def days_since_pub(self):
         actual = datetime.date.today()
         pub = datetime.datetime.strptime(str(self.fecha_publ).split(' ')[0], "%Y-%m-%d").date()
-        return (actual-pub).days
+        dias = (actual-pub).days
+        if dias==0:
+            return 'Publicado hoy'
+        elif dias>0:
+            return f'Hace {dias} días' 
     def get_month(self):
         m = datetime.datetime.strptime(str(self.fecha_inicial), "%Y-%m-%d").strftime("%B")
         meses = {

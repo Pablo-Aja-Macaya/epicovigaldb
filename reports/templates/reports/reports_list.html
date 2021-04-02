@@ -9,7 +9,7 @@
     <a href="{% url 'report' id=report.id %}" class="list-group-item list-group-item-action">
       <div class="d-flex w-100 justify-content-between">
         <h5 class="mb-1 text-dark" ><strong>{{ report.titulo }}</strong></h5>
-        <small>Hace {{ report.days_since_pub }} días</small>
+        <small>{{ report.days_since_pub }}</small>
       </div>
       <p class="mb-1">{{ report.subtitulo }}</p>
       <small>{{ report.fecha_inicial }} - {{ report.fecha_final }}</small>
@@ -23,7 +23,7 @@
     <a href="{% url 'report' id=report.id %}" class="list-group-item list-group-item-action">
       <div class="d-flex w-100 justify-content-between">
         <h5 class="mb-1 text-dark" ><strong>{{ report.titulo }}</strong></h5>
-        <small>Hace {{ report.days_since_pub }} días</small>
+        <small>{{ report.days_since_pub }}</small>
       </div>
       <p class="mb-1">{{ report.subtitulo }}</p>
       <small>{{ report.fecha_inicial }} - {{ report.fecha_final }}</small>
