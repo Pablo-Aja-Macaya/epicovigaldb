@@ -3,32 +3,33 @@
 {% block content %}
 
 <div class='container-lg pb-3'>
-    <h3 class='pb-2 pt-2 text-dark' ><strong>Informe completo</strong> </h3>
+  <h3 class='pb-2 pt-2 text-dark' ><strong>Informes generales</strong> </h3>
+  <div class="list-group">
+    {% for report in generales.all %}
+    <a href="{% url 'report' id=report.id %}" class="list-group-item list-group-item-action">
+      <div class="d-flex w-100 justify-content-between">
+        <h5 class="mb-1 text-dark" ><strong>{{ report.titulo }}</strong></h5>
+        <small>Hace {{ report.days_since_pub }} días</small>
+      </div>
+      <p class="mb-1">{{ report.subtitulo }}</p>
+      <small>{{ report.fecha_inicial }} - {{ report.fecha_final }}</small>
+    </a>
+    {% endfor %}
+  </div>
 
-    <div class="list-group pb-3">
-        <a href="{% url 'general_report' fecha_inicial='2020-03-01' fecha_final='2021-12-31'%}" class="list-group-item list-group-item-action">
-          <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1 text-dark" ><strong>Informe completo (2020-2021)</strong></h5>
-              <small>Hace 2 días</small>
-          </div>
-          <p class="mb-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis,</p>
-          <small>January 1, 2021 - December 31, 2021</small>
-        </a>
-    </div>
-
-    <h3 class='pb-2 pt-2 text-dark' ><strong>Informes mensuales</strong> </h3>
-    <div class="list-group">
-      {% for report in data.all %}
-      <a href="{% url 'report' id=report.id %}" class="list-group-item list-group-item-action">
-        <div class="d-flex w-100 justify-content-between">
-          <h5 class="mb-1 text-dark" ><strong>{{ report.get_month }} ({{ report.get_year }})</strong></h5>
-          <small>Hace 2 días</small>
-        </div>
-        <p class="mb-1">{{ report.subtitulo }}</p>
-        <small>{{ report.fecha_inicial }} - {{ report.fecha_final }}</small>
-      </a>
-      {% endfor %}
-    </div>
+  <h3 class='pb-2 pt-2 text-dark' ><strong>Informes mensuales</strong> </h3>
+  <div class="list-group">
+    {% for report in mensuales.all %}
+    <a href="{% url 'report' id=report.id %}" class="list-group-item list-group-item-action">
+      <div class="d-flex w-100 justify-content-between">
+        <h5 class="mb-1 text-dark" ><strong>{{ report.titulo }}</strong></h5>
+        <small>Hace {{ report.days_since_pub }} días</small>
+      </div>
+      <p class="mb-1">{{ report.subtitulo }}</p>
+      <small>{{ report.fecha_inicial }} - {{ report.fecha_final }}</small>
+    </a>
+    {% endfor %}
+  </div>
 </div>
 
 {% endblock %}

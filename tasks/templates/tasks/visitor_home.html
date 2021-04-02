@@ -213,50 +213,13 @@
               <h5 class="card-title"><strong>Variantes (DATOS NO REALES)</strong></h5>
               <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
               <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
-
-              <div class="accordion" id="accordionExample">
-                <div class="card" >
-                  <div class="card-header" id="headingOne" >
-                    <h2 class="mb-0">
-                      <button class="btn btn-link btn-block text-left"  type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                        Variante S:E484
-                      </button>
-                    </h2>
-                  </div>
-              
-                  <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
-                    <div class="card-body">
-                      <div class="container-lg pt-3 pb-5">
-                        <div id="variants_line_graph" data-url="{% url 'variants_line_graph' variant='S:E484' fecha_inicial='2020-01-01' fecha_final='2030-1-1' %}"></div>
-                      </div>    
-                    </div>
-                  </div>
-                </div>
-                <div class="card">
-                  <div class="card-header" id="headingTwo" >
-                    <h2 class="mb-0">
-                      <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                        Variante S:N501
-                      </button>
-                    </h2>
-                  </div>
-                  <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
-                    <div class="card-body">
-                      <div class="container-lg pt-3 pb-5">
-                        <div id="variants_line_graph2" data-url="{% url 'variants_line_graph' variant='S:N501' fecha_inicial='2020-01-01' fecha_final='2030-1-1'%}"></div>
-                      </div>  
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-           
           </div>
+          <div id="variants_line_graph" data-url="{% url 'variants_line_graph' variant='S:E484' fecha_inicial='2020-01-01' fecha_final='2030-1-1' %}"></div>
+          <div id="variants_line_graph2" data-url="{% url 'variants_line_graph' variant='S:N501' fecha_inicial='2020-01-01' fecha_final='2030-1-1'%}"></div>
         </div>
       </div>
     </div>
   </div>  
-
 
   <div class="container-lg pt-1 pb-4">
     <div class="card" style="width: 100%;border-style: none;">
@@ -266,15 +229,12 @@
               <h5 class="card-title"><strong>Origins (DATOS NO REALES)</strong></h5>
               <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
               <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
-            <div class="container-lg pt-3 pb-5">
-              <div id="variants_column_graph" data-url="{% url 'variants_column_graph' variant='20E (EU1)' fecha_inicial='2020-01-01' fecha_final='2030-1-1' %}"></div>
-            </div>
           </div>
+          <div id="variants_column_graph" data-url="{% url 'variants_column_graph' variant='20E (EU1)' fecha_inicial='2020-01-01' fecha_final='2030-1-1' %}"></div>
         </div>
       </div>
     </div>
   </div> 
-
 </main>
 
 <script>

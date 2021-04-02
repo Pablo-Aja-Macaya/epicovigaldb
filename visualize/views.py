@@ -379,6 +379,7 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
             }
         },
         'series': [{
+            'boostThreshold': 1,
             'data': data,
             'keys': ['NomeMAY', 'value'],
             'joinBy': 'NomeMAY',
