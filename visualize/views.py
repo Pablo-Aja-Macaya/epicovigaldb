@@ -171,19 +171,33 @@ import geojson
 import random
 
 def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
+    linajes_count = Sample.objects.filter(categoria_muestra='aleatoria',fecha_muestra__range=[fecha_inicial, fecha_final])\
+        .values('lineagestest__lineage')\
+        .exclude(lineagestest__lineage__isnull=True)\
+        .annotate(Count('lineagestest__lineage'))\
+        .exclude(lineagestest__lineage='None')
+
+    lista_linajes = []
+    lista_valores = []
+    for i in linajes_count:
+        lista_valores.append(i['lineagestest__lineage__count'])
+        lista_linajes.append(i['lineagestest__lineage'])
+
+    print(lista_linajes)
+    print(lista_valores)
     chart = {
         'chart': {
             # 'height': 300,
             'type': 'bar'
         },
         'title': {
-            'text': f'Variantes en Galicia (22-28 feb)' # ({fecha_inicial} | {fecha_final})
+            'text': f'Variantes en Galicia ({fecha_inicial} | {fecha_final})' # ({fecha_inicial} | {fecha_final})
         },
         'subtitle': {
-            'text': 'Muestras aleatorias de la semana 8 (22-28 feb) de 2021.'
+            'text': f'Muestras aleatorias ({fecha_inicial} | {fecha_final})'
         },
         'xAxis': {
-            'categories': ['B.1.499', 'B.1.177', 'B.1.160', 'B.1.1.7', 'B.1.1.222', 'B.1'],
+            'categories': lista_linajes,
             'title': {
                 'text': ''
             },
@@ -224,7 +238,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
         'series': [{
             'name':'Porcentaje',
             'showInLegend': False, 
-            'data': [1.5,2.3,1.3,91.8,0.7,2.4]
+            'data': lista_valores
         }
         ]
     }
@@ -326,7 +340,6 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
         ]
     }
     return JsonResponse(chart)
-
 
 def concellos_gal_graph(request, fecha_inicial, fecha_final):
     map_file = './mapas_galicia/GaliciaConcellos_Simple.geojson'
