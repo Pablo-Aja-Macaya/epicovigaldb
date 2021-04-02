@@ -52,8 +52,8 @@
       <div class="row">
         <div class="col-lg-5 d-flex justify-content-center my-auto">
           <div class="card-body" >
-              <h5 class="card-title" ><strong>Variantes por hospital (22-28 feb)</strong></h5>
-              <h6 class="card-subtitle mb-2 text-muted" >Muestras aleatorias de la semana 8 (22-28 feb) de 2021</h6>
+              <h5 class="card-title" ><strong>Variantes por hospital</strong></h5>
+              <h6 class="card-subtitle mb-2 text-muted" >Muestras aleatorias ({{ report.fecha_inicial|date:'d-m-Y' }} | {{ report.fecha_final|date:'d-m-Y' }})</h6>
               <p class="card-text" >{{ report.texto_variantes_hospitales }}</p>
           </div>
         </div>
@@ -69,8 +69,8 @@
       <div class="row">
         <div class="col-lg-5 d-flex justify-content-center my-auto">
           <div class="card-body">
-              <h5 class="card-title"><strong>Variantes en Galicia  (22-28 feb)</strong></h5>
-              <h6 class="card-subtitle mb-2 text-muted">Muestras aleatorias de la semana 8 (22-28 feb) de 2021</h6>
+              <h5 class="card-title"><strong>Variantes en Galicia </strong></h5>
+              <h6 class="card-subtitle mb-2 text-muted">Muestras aleatorias ({{ report.fecha_inicial|date:'d-m-Y' }} | {{ report.fecha_final|date:'d-m-Y' }})</h6>
               <p class="card-text">{{ report.texto_variantes_galicia }}</p>
           </div>
         </div>
