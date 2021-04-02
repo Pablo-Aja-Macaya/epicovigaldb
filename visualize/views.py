@@ -292,10 +292,10 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
             'type': 'bar'
         },
         'title': {
-            'text': f'Variantes por hospital ({fecha_inicial} | {fecha_final})' # ({fecha_inicial} | {fecha_final})
+            'text': f'Variantes por hospital 22-28 Febrero' # ({fecha_inicial} | {fecha_final})
         },
         'subtitle': {
-            'text': f'Muestras aleatorias ({fecha_inicial} | {fecha_final})'
+            'text': f'Muestras aleatorias '
         },
         'xAxis': {
             'categories': ['CHOP', 'CHUO', 'CHUAC', 'CHUF', 'CHUS', 'CHUVI', 'HULA'],
