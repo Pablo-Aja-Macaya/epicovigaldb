@@ -245,11 +245,6 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
     }
     return JsonResponse(chart)
 
-
-
-
-
-
 def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
     # Query que cuenta las veces que aparece una variante en cada hospital
     # Estructura:
@@ -358,7 +353,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
             # 'shadow': True
         },
         'credits': {
-            'enabled': True
+            'enabled': False
         },
         # 'CHOP', 'CHUO', 'CHUAC', 'CHUF', 'CHUS', 'CHUVI', 'HULA'
         'series': list(series_dicc.values())
@@ -427,6 +422,9 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
                 'animation': False
             }
         },
+        'credits': {
+            'enabled': False
+        },
         'series': [{
             'boostThreshold': 1,
             'data': data,
@@ -480,7 +478,10 @@ def hospital_graph(request, fecha_inicial, fecha_final):
             'series': {
                 'animation': False
             }
-        },  
+        },
+        'credits': {
+            'enabled': False
+        }, 
         'series': [{
             'name': 'Cantidad',
             'data': answer # [{ name: 'CHHUVI', y: 1 }, { name: 'CHUAC', y: 1 }]
@@ -553,7 +554,10 @@ def variants_line_graph(request, fecha_inicial, fecha_final, variant):
             'series': {
                 'animation': False
             }
-        },  
+        },
+        'credits': {
+            'enabled': False
+        },
         'series': [{
             'name': 'Spain',
             'data': dicc[variantes[0]]
@@ -637,6 +641,9 @@ def variants_column_graph(request, fecha_inicial, fecha_final, variant):
             'series': {
                 'animation': False
             }
+        },
+        'credits': {
+            'enabled': False
         },
         'series': [{
             'name': f'{variant}',
