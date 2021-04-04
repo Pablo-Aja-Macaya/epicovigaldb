@@ -255,7 +255,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
     # Estructura:
     # <QuerySet [{'lineagestest__lineage': 'B.1.177', 'samplemetadata__id_hospital': 'CHUF', 'lineagestest__lineage__count': 1}, 
     # {'lineagestest__lineage': 'B.1.177', 'samplemetadata__id_hospital': 'HULA', 'lineagestest__lineage__count': 1}]>
-    linajes_count = Sample.objects.filter(fecha_muestra__range=[fecha_inicial, fecha_final]).values('lineagestest__lineage','samplemetadata__id_hospital').exclude(lineagestest__lineage__isnull=True).order_by('lineagestest__lineage', 'samplemetadata__id_hospital').annotate(Count('lineagestest__lineage')).exclude(lineagestest__lineage='None')
+    linajes_count = Sample.objects.filter(categoria_muestra='aleatoria',fecha_muestra__range=[fecha_inicial, fecha_final]).values('lineagestest__lineage','samplemetadata__id_hospital').exclude(lineagestest__lineage__isnull=True).order_by('lineagestest__lineage', 'samplemetadata__id_hospital').annotate(Count('lineagestest__lineage')).exclude(lineagestest__lineage='None')
 
     # Se hace un set ordenado de los códigos de hospitales (CHUAC, CHUS...)
     lista_hospitales = [i['samplemetadata__id_hospital'] for i in linajes_count]
@@ -305,7 +305,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
             'type': 'bar'
         },
         'title': {
-            'text': f'Variantes por hospital 22-28 Febrero' # ({fecha_inicial} | {fecha_final})
+            'text': f'Variantes por hospital ({fecha_inicial} | {fecha_final})' # ({fecha_inicial} | {fecha_final})
         },
         'subtitle': {
             'text': f'Muestras aleatorias '
