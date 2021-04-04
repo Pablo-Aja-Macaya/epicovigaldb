@@ -215,7 +215,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
         'yAxis': {
             'min': 0,
             'title': {
-                'text': 'Porcentaje',
+                'text': 'Cantidad',
                 'align': 'middle'
             },
             'labels': {
@@ -225,8 +225,9 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
         'plotOptions': {
             'bar': {
                 'dataLabels': {
-                    'enabled': True
-                }
+                    'enabled': True,
+                },
+                
             },
             'series': {
                 'pointWidth': 8,
