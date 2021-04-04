@@ -246,45 +246,58 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
     return JsonResponse(chart)
 
 
-# linajes_count = Sample.objects.filter(fecha_muestra__range=[fecha_inicial, fecha_final]).values('lineagestest__lineage','samplemetadata__id_hospital').exclude(lineagestest__lineage__isnull=True).order_by('lineagestest__lineage', 'samplemetadata__id_hospital').annotate(Count('lineagestest__lineage')).exclude(lineagestest__lineage='None')
-# lista_hospitales = []
-# series_dicc = {}
-# for i in linajes_count:
-#     hosp = i['samplemetadata__id_hospital']
-#     linaje = i['lineagestest__lineage']
-#     count = i['lineagestest__lineage__count']
-    
-#     if hosp not in lista_hospitales:
-#         lista_hospitales.append(hosp)
-    
-#     if linaje not in series_dicc.keys():
-#         series_dicc[linaje] = {
-#             'name':linaje,
-#             'data':{hosp:count}
-#         }
-#     else:
-#         if series_dicc[linaje]['data'].get(hosp):
-#             series_dicc[linaje]['data'][hosp] += count
 
-# dicc = {
-#     'linaje1':{
-#         'name':'linaje1',
-#         'data':{
-#             'hosp1':10,
-#             'hosp2':2
-#         }
-#     },
-#     'linaje2':{
-#         'name':'linaje2',
-#         'data':{
-#             'hosp1':10,
-#             'hosp2':2
-#         }
-#     }
-# }
+
+
 
 def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
+    # Query que cuenta las veces que aparece una variante en cada hospital
+    # Estructura:
+    # <QuerySet [{'lineagestest__lineage': 'B.1.177', 'samplemetadata__id_hospital': 'CHUF', 'lineagestest__lineage__count': 1}, 
+    # {'lineagestest__lineage': 'B.1.177', 'samplemetadata__id_hospital': 'HULA', 'lineagestest__lineage__count': 1}]>
+    linajes_count = Sample.objects.filter(fecha_muestra__range=[fecha_inicial, fecha_final]).values('lineagestest__lineage','samplemetadata__id_hospital').exclude(lineagestest__lineage__isnull=True).order_by('lineagestest__lineage', 'samplemetadata__id_hospital').annotate(Count('lineagestest__lineage')).exclude(lineagestest__lineage='None')
 
+    # Se hace un set ordenado de los códigos de hospitales (CHUAC, CHUS...)
+    lista_hospitales = [i['samplemetadata__id_hospital'] for i in linajes_count]
+    lista_hospitales = sorted(set(lista_hospitales))
+
+    series_dicc = {}
+    for i in linajes_count:
+        hosp = i['samplemetadata__id_hospital']
+        linaje = i['lineagestest__lineage']
+        count = i['lineagestest__lineage__count']
+        pos_hosp = lista_hospitales.index(hosp) # posición del hospital en el set de hospitales
+        
+        # Si todavía no se ha visto la variante
+        if linaje not in series_dicc.keys():
+            # Se inicializa una lista de Nones 
+            tmp_list = [None for i in range(len(lista_hospitales))]
+            # En la posición del hospital se pone el valor para ese hospital
+            tmp_list[pos_hosp] = count
+            series_dicc[linaje] = {
+                'name':linaje,
+                'data':tmp_list
+            }
+        # Si se ha visto la variante
+        else:
+            # Si ya hay una cuenta para cierto hospital (en esta posición None a pasado a ser un número)
+            if series_dicc[linaje]['data'][pos_hosp]:
+                series_dicc[linaje]['data'][pos_hosp] += count
+            # Si este hospital todavía no se ha visto
+            else:
+                series_dicc[linaje]['data'][pos_hosp] = count
+
+    # Estructura de series_dicc
+    # dicc = {
+    #     'linaje1':{
+    #         'name':'linaje1',
+    #         'data':[1,2,3]
+    #     },
+    #     'linaje2':{
+    #         'name':'linaje2',
+    #         'data':[1,2,3]
+    #     }
+    # }
 
     chart = {
         'chart': {
@@ -298,7 +311,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
             'text': f'Muestras aleatorias '
         },
         'xAxis': {
-            'categories': ['CHOP', 'CHUO', 'CHUAC', 'CHUF', 'CHUS', 'CHUVI', 'HULA'],
+            'categories': lista_hospitales,
             'title': {
                 'text': None
             },
@@ -348,37 +361,19 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
             'enabled': True
         },
         # 'CHOP', 'CHUO', 'CHUAC', 'CHUF', 'CHUS', 'CHUVI', 'HULA'
-        'series': [{
-            'name': 'B.1.499',
-            'data': [None,None,None,None,None,None,2]
-        }, {
-            'name': 'B.1.177',
-            'data': [None,2,None,2,None,None,None]
-        }, {
-            'name': 'B.1.160',
-            'data': [None,None,None,None,None,1,None]
-        }, {
-            'name': 'B.1.1.7',
-            'data': [12,9,18,10,15,20,10]
-        }, {
-            'name': 'B.1.1.222',
-            'data': [None,1,None,None,None,None,None]
-        }, {
-            'name': 'B.1',
-            'data': [None,None,None,None,None,1,None]
-        },
-        {
-            'name': 'Error B.1',
-            'type': 'errorbar',
-            'yAxis': 0,
-            'data': [[None,None], [None,None], [None,None], [None,None], [None,None], [0.5,1.5], [None,None]],
-            # 'tooltip': {
-            #     'pointFormat': 'Rango error: {point.low}-{point.high}'
-            # },
-            'stemWidth': 1,
-            'whiskerLength': 5
-        },
-        ]
+        'series': list(series_dicc.values())
+        # {
+        #     'name': 'Error B.1',
+        #     'type': 'errorbar',
+        #     'yAxis': 0,
+        #     'data': [[None,None], [None,None], [None,None], [None,None], [None,None], [0.5,1.5], [None,None]],
+        #     # 'tooltip': {
+        #     #     'pointFormat': 'Rango error: {point.low}-{point.high}'
+        #     # },
+        #     'stemWidth': 1,
+        #     'whiskerLength': 5
+        # },
+        
     }
     return JsonResponse(chart)
 
