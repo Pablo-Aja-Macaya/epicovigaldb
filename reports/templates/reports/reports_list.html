@@ -30,6 +30,23 @@
     </a>
     {% endfor %}
   </div>
+
+  {% if privados.all %}
+  <h3 class='pb-2 pt-2 text-dark' ><strong>Informes privados </strong> </h3>
+  <div class="list-group">
+    {% for report in privados.all %}
+    <a href="{% url 'report' id=report.id %}" class="list-group-item list-group-item-action">
+      <div class="d-flex w-100 justify-content-between">
+        <h5 class="mb-1 text-dark" ><strong>{{ report.titulo }}</strong></h5>
+        <small>{{ report.days_since_pub }}</small>
+      </div>
+      <p class="mb-1">{{ report.subtitulo }}</p>
+      <small>{{ report.fecha_inicial }} - {{ report.fecha_final }}</small>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
 </div>
 
 {% endblock %}

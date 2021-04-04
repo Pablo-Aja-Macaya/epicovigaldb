@@ -170,6 +170,13 @@ from datetime import date, datetime
 import geojson
 import random
 
+credits = {
+    'enabled': True,'text':
+    'epicovigaldb.com',
+    'href':'https://epicovigaldb.com',
+    'style':{'fontSize':15}
+    }
+
 def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
     linajes_count = Sample.objects.filter(categoria_muestra='aleatoria',fecha_muestra__range=[fecha_inicial, fecha_final])\
         .values('lineagestest__lineage')\
@@ -234,9 +241,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
                 'animation': False
             }
         },
-        'credits': {
-            'enabled': False
-        },
+        'credits':credits,
         'series': [{
             'name':'Cantidad',
             'showInLegend': False, 
@@ -353,9 +358,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
             'borderWidth': 0.5,
             # 'shadow': True
         },
-        'credits': {
-            'enabled': False
-        },
+        'credits': credits,
         # 'CHOP', 'CHUO', 'CHUAC', 'CHUF', 'CHUS', 'CHUVI', 'HULA'
         'series': list(series_dicc.values())
         # {
@@ -380,16 +383,13 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
     # map_file = '/home/pabs/GaliciaComarcas.geojson'
     with open(map_file) as map:
         geojson_data = geojson.load(map) # mapa
-
-
-    # data = list(Sample.objects.values('id_region__localizacion').filter(id_region__localizacion__gte=2).order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
     
     # Datos: [{'NomeMAY':'A CORUÑA', 'value':10}, {'NomeMAY':'SANTIAGO', 'value':15}...]
     data = list(Sample.objects.values('id_region__localizacion')\
             .filter(id_region__localizacion__gte=2)\
             .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
             .order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
-
+            
     chart = {
         'chart':{
             'map':geojson_data,
@@ -410,7 +410,7 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
         },
         'tooltip': {
           'headerFormat': '',
-          'pointFormat': '<b>{point.NomeMAY}</b><br>Total: {point.value}<br>Variante 1: 80%<br>Variante 2: 20%'
+          'pointFormat': '<b>{point.NomeMAY}</b><br>Total: {point.value}'
         },
         # 'mapNavigation': {
         #     'enabled': 'true',
@@ -423,9 +423,7 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
                 'animation': False
             }
         },
-        'credits': {
-            'enabled': False
-        },
+        'credits': credits,
         'series': [{
             'boostThreshold': 1,
             'data': data,
@@ -480,9 +478,7 @@ def hospital_graph(request, fecha_inicial, fecha_final):
                 'animation': False
             }
         },
-        'credits': {
-            'enabled': False
-        }, 
+        'credits': credits,
         'series': [{
             'name': 'Cantidad',
             'data': answer # [{ name: 'CHHUVI', y: 1 }, { name: 'CHUAC', y: 1 }]
@@ -556,9 +552,7 @@ def variants_line_graph(request, fecha_inicial, fecha_final, variant):
                 'animation': False
             }
         },
-        'credits': {
-            'enabled': False
-        },
+        'credits': credits,
         'series': [{
             'name': 'Spain',
             'data': dicc[variantes[0]]
@@ -643,9 +637,7 @@ def variants_column_graph(request, fecha_inicial, fecha_final, variant):
                 'animation': False
             }
         },
-        'credits': {
-            'enabled': False
-        },
+        'credits':credits,
         'series': [{
             'name': f'{variant}',
             'data': [483, 420, 601, 724, 977, 1412, 2206, 2122, 2335, 2512, 2282, 2099, 1448, 918, 577, 123]
