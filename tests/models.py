@@ -110,6 +110,11 @@ class VariantsTest(models.Model): #.tsv
 # #     # aa_position
 # #     # thresholds
 
+class Country(models.Model):
+    name = models.CharField(primary_key=True,max_length=30)
+    def __str__(self):
+        return str(self.name)
+
 class LineagesTest(models.Model): #.csv
     id = models.AutoField(primary_key=True)
     id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE)# a partir de columna 'taxon'
@@ -117,8 +122,9 @@ class LineagesTest(models.Model): #.csv
 
     lineage = models.CharField(max_length=10)
     probability = models.DecimalField(max_digits=7, decimal_places=6) 
-    pangolearn_version = models.CharField(max_length=15, blank=True)
-    comments = models.TextField(max_length=50, default=None, blank=True)
+    countries = models.ManyToManyField(Country)
+    pangolearn_version = models.CharField(max_length=15, blank=True, null=True)
+    comments = models.TextField(max_length=50, default=None, blank=True, null=True)
 
     date = models.DateTimeField(auto_now=True)
 
@@ -127,16 +133,21 @@ class LineagesTest(models.Model): #.csv
     def __str__(self):
         return str(self.id_uvigo) + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
 
-class LineagesMostCommonCountries(models.Model):
-    # Esta tabla se hace porque el atributo 'most common countries' de pangolin es multivaluado 'Spain,Portugal'
-    id = models.AutoField(primary_key=True)
-    id_uvigo = models.ForeignKey(LineagesTest, on_delete=models.CASCADE)
-    # id_process = models.CharField(max_length=40)
-    date = models.DateTimeField(auto_now=True)
-    country = models.TextField(max_length=50, default=None, blank=True)
-    
-    def __str__(self):
-        return str(self.id_uvigo + ' - ' + self.date.strftime("%m/%d/%Y, %H:%M:%S") + ' (UTC)')
+
+
+
+# class LineagesMostCommonCountries(models.Model):
+#     # Esta tabla se hace porque el atributo 'most common countries' de pangolin es multivaluado 'Spain,Portugal'
+#     id = models.AutoField(primary_key=True)
+#     id_uvigo = models.ForeignKey(LineagesTest, on_delete=models.CASCADE)
+#     # id_process = models.CharField(max_length=40)
+#     date = models.DateTimeField(auto_now=True)
+#     country = models.CharField(max_length=30, default=None, blank=True)
+
+#     class Meta:
+#         unique_together = ('id_uvigo','country')    
+#     def __str__(self):
+#         return str(self.id_uvigo) + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
 
 
 # class ModeloPrueba(models.Model):
@@ -515,16 +526,20 @@ def upload_lineages(reader):
             )
             lineage_reference = LineagesTest.objects.get(id_uvigo=id_uvigo)
             for country in countries:
-                country = country.strip()
-                _, created = LineagesMostCommonCountries.objects.update_or_create(
-                    id_uvigo=lineage_reference,
-                    defaults={
-                        'id_uvigo' : lineage_reference,
-                        # 'id_process' : id_process,
-                        'country' : country,
+                c = Country(name=country)
+                c.save()
+                lineage_reference.countries.add(c)
+            # for country in countries:
+            #     country = country.strip()
+            #     _, created = LineagesMostCommonCountries.objects.update_or_create(
+            #         id_uvigo=lineage_reference,
+            #         defaults={
+            #             'id_uvigo' : lineage_reference,
+            #             # 'id_process' : id_process,
+            #             'country' : country,
                 
-                    }
-                )
+            #         }
+            #     )
 
 ################################
 def select_test(test, file, sample_name, fieldnames, dialect):
