@@ -11,23 +11,32 @@
     </li>
   </ul>
   <p></p>
-
-  {% if message %}
+  {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message|safe }}
+      </div>
+      {% endfor %}
+  {% endif %}
+  <!-- {% if request.session.context.message %}
     <div class="alert alert-success" role="alert">
-      {{ message }}
+      {{ request.session.context.message }}
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
   {% endif %}
-  {% if warning %}
+  {% if request.session.context.warning %}
     <div class="alert alert-warning" role="alert">
-      {{ warning }}
+      {{ request.session.context.warning }}
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
-  {% endif %}
+  {% endif %} -->
 
   <div class="container-lg pb-2 pt-2">
     <div class="card mb-3" style="max-width: 100%;" >
@@ -46,8 +55,8 @@
         <div class="col-md-2 text-center my-auto">
             <div class="btn-group">
                 <a href="{% url 'update' %}" >
-                  <button type="button" class="btn btn-primary border border-dark" onclick="this.classList.toggle('btn--loading')">
-                    <span class="btn__text">Actualizar</span>
+                  <button type="button" class="boton_carga" onclick="this.classList.toggle('boton_carga--loading')">
+                    <span class="boton_carga__text">Actualizar</span>
                   </button>
                 </a>
             </div>
@@ -76,8 +85,8 @@
       </div>  
         <div class="form-group row justify-content-center">
             <a href="javascript:{document.getElementById('send_results').submit()}">
-              <button type="submit" class="btn btn-primary" onclick="this.classList.toggle('btn--loading')" data-toggle="collapse" data-target="#collapseLoading" aria-expanded="false" aria-controls="collapseExample">
-                <span class="btn__text">Subir archivos</span>
+              <button type="submit" class="boton_carga" onclick="this.classList.toggle('boton_carga--loading')" data-toggle="collapse" data-target="#collapseLoading" aria-expanded="false" aria-controls="collapseExample">
+                <span class="boton_carga__text">Subir archivos</span>
               </button>
             </a>
         </div>
@@ -85,7 +94,7 @@
 
 
     <!-- Menú de carga colapsable -->
-    <div class="collapse" id="collapseLoading">
+    <!-- <div class="collapse" id="collapseLoading">
       <div class="card card-body border-0">  
         <div class="d-flex justify-content-center text-center">
           <div class="spinner-border text-primary" style="width: 5rem; height: 5rem;" role="status">
@@ -96,7 +105,7 @@
         <strong>Cargando</strong>
         </div>  
       </div>
-    </div>
+    </div> -->
   </div>
 </div>
 <script>

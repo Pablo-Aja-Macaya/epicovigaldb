@@ -73,28 +73,28 @@ def upload_sample_hospital(stream):
     lista_fallos = []
     for line in reader:
         try:
-            id_uvigo = line['id_uvigo']
-            id_hospital = line['id_hospital']
-            id_paciente = str(line['id_paciente'])
-            numero_envio = line['numero_envio']
-            id_tubo = line['id_tubo']
-            id_muestra = line['id_muestra']
-            hospitalizacion = line['hospitalizacion'][:1] # Para que si hay un 'Si' pille sólo la S
-            uci = line['uci']
-            categoria_muestra = line['categoria_muestra']
-            nodo_secuenciacion = line['nodo_secuenciacion']
-            observaciones = line['observaciones']
-            cp = line['cp']
-            loc = line['localizacion']
-            sexo = line['sexo']
-            edad = line['edad']
+            id_uvigo = line.get('id_uvigo')
+            id_hospital = line.get('id_hospital')
+            id_paciente = str(line.get('id_paciente'))
+            numero_envio = line.get('numero_envio')
+            id_tubo = line.get('id_tubo')
+            id_muestra = line.get('id_muestra')
+            hospitalizacion = line.get('hospitalizacion')[:1] # Para que si hay un 'Si' pille sólo la S
+            uci = line.get('uci')
+            categoria_muestra = line.get('categoria_muestra')
+            nodo_secuenciacion = line.get('nodo_secuenciacion')
+            observaciones = line.get('observaciones')
+            cp = line.get('cp')
+            loc = line.get('localizacion')
+            sexo = line.get('sexo')
+            edad = line.get('edad')
             
             # Formateo de los ct (cambiar coma por puntos y cambiar espacio en blanco por 0 (quizás mejor Null?)) 
-            orf1ab = line['ct_orf1ab'].replace(',','.')
-            gen_e = line['ct_gen_e'].replace(',','.')
-            gen_n = line['ct_gen_n'].replace(',','.')
-            rdrp = line['ct_rdrp'].replace(',','.')
-            ct_s = line['ct_s'].replace(',','.')
+            orf1ab = line.get('ct_orf1ab').replace(',','.')
+            gen_e = line.get('ct_gen_e').replace(',','.')
+            gen_n = line.get('ct_gen_n').replace(',','.')
+            rdrp = line.get('ct_rdrp').replace(',','.')
+            ct_s = line.get('ct_s').replace(',','.')
 
             def check_numbers(number):
                 try:
@@ -115,16 +115,16 @@ def upload_sample_hospital(stream):
                 
             try:
                 int(edad)
-            except: edad = 0
+            except: edad = None
 
             # Formateo de fechas
-            f_muestra = time_transform(line['fecha_muestra'])
-            f_sintomas = time_transform(line['fecha_sintomas'])
-            f_diagnostico = time_transform(line['fecha_diagnostico'])
-            f_entrada_uv = time_transform(line['fecha_entrada'])
-            f_envio_cdna = time_transform(line['fecha_envio_cdna'])
-            f_run_ngs = time_transform(line['fecha_run_ngs'])
-            f_entrada_fastq = time_transform(line['fecha_entrada_fastq'])
+            f_muestra = time_transform(line.get('fecha_muestra'))
+            f_sintomas = time_transform(line.get('fecha_sintomas'))
+            f_diagnostico = time_transform(line.get('fecha_diagnostico'))
+            f_entrada_uv = time_transform(line.get('fecha_entrada'))
+            f_envio_cdna = time_transform(line.get('fecha_envio_cdna'))
+            f_run_ngs = time_transform(line.get('fecha_run_ngs'))
+            f_entrada_fastq = time_transform(line.get('fecha_entrada_fastq'))
 
             # Quitar acentos y cosas raras a localización
             loc = loc.upper().translate(repl)
@@ -135,15 +135,15 @@ def upload_sample_hospital(stream):
                 loc = 'A ' + loc[:-4]
 
             # Insertado en la base de datos
-            if not Region.objects.filter(cp=cp, localizacion=loc).exists():
-                _, created = Region.objects.update_or_create(
-                        cp = int(cp),
-                        localizacion = loc,
-                        pais = 'SPAIN',
-                        region = 'EUROPE',
-                        latitud = 0,
-                        longitud = 0
-                    )
+            # if not Region.objects.filter(cp=cp, localizacion=loc).exists():
+            _, created = Region.objects.update_or_create(
+                    cp = int(cp),
+                    localizacion = loc,
+                    pais = 'SPAIN',
+                    region = 'EUROPE',
+                    # latitud = 0,
+                    # longitud = 0
+                )
 
             region_reference = Region.objects.get(cp=cp, localizacion=loc)
             if id_uvigo:
@@ -190,7 +190,8 @@ def upload_sample_hospital(stream):
                         }
 
                     ) 
-        except:
+        except Exception as e:
+            print(e)
             lista_fallos.append(id_uvigo)
 
     return lista_fallos, lista_columnas_inesperadas

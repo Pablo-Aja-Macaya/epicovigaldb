@@ -13,8 +13,17 @@
     </li>
   </ul>
   <p></p>
-
-  {% if message %}
+  {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message|safe }}
+      </div>
+      {% endfor %}
+  {% endif %}
+  <!-- {% if message %}
     <div class="alert alert-success" role="alert">
       {{ message }}. Compruébalo desde la <a href="{% url 'samples' %}">página de visualización</a>.
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -35,7 +44,7 @@
         </div>
       </div>
     </div>
-  {% endif %}
+  {% endif %} -->
 
 
   <div class="container-lg pb-2 pt-2">
@@ -96,7 +105,7 @@
           </div>
         </div>
       </fieldset>
-      <div class="form-group row">
+      <!-- <div class="form-group row">
         <div class="col-sm-2">Otra opción</div>
         <div class="col-sm-10">
           <div class="form-check">
@@ -106,7 +115,7 @@
             </label>
           </div>
         </div>
-      </div>
+      </div> -->
       <!-- Archivo -->
       <div class="form-group row">
         <div class="col-sm-2">Archivo</div>
