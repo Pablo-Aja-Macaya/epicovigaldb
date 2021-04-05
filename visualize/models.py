@@ -97,7 +97,7 @@ class CompletedTestsTable(tables.Table):
     ngsstatstest = tables.Column(verbose_name='NGSStats')
     lineagestest = tables.Column(verbose_name='Pangolin')
     singlechecktest = tables.Column(verbose_name='SingleCheck')
-    variantstest = tables.Column(verbose_name='iVar')
+    variantstest__id_uvigo = tables.Column(verbose_name='iVar')
     class Meta:
         template_name = "table_template.html"
 

@@ -15,16 +15,16 @@ def get_completed_tests():
     '''
     Devuelve para cada muestra si se ha hecho cada test
     '''
-    lista = Sample.objects.values('id_uvigo','lineagestest','nextcladetest','ngsstatstest','picardtest','singlechecktest','variantstest')
+    # lista = Sample.objects.values('id_uvigo','lineagestest','nextcladetest','ngsstatstest','picardtest','singlechecktest','variantstest')
+    lista = Sample.objects.values('id_uvigo').distinct().values('id_uvigo','lineagestest','nextcladetest','ngsstatstest','picardtest','singlechecktest','variantstest__id_uvigo')
     lista2 = []
     for i in lista:
-        fields = ['lineagestest','nextcladetest','ngsstatstest','picardtest','singlechecktest','variantstest']
+        fields = ['lineagestest','nextcladetest','ngsstatstest','picardtest','singlechecktest','variantstest__id_uvigo']
         for f in fields:
-            try:
-                int(i[f])
+            if i[f]!=None:
+                # int(i[f])
                 i[f] = 1
-            except:
-                pass
+
         lista2.append(i)
     return lista2
 
