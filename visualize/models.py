@@ -38,6 +38,7 @@ class SampleMetaDataTable(tables.Table):
 class LineagesTable(tables.Table):
     id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
     date = tables.DateTimeColumn(format ='d/m/Y, h:i A')
+    most_common_countries = tables.ManyToManyColumn()
     class Meta:
         model = LineagesTest
         template_name = "table_template.html"

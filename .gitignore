@@ -8,3 +8,4 @@ local_settings.py
 # /media
 # /static
 
+tests/migrations/0070_country_lineagestest.py

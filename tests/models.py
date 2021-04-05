@@ -122,7 +122,7 @@ class LineagesTest(models.Model): #.csv
 
     lineage = models.CharField(max_length=10)
     probability = models.DecimalField(max_digits=7, decimal_places=6) 
-    countries = models.ManyToManyField(Country)
+    most_common_countries = models.ManyToManyField(Country)
     pangolearn_version = models.CharField(max_length=15, blank=True, null=True)
     comments = models.TextField(max_length=50, default=None, blank=True, null=True)
 
@@ -526,9 +526,9 @@ def upload_lineages(reader):
             )
             lineage_reference = LineagesTest.objects.get(id_uvigo=id_uvigo)
             for country in countries:
-                c = Country(name=country)
+                c = Country(name=country.strip())
                 c.save()
-                lineage_reference.countries.add(c)
+                lineage_reference.most_common_countries.add(c)
             # for country in countries:
             #     country = country.strip()
             #     _, created = LineagesMostCommonCountries.objects.update_or_create(
