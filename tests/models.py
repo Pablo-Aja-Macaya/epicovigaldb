@@ -110,28 +110,28 @@ class VariantsTest(models.Model): #.tsv
 # #     # aa_position
 # #     # thresholds
 
-# class Country(models.Model):
-#     name = models.CharField(primary_key=True,max_length=30)
-#     def __str__(self):
-#         return str(self.name)
+class Country(models.Model):
+    name = models.CharField(primary_key=True,max_length=30)
+    def __str__(self):
+        return str(self.name)
 
-# class LineagesTest(models.Model): #.csv
-#     id = models.AutoField(primary_key=True)
-#     id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE)# a partir de columna 'taxon'
-#     # id_process = models.CharField(max_length=40)
+class LineagesTest(models.Model): #.csv
+    id = models.AutoField(primary_key=True)
+    id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE)# a partir de columna 'taxon'
+    # id_process = models.CharField(max_length=40)
 
-#     lineage = models.CharField(max_length=10)
-#     probability = models.DecimalField(max_digits=7, decimal_places=6) 
-#     countries = models.ManyToManyField(Country)
-#     pangolearn_version = models.CharField(max_length=15, blank=True, null=True)
-#     comments = models.TextField(max_length=50, default=None, blank=True, null=True)
+    lineage = models.CharField(max_length=10)
+    probability = models.DecimalField(max_digits=7, decimal_places=6) 
+    countries = models.ManyToManyField(Country)
+    pangolearn_version = models.CharField(max_length=15, blank=True, null=True)
+    comments = models.TextField(max_length=50, default=None, blank=True, null=True)
 
-#     date = models.DateTimeField(auto_now=True)
+    date = models.DateTimeField(auto_now=True)
 
-#     class Meta:
-#         unique_together = ('id_uvigo','date')
-#     def __str__(self):
-#         return str(self.id_uvigo) + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
+    class Meta:
+        unique_together = ('id_uvigo','date')
+    def __str__(self):
+        return str(self.id_uvigo) + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
 
 
 
@@ -513,22 +513,22 @@ def upload_lineages(reader):
 
         if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
-            # _, created = LineagesTest.objects.update_or_create(
-            #     id_uvigo=sample_reference,
-            #     defaults={
-            #         'id_uvigo' : sample_reference,
-            #         # 'id_process' : id_process,
-            #         'lineage' : lineage,
-            #         'probability' : probability,
-            #         'comments' : '',
-            #         'pangolearn_version':pangolearn_version             
-            #     }
-            # )
-            # lineage_reference = LineagesTest.objects.get(id_uvigo=id_uvigo)
-            # for country in countries:
-            #     c = Country(name=country)
-            #     c.save()
-            #     lineage_reference.countries.add(c)
+            _, created = LineagesTest.objects.update_or_create(
+                id_uvigo=sample_reference,
+                defaults={
+                    'id_uvigo' : sample_reference,
+                    # 'id_process' : id_process,
+                    'lineage' : lineage,
+                    'probability' : probability,
+                    'comments' : '',
+                    'pangolearn_version':pangolearn_version             
+                }
+            )
+            lineage_reference = LineagesTest.objects.get(id_uvigo=id_uvigo)
+            for country in countries:
+                c = Country(name=country)
+                c.save()
+                lineage_reference.countries.add(c)
             # for country in countries:
             #     country = country.strip()
             #     _, created = LineagesMostCommonCountries.objects.update_or_create(

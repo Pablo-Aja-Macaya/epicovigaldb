@@ -6,7 +6,7 @@ from django_tables2 import RequestConfig
 from upload.models import Region, Sample
 from upload.models import SampleMetaData 
 
-from tests.models import PicardTest, NextcladeTest, NGSstatsTest#,LineagesTest
+from tests.models import LineagesTest, PicardTest, NextcladeTest, NGSstatsTest
 from .models import CompletedTestsTable, SampleTable, RegionTable, SampleMetaDataTable, SingleCheckTest, VariantsTest
 from .models import LineagesTable, PicardTable, NextcladeTable, NGSTable, VariantsTable, SingleCheckTable
 from .models import SampleFilter, MetaDataFilter

@@ -2,7 +2,7 @@ from django.db import models
 from upload.models import Sample, Region
 from upload.models import SampleMetaData
 from tests.models import PicardTest, NextcladeTest, NGSstatsTest, SingleCheckTest, VariantsTest
-# from tests.models import LineagesTest
+from tests.models import LineagesTest
 
 import django_tables2 as tables
 import django_filters
@@ -39,7 +39,7 @@ class LineagesTable(tables.Table):
     id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
     date = tables.DateTimeColumn(format ='d/m/Y, h:i A')
     class Meta:
-        # model = LineagesTest
+        model = LineagesTest
         template_name = "table_template.html"
 
 class PicardTable(tables.Table):
