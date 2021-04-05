@@ -256,7 +256,8 @@ def detect_file(header):
 
 def find_sample_name(string):
     # Encontrar si una cadena contiene 'EPI.*.X', si es así ese será el nombre de la muestra
-    sample_name = re.search(r'EPI\..+\.\d+\.',string)
+    sample_name = re.search(r'EPI\..+\.\d+.\.',string+'.')
+    print(string, sample_name)
     if sample_name:
         return sample_name.group()[:-1]
     else:
