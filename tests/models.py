@@ -566,7 +566,7 @@ def select_test(test, file, sample_name, fieldnames, dialect):
 
 
 def send_results_processing(file):
-    data = file.read().decode('UTF-8')
+    data = file.read().decode('utf-8-sig')
     io_string = io.StringIO(data)
     dialect = csv.Sniffer().sniff(io_string.readline())
     io_string.seek(0)
