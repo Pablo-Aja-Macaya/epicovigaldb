@@ -46,20 +46,15 @@
       <div class="container-lg">
         <div class="row">
           {% for task in tasks.all %}      
-          <div class="col-md-4 text-center mx-auto">  <!--mx-auto -->
-            <div class="card mb-4 shadow-sm " >
+          <div class="col-md-4 text-center mx-auto d-flex ">  <!--mx-auto -->
+            <div class="card mb-4 shadow-sm flex-fill" >
               <div class="card-body">
                 <img src="{{ task.image.url }}" class="img-fluid" style="max-width:80px;width:100%"/>
-                <h4 class="card-text text-center pt-3">{{ task.title }} </h4>
+                {% for k,v in task.url_button_dict.items %}
+                <h4 class="card-text text-center pt-3"><a href='{% url k %}'><strong>{{ task.title }}</strong></a></h4>
+                {% endfor %}
                 <hr style="width:70%">
                 <p>{{ task.summary }}</p>
-                <div class="d-flex justify-content-center align-items-center">
-                  <div class="btn-group">
-                    {% for k,v in task.url_button_dict.items %}
-                    <button type="button" class="btn btn-primary my-2 border border-dark" onclick="window.location='{% url k %}';" style="cursor: pointer;">{{v}}</button>
-                    {% endfor %}
-                  </div>
-                </div>
               </div>
             </div>
           </div>
