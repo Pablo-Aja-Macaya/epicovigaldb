@@ -117,9 +117,14 @@ class SampleFilter(django_filters.FilterSet):
 
 class MetaDataFilter(django_filters.FilterSet):
     id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo', lookup_expr='icontains')
-    fecha_entrada_uv = django_filters.DateFromToRangeFilter(field_name = 'fecha_entrada_uv')
+    fecha_entrada = django_filters.DateFromToRangeFilter(field_name = 'fecha_entrada')
 
     class Meta:
-        model = Sample
-        fields = ['id_uvigo', 'fecha_entrada_uv']
-                
+        model = SampleMetaData
+        fields = ['id_uvigo', 'fecha_entrada']
+
+# class CompletedTestsFilter(django_filters.FilterSet):
+#     id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo', lookup_expr='icontains')
+#     class Meta:
+#         # model = Sample
+#         fields = ['id_uvigo']

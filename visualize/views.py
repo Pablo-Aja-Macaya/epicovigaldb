@@ -7,9 +7,10 @@ from upload.models import Region, Sample
 from upload.models import SampleMetaData 
 
 from tests.models import LineagesTest, PicardTest, NextcladeTest, NGSstatsTest
-from .models import CompletedTestsTable, SampleTable, RegionTable, SampleMetaDataTable, SingleCheckTest, VariantsTest
-from .models import LineagesTable, PicardTable, NextcladeTable, NGSTable, VariantsTable, SingleCheckTable
-from .models import SampleFilter, MetaDataFilter
+from .models import *
+# from .models import CompletedTestsTable, SampleTable, RegionTable, SampleMetaDataTable, SingleCheckTest, VariantsTest
+# from .models import LineagesTable, PicardTable, NextcladeTable, NGSTable, VariantsTable, SingleCheckTable
+# from .models import SampleFilter, MetaDataFilter,CompletedTestsFilter
 
 def get_completed_tests():
     '''
@@ -30,20 +31,11 @@ def get_completed_tests():
 
 @login_required(login_url="/accounts/login") 
 def general(request):  
-    
-    hospital_list = []
-    for i in Sample.objects.all():
-        hospital_list.append(i.hospital_id())
-    queryset = []
-    hospital_count = Counter(i['id_uvigo'] for i in hospital_list)
-    for k,v in hospital_count.items():
-        queryset.append({'hospital':k, 'number':int(v)})
-
     table = CompletedTestsTable(get_completed_tests())
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
 
-    return render(request, 'visualize/general.html', {'hospitals':queryset, 'table':table})
+    return render(request, 'visualize/general.html', {'table':table, 'filter':filter})
     
 
 # Para metadatos
