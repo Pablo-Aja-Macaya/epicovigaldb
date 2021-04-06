@@ -220,6 +220,7 @@
                 <div class="navbar-nav ml-auto" style="font-size: 22px;">
                   {% if user.is_authenticated %}
                   <li class="nav-item dropdown">
+
                     <a class="nav-link" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Tasks">
                       <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class=" bi bi-list" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M2.5 11.5A.5.5 0 0 1 3 11h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 7h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 3h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
@@ -229,8 +230,8 @@
                       <a class="dropdown-item" href="{% url 'csv' %}">Metadatos</a>
                       <a class="dropdown-item" href="{% url 'selection' %}">Tests</a>
                       <a class="dropdown-item" href="{% url 'general' %}">Tablas</a>
-                      <a class="dropdown-item" href="#">Cola de tareas</a>
-                      <a class="dropdown-item" href="#">Mapa</a>
+                      <!-- <a class="dropdown-item" href="#">Cola de tareas</a>
+                      <a class="dropdown-item" href="#">Mapa</a> -->
                     </div>
                   </li>
                   <li class="nav-item dropdown">
@@ -241,9 +242,9 @@
                       </svg>
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                      <a class="dropdown-item" href="">Perfil</a>
+                      <a class="dropdown-item" href=""><strong>{{ user.get_username }}</strong></a>
                       <a class="dropdown-item" href="">Configuración</a>
-                      <a class="dropdown-item" href="">Tema</a>
+                      <!-- <a class="dropdown-item" href="">Tema</a> -->
                     </div>
                   </li>
 
