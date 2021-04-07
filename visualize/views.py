@@ -228,7 +228,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
             }
         },
         'tooltip': {
-            'valueSuffix': ''
+            # 'valueSuffix': ' %'
         },
         'yAxis': {
             'min': 0,
@@ -244,6 +244,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
             'bar': {
                 'dataLabels': {
                     'enabled': True,
+                    'format': '{point.y}'
                 },
                 
             },
@@ -355,7 +356,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
         'yAxis': {
             'min': 0,
             'title': {
-                'text': 'Cantidad',
+                'text': 'Porcentaje',
                 'align': 'middle'
             },
             'labels': {
@@ -365,7 +366,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
         'tooltip': {
             'headerFormat': '<span style="font-size:10px"><strong>{point.key}</strong></span><table>',
             'pointFormat': '<tr><td style="color:{series.color};padding:0;"><strong>{series.name}:</strong> </td>' +
-                '<td style="padding:0"><b>{point.y}</b></td></tr>',
+                '<td style="padding:0"> <strong>&nbsp;{point.y}</strong> ({point.percentage:.0f}%) </td></tr>',
             'footerFormat': '</table>',
             'shared': True,
             'useHTML': True
@@ -373,12 +374,13 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
         'plotOptions': {
             'bar': {
                 'dataLabels': {
-                    'enabled': True
+                    'enabled': True,
+                    'format': '{point.percentage:.0f}%'
                 }
             },
             'series': {
                 # 'groupPadding': 10,
-                'stacking': 'normal',
+                'stacking': 'percent',
                 'pointPadding': 1,
                 'pointWidth': 20,
                 'animation': False
