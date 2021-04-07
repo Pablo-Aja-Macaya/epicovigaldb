@@ -160,7 +160,7 @@ from django.db.models import F
 from django.db.models import Count
 from datetime import date, datetime
 import geojson
-import random
+from random import randint
 
 credits = {
     'enabled': True,'text':
@@ -169,13 +169,32 @@ credits = {
     'style':{'fontSize':15}
     }
 
+COLOR_LIST = [
+    '#f0e68c','#fa8072','#ffff54',
+    '#6495ed','#dda0dd','#90ee90',
+    '#ff1493','#7b68ee','#afeeee',
+    '#483d8b','#cd853f','#9acd32',
+    '#20b2aa','#00008b','#32cd32',
+    '#8fbc8f','#8b008b','#b03060',
+    '#ff4500','#ffa500','#7fff00',
+    '#9400d3','#dc143c','#00ffff',
+    '#00bfff','#0000ff','#ff00ff',
+    '#a9a9a9','#2f4f4f','#556b2f',
+    '#228b22','#7f0000','#808000',
+    '#ffe4c4','#ffb6c1',
+]
+
 def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
+    thresh = 2 # para eliminar variantes 
     linajes_count = Sample.objects.filter(categoria_muestra='aleatoria',fecha_muestra__range=[fecha_inicial, fecha_final])\
-        .values('lineagestest__lineage')\
+        .values('lineagestest__lineage','samplemetadata__id_hospital')\
         .exclude(lineagestest__lineage__isnull=True)\
+        .exclude(samplemetadata__id_hospital='ICVS')\
+        .values('lineagestest__lineage')\
         .order_by('lineagestest__lineage')\
         .annotate(Count('lineagestest__lineage'))\
-        .exclude(lineagestest__lineage='None')
+        .exclude(lineagestest__lineage='None')\
+        .exclude(lineagestest__lineage__count__lt = thresh)
 
     lista_linajes = []
     lista_valores = []
@@ -183,18 +202,18 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
         lista_valores.append(i['lineagestest__lineage__count'])
         lista_linajes.append(i['lineagestest__lineage'])
 
-    print(lista_linajes)
-    print(lista_valores)
+    # print(lista_linajes)
+    # print(lista_valores)
     chart = {
         'chart': {
-            # 'height': 300,
+            'height': 400,
             'type': 'bar'
         },
         'title': {
             'text': f'Variantes en Galicia ({fecha_inicial} | {fecha_final})' # ({fecha_inicial} | {fecha_final})
         },
         'subtitle': {
-            'text': f'Muestras aleatorias ({fecha_inicial} | {fecha_final})'
+            'text': f'Variantes que aparecen, al menos, {thresh} veces (Muestras aleatorias, sin incluir al ICVS).'
         },
         'xAxis': {
             'categories': lista_linajes,
@@ -248,7 +267,13 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
     # Estructura:
     # <QuerySet [{'lineagestest__lineage': 'B.1.177', 'samplemetadata__id_hospital': 'CHUF', 'lineagestest__lineage__count': 1}, 
     # {'lineagestest__lineage': 'B.1.177', 'samplemetadata__id_hospital': 'HULA', 'lineagestest__lineage__count': 1}]>
-    linajes_count = Sample.objects.filter(categoria_muestra='aleatoria',fecha_muestra__range=[fecha_inicial, fecha_final]).values('lineagestest__lineage','samplemetadata__id_hospital').exclude(lineagestest__lineage__isnull=True).order_by('lineagestest__lineage', 'samplemetadata__id_hospital').annotate(Count('lineagestest__lineage')).exclude(lineagestest__lineage='None')
+    linajes_count = Sample.objects.filter(categoria_muestra='aleatoria',fecha_muestra__range=[fecha_inicial, fecha_final])\
+        .values('lineagestest__lineage','samplemetadata__id_hospital')\
+        .exclude(lineagestest__lineage__isnull=True)\
+        .order_by('lineagestest__lineage', 'samplemetadata__id_hospital')\
+        .annotate(Count('lineagestest__lineage'))\
+        .exclude(lineagestest__lineage='None')
+    # .exclude(lineagestest__lineage__count__lt = thresh)
 
     # Se hace un set ordenado de los códigos de hospitales (CHUAC, CHUS...)
     lista_hospitales = [i['samplemetadata__id_hospital'] for i in linajes_count]
@@ -280,6 +305,18 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
             else:
                 series_dicc[linaje]['data'][pos_hosp] = count
 
+    
+    # Quitar variantes que no aparecen más de N veces en ningún hospital 
+    thresh = 3
+    series_dicc_mod = {}
+    for i in series_dicc.keys():
+        keep = False
+        for n in series_dicc[i]['data']:
+            if n and n>thresh:
+                keep=True
+        if keep == True:
+            series_dicc_mod[i] = series_dicc[i]
+
     # Estructura de series_dicc
     # dicc = {
     #     'linaje1':{
@@ -294,14 +331,14 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
 
     chart = {
         'chart': {
-            'height': 700,
+            'height': 500,
             'type': 'bar'
         },
         'title': {
             'text': f'Variantes por hospital ({fecha_inicial} | {fecha_final})' # ({fecha_inicial} | {fecha_final})
         },
         'subtitle': {
-            'text': f'Muestras aleatorias '
+            'text': f'Variantes que aparecen, al menos, {thresh} veces en algún hospital (Muestras aleatorias).'
         },
         'xAxis': {
             'categories': lista_hospitales,
@@ -325,9 +362,14 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
                 'overflow': 'justify'
             }
         },
-        # 'tooltip': {
-        #     'valueSuffix': ' sufijo'
-        # },
+        'tooltip': {
+            'headerFormat': '<span style="font-size:10px"><strong>{point.key}</strong></span><table>',
+            'pointFormat': '<tr><td style="color:{series.color};padding:0;"><strong>{series.name}:</strong> </td>' +
+                '<td style="padding:0"><b>{point.y}</b></td></tr>',
+            'footerFormat': '</table>',
+            'shared': True,
+            'useHTML': True
+        },
         'plotOptions': {
             'bar': {
                 'dataLabels': {
@@ -335,24 +377,26 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
                 }
             },
             'series': {
+                # 'groupPadding': 10,
+                'stacking': 'normal',
                 'pointPadding': 1,
-                'pointWidth': 8,
+                'pointWidth': 20,
                 'animation': False
             }
         },
         'legend': {
-            'layout': 'vertical',
-            'align': 'right',
-            'verticalAlign': 'top',
-            'x': 0,
-            'y': 50,
-            'floating': True,
-            'borderWidth': 0.5,
+            'layout': 'horizontal',
+            'align': 'center',
+            'verticalAlign': 'bottom',
+            'x': 10,
+            # 'y': 60,
+            # 'floating': True,
+            # 'borderWidth': 0.5,
             # 'shadow': True
         },
+        # 'colors': COLOR_LIST,
         'credits': credits,
-        # 'CHOP', 'CHUO', 'CHUAC', 'CHUF', 'CHUS', 'CHUVI', 'HULA'
-        'series': list(series_dicc.values())
+        'series': list(series_dicc_mod.values())
         # {
         #     'name': 'Error B.1',
         #     'type': 'errorbar',
@@ -377,7 +421,8 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
         geojson_data = geojson.load(map) # mapa
     
     # Datos: [{'NomeMAY':'A CORUÑA', 'value':10}, {'NomeMAY':'SANTIAGO', 'value':15}...]
-    data = list(Sample.objects.values('id_region__localizacion')\
+    data = list(Sample.objects.filter(categoria_muestra='aleatoria')\
+            .values('id_region__localizacion')\
             .filter(id_region__localizacion__gte=2)\
             .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
             .order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
@@ -391,8 +436,11 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
             'useGPUTranslations': True
         },
         'title': {
-            'text': ''
-        },    
+            'text': f'Geolocalización ({fecha_inicial} | {fecha_final})' # ({fecha_inicial} | {fecha_final})
+        },
+        'subtitle': {
+            'text': f'Muestras aleatorias en cada concello.'
+        },
         'colorAxis': {
             'tickPixelInterval': 100,
             'stops': [[0, '#ffe5e3'], [0.65, '#f04d55'], [1, '#f50a15']],
@@ -436,7 +484,7 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
     return JsonResponse(chart)
 
 def hospital_graph(request, fecha_inicial, fecha_final):
-    hospitales = SampleMetaData.objects.filter(id_uvigo__fecha_muestra__range=[fecha_inicial,fecha_final]).values('id_hospital')
+    hospitales = SampleMetaData.objects.filter(id_uvigo_id__categoria_muestra='aleatoria',id_uvigo__fecha_muestra__range=[fecha_inicial,fecha_final]).values('id_hospital')
     posibles_hospitales = hospitales.distinct()
     answer = []
     for i in posibles_hospitales:
@@ -448,7 +496,10 @@ def hospital_graph(request, fecha_inicial, fecha_final):
         'chart': {
             'type': 'pie',
         },
-        'title': {'text': 'Origen de muestras'},
+        'title': {'text': f'Origen de muestras ({fecha_inicial} | {fecha_final})'},
+        'subtitle': {
+            'text': f'Origen de muestras aleatorias recibidas (Incluyendo secuenciadas y no secuenciadas)'
+        },
         'tooltip': {
             'pointFormat': '{series.name}: <b>{point.percentage:.1f}%</b>'
         },

@@ -5,7 +5,7 @@
 
 
 <main role="main">
-
+  {% now "Y-m-d" as current_date %}
   <!-- <div class="container-lg">
     <div class="card mb-3" >
       <div class="row no-gutters">
@@ -21,6 +21,7 @@
       </div>
     </div>
   </div>   -->
+  
   <div class="container-lg pt-1 pb-1">
     <div class="alert alert-danger" role="alert">
       <div class="row">
@@ -160,7 +161,7 @@
           </div>
         </div>
         <div class="col-lg-6 justify-content-center my-auto">
-          <div id="hospital_graph" data-url="{% url 'hospital_graph' fecha_inicial='2020-01-01' fecha_final='2030-1-1' %}"></div>
+          <div id="hospital_graph" data-url="{% url 'hospital_graph' fecha_inicial='2020-01-01' fecha_final=current_date %}"></div>
         </div>
 
       </div>
@@ -177,7 +178,7 @@
           </div>
         </div>
         <div class="col-lg-7 justify-content-center my-auto" >
-          <div id="linajes_hospitales_graph" data-url="{% url 'linajes_hospitales_graph' fecha_inicial='2020-01-01' fecha_final='2030-1-1' %}"></div>
+          <div id="linajes_hospitales_graph" data-url="{% url 'linajes_hospitales_graph' fecha_inicial='2020-01-01' fecha_final=current_date %}"></div>
         </div>
       </div>
     </div>
@@ -193,7 +194,7 @@
           </div>
         </div>
         <div class="col-lg-7 justify-content-center my-auto" >
-          <div id="linajes_porcentaje_total" data-url="{% url 'linajes_porcentaje_total' fecha_inicial='2020-01-01' fecha_final='2030-1-1' %}"></div>
+          <div id="linajes_porcentaje_total" data-url="{% url 'linajes_porcentaje_total' fecha_inicial='2020-01-01' fecha_final=current_date %}"></div>
         </div>
       </div>
     </div>
@@ -209,13 +210,13 @@
           </div>
         </div>
         <div class="col-lg-6 justify-content-center my-auto">
-          <div id="concellos_gal_graph" data-url="{% url 'concellos_gal_graph' fecha_inicial='2020-01-01' fecha_final='2030-1-1' %}" style="height: 700px;"></div>
+          <div id="concellos_gal_graph" data-url="{% url 'concellos_gal_graph' fecha_inicial='2020-01-01' fecha_final=current_date %}" style="height: 700px;"></div>
         </div>
 
       </div>
     </div>
   </div>  
-  <div class="container-lg pt-2 pb-3">
+  <!-- <div class="container-lg pt-2 pb-3">
     <div class="card" style="width: 100%;border-style: none;">
       <div class="row">
         <div class="container-lg">
@@ -244,7 +245,7 @@
         </div>
       </div>
     </div>
-  </div> 
+  </div>  -->
 </main>
 
 <script>
