@@ -282,6 +282,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
 
     series_dicc = {}
     for i in linajes_count:
+        # print(i)
         hosp = i['samplemetadata__id_hospital']
         linaje = i['lineagestest__lineage']
         count = i['lineagestest__lineage__count']
@@ -317,7 +318,9 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
                 keep=True
         if keep == True:
             series_dicc_mod[i] = series_dicc[i]
+            series_dicc_mod[i]['drilldown'] = i
 
+    # print(series_dicc_mod)
     # Estructura de series_dicc
     # dicc = {
     #     'linaje1':{
@@ -369,6 +372,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
                 '<td style="padding:0"> <strong>&nbsp;{point.y}</strong> ({point.percentage:.0f}%) </td></tr>',
             'footerFormat': '</table>',
             'shared': True,
+            'backgroundColor':'#FFFFFF',
             'useHTML': True
         },
         'plotOptions': {
@@ -398,7 +402,19 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
         },
         # 'colors': COLOR_LIST,
         'credits': credits,
-        'series': list(series_dicc_mod.values())
+        'series': list(series_dicc_mod.values()),
+        'drilldown':{
+            'series':[{
+                    # 'name':'B.1',
+                    'id':'B.1',
+                    'data':[
+                        ["v58.0",1.02],
+                        ["v57.0",7.36],                        
+                    ]
+                }
+            ]
+
+        }
         # {
         #     'name': 'Error B.1',
         #     'type': 'errorbar',
@@ -697,3 +713,62 @@ def variants_column_graph(request, fecha_inicial, fecha_final, variant):
         ]        
     }
     return JsonResponse(chart)
+
+
+
+
+dicc = {
+    'B.1':{
+        'name':'B.1',
+        'data':{
+            'CHUVI':{'name': 'CHUVI', 'y': 100, 'drilldown': 'chuvi-B.1'},
+            'CHUAC':{'name': 'CHUAC', 'y': 60, 'drilldown': 'chuac-B.1'},
+        }
+    }
+}
+
+# from django.db.models import Count
+
+# linajes_count = Sample.objects.filter(categoria_muestra='aleatoria',fecha_muestra__range=['2020-01-01', '2030-01-01'])\
+#     .values('lineagestest__lineage','samplemetadata__id_hospital')\
+#     .exclude(lineagestest__lineage__isnull=True)\
+#     .order_by('lineagestest__lineage', 'samplemetadata__id_hospital')\
+#     .annotate(Count('lineagestest__lineage'))\
+#     .exclude(lineagestest__lineage='None')
+# # .exclude(lineagestest__lineage__count__lt = thresh)
+
+# # Se hace un set ordenado de los códigos de hospitales (CHUAC, CHUS...)
+# lista_hospitales = [i['samplemetadata__id_hospital'] for i in linajes_count]
+# lista_hospitales = sorted(set(lista_hospitales))
+
+# series_dicc = {}
+# for i in linajes_count:
+#     hosp = i['samplemetadata__id_hospital']
+#     linaje = i['lineagestest__lineage']
+#     count = i['lineagestest__lineage__count']
+#     pos_hosp = lista_hospitales.index(hosp) # posición del hospital en el set de hospitales
+    
+#     # Si todavía no se ha visto la variante
+#     if linaje not in series_dicc.keys():
+#         series_dicc[linaje] = {
+#             'name':linaje,
+#             'data':{
+#                 hosp:{'name':hosp, 'y':count, 'drilldown':hosp+'-'+linaje}
+#             }
+#         }
+#     # Si se ha visto la variante
+#     else: 
+#         if hosp in series_dicc[linaje]['data'].keys():
+#             series_dicc[linaje]['data'][hosp]['y'] +=count
+#         else:
+#             series_dicc[linaje]['data'][hosp]={'name':hosp, 'y':count, 'drilldown':hosp+'-'+linaje}
+
+# for i in series_dicc.keys():
+#     series_dicc[i]['data'] = list(series_dicc[i]['data'].values())
+#     if len(series_dicc[i]['data'])<2:
+#         keep = False
+#         for n,d in enumerate(series_dicc[i]['data']):
+#             if series_dicc[i]['data'][n]['y'] <= 3:
+#                 drill_id = series_dicc[i]['data'][n]['drilldown'] 
+#                 series_dicc[i]['data'][n]['drilldown'] = drill_id.split('-')[0]+'-otros'
+#                 print(i, series_dicc[i]['data'][n])

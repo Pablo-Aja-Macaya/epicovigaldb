@@ -12,7 +12,7 @@
     <!-- Bootstrap core CSS -->
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous"> -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-    <link rel="stylesheet" href="{% static 'open-iconic/font/css/open-iconic-bootstrap.css' %}"  >   
+    <!-- <link rel="stylesheet" href="{% static 'open-iconic/font/css/open-iconic-bootstrap.css' %}"  >    -->
     
     <!-- Highcharts maps -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.6/proj4.js"></script>
@@ -27,6 +27,7 @@
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/highcharts-more.js"></script>
     <script src="https://code.highcharts.com/modules/data.js"></script>
+    <script src="https://code.highcharts.com/modules/drilldown.js"></script>
     <script src="https://code.highcharts.com/modules/series-label.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/export-data.js"></script>
@@ -41,13 +42,46 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>   
     
     <style>
+      /* Show more/less */
+      #module {
+        font-size: 1rem;
+        line-height: 1.5;
+        
+      }
+
+      #module #collapseExample.collapse:not(.show) {
+        display: block;
+        height: 12rem;
+        overflow: hidden;
+       
+        
+      }
+
+      #module #collapseExample.collapsing {
+        height: 12rem;
+        
+      }
+
+      #module a.collapsed::after {
+        content: '\002B   Mostrar más';
+        font-weight: bold;
+        color: royalblue;
+        
+      }
+
+      #module a:not(.collapsed)::after {
+        content: '\2212   Mostrar menos';
+        font-weight: bold;
+        color: royalblue;
+      }
 
 
+      /* Tablas */
      .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
        background-color:  #DAF7A6    ;
       }
      .table td {
-        text-align: center;   
+        text-align: center; 
       }
 
       .table-sortable > thead > tr > th {
@@ -120,7 +154,7 @@
         background-color: #000302 ;
         bottom: 0;
         width: 100%;
-        height: 7rem;            /* Footer height */
+        /* height: 18rem;          */
       }
 
       /* Boton carga */
@@ -303,9 +337,44 @@
         {% endblock %}
       </div>
     </div>
-
+  
+  {% if user.is_authenticated %}
   <br><br><br>
-  <footer class="text-muted pb-1 pt-4 " id="footer" >
+  <br><br><br>
+
+    <footer class="text-muted pb-1 pt-4 " id="footer" style=" height: 8rem; ">
+      <div class="container text-center">
+        <a href="#" title="Información del proyecto" class="pr-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="rgb(255,255,255)" class="icon bi bi-info-circle" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+            <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+          </svg>
+        </a>
+        <a href="#" title="Nuestro GitHub" class="pr-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="rgb(255,255,255)" class="icon bi bi-github" viewBox="0 0 16 16">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+        </a>
+        <a href="https://twitter.com" title="Nuestro Twitter" class="pr-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="rgb(255,255,255)" class="icon bi bi-twitter" viewBox="0 0 16 16">
+          <path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z"/>
+          </svg>
+        </a>
+        <a href="#" title="Contacto" class="pr-2">    
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="rgb(255,255,255)" class="icon bi bi-envelope" viewBox="0 0 16 16">
+            <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2zm13 2.383l-4.758 2.855L15 11.114v-5.73zm-.034 6.878L9.271 8.82 8 9.583 6.728 8.82l-5.694 3.44A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.739zM1 11.114l4.758-2.876L1 5.383v5.73z"/>
+          </svg>
+        </a>
+        <p class="pt-2 pb-2"><strong>EPICOVIGAL DB 2020-{% now "Y" %}</strong> </p>
+      </div>
+    </footer>
+  {% else %}
+  <br><br><br>
+  <br><br><br>
+  <br><br><br>
+  <br><br><br>
+  <br><br><br>
+  <footer class="text-muted pb-1 pt-4 " id="footer" style=" height: 18rem; ">
     <div class="container text-center">
       <a href="#" title="Información del proyecto" class="pr-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="rgb(255,255,255)" class="icon bi bi-info-circle" viewBox="0 0 16 16">
@@ -328,10 +397,26 @@
           <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2zm13 2.383l-4.758 2.855L15 11.114v-5.73zm-.034 6.878L9.271 8.82 8 9.583 6.728 8.82l-5.694 3.44A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.739zM1 11.114l4.758-2.876L1 5.383v5.73z"/>
         </svg>
       </a>
-      <p class="pt-2"> EPICOVIGAL DB 2020-{% now "Y" %}</p>
-
+      <p class="pt-2 pb-2"><strong>EPICOVIGAL DB 2020-{% now "Y" %}</strong> </p>
+      <hr style="border-color: rgb(116, 116, 116); width:50%;"></hr>
+      <p class=""> Aplicación web creada por Pablo Aja Macaya gracias a:</p>
+      <div class="row justify-content-center my-auto">
+        <div class="col-1"></div>
+        <div class="col-10">
+        <img src="/media/images/pythonlogo.png" title="Python" alt="..." width="50" height="50" class="pr-2">
+        <img src="/media/images/cesgalogo.png" title="CESGA" alt="..." width="150" height="50" class="pr-2">
+        <img src="/media/images/mysqllogo.png" title="MySQL" alt="..." width="70" height="50" class="pr-2">
+        <img src="/media/images/nginxlogo.png" title="NGINX" alt="..." width="50" height="50" class="pr-1">
+        <img src="/media/images/django.png" title="Django" alt="..." width="70" height="50" class="pr-2">
+        <img src="/media/images/bootstraplogo.png" title="Bootstrap" alt="..." width="60" height="50" class="pr-3">
+        <img src="/media/images/highchartslogo.png" title="Highcharts" alt="..." width="60" height="50" >           
+        </div>
+        <div class="col-1"></div>
+  
+      </div>
     </div>
   </footer>
+  {% endif %}
   </div>
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
