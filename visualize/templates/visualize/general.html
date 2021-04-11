@@ -31,24 +31,16 @@
   Suspendisse sodales eget felis sit amet gravida. Sed lacinia id neque in commodo. Donec urna enim, maximus lacinia consectetur sit amet, fermentum eu metus. Etiam sit amet quam eu arcu euismod placerat sed eu tellus. Aliquam malesuada libero nunc, eleifend rutrum ipsum eleifend at. Nunc mattis dolor ligula, sed aliquam risus sodales nec
 
   <hr>
-  
-    
-    <!-- <div class="row">
-      <small class="text-muted ml-2 mt-1">Action:</small>
-          <div class="col col-sm-4 " id="x" >
-            <select class="form-control form-control-sm">
-              <option>------------</option>
-              <option>Run tests</option>
-              <option>Show details</option>
-            </select>
-          </div>
-          <input type="hidden" name="select_across" value="0" class="select-across">
-              <button type="submit" class="btn btn-primary btn-sm" aria-describedby="passwordHelpInline" title="Run the selected action" name="index" value="0">Go</button>
-              <small id="passwordHelpInline" class="text-muted ml-2 mt-1">
-                X out of N samples selected. <a href="#">Select everything</a>
-              </small>
-    </div> -->
-
+  {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message|safe }}
+      </div>
+      {% endfor %}
+  {% endif %}
 
   <h2>Tabla de tests realizados</h2>
   <p>Esta tabla indica, para cada muestra, qué tests se han realizado.</p>
@@ -61,115 +53,7 @@
   </div>
   
 
-<!-- 
-  <table class="table table-bordered table-hover text-center">
-    <thead class="thead-dark">
-    
-      <tr>
-
-        <th scope="col"  class="action-checkbox-column">
-          <div class="text"><span><input type="checkbox" id="action-toggle"></span></div>
-          <div class="clear"></div>
-        </th>
-        <th scope="col">id</th>
-        <th scope="col">iVar</th>
-        <th scope="col">Picard</th>
-        <th scope="col">NextClade</th>
-        <th scope="col">NGSStats</th>
-      </tr>
-      
-    </thead>
-    <tbody>
-    
-      <tr>
-        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td>
-        <th scope="row"><a href="#">CHUAC.100</a></th>
-        <td><p data-status="1" class="status"></p></td>
-        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-        <td><p data-status="1" class="status"></p></td>
-        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-
-      </tr>
-      <tr>
-        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td>    
-        <th scope="row"><a href="#">CHUAC.205</a></th>
-        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-        <td><p data-status="1" class="status"></p></td>
-        <td><p data-status="1" class="status"></p></td>
-
-      </tr>
-      <tr>
-        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
-        <th scope="row"><a href="#">CHUAC.300</a></th>
-        <td><p data-status="1" class="status"></p></td>
-        <td><p data-status="1" class="status"></p></td>
-        <td><p data-status="1" class="status"></p></td>
-        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-      </tr>
-      <tr>
-        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
-        <th scope="row"><a href="#">CHUAC.600</a></th>
-        <td><a href="#"><p data-status="2" class="status"></p></a></td>
-        <td><a href="#"><p data-status="2" class="status"></p></a></td>
-        <td><a href="#"><p data-status="2" class="status"></p></a></td>
-        <td><a href="#"><p data-status="2" class="status"></p></a></td>
-      </tr>
-      <tr>
-        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
-        <th scope="row"><a href="#">CHUAC.115</a></th>
-        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-      </tr>
-      <tr>
-        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
-        <th scope="row"><a href="#">CHUAC.301</a></th>
-        <td><p data-status="1" class="status"></p></td>
-        <td><p data-status="1" class="status"></p></td>
-        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-      </tr>
-      <tr>
-        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
-        <th scope="row"><a href="#">CHUAC.211</a></th>
-        <td><p data-status="1" class="status"></p></td>
-        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-        <td><p data-status="1" class="status"></p></td>
-        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-      </tr>
-      <tr>
-        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
-        <th scope="row"><a href="#">CHUAC.322</a></th>
-        <td><p data-status="1" class="status"></p></td>
-        <td><p data-status="1" class="status"></p></td>
-        <td><p data-status="1" class="status"></p></td>
-        <td><p data-status="1" class="status"></p></td>
-      </tr>
-      <tr>
-        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
-        <th scope="row"><a href="#">CHUAC.670</a></th>
-        <td><p data-status="1" class="status"></p></td>
-        <td><p data-status="1" class="status"></p></td>
-        <td><p data-status="1" class="status"></p></td>
-        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-      </tr>
-        <td class="action-checkbox"><input type="checkbox" name="_selected_action" value="EPI.HULA.200" class="action-select"></td> 
-        <th scope="row"><a href="#">CHUAC.123</a></th>
-        <td><p data-status="1" class="status"></p></td>
-        <td><p data-status="1" class="status"></p></td>
-        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-        <td><a href="{% url 'selection' %}"><p data-status="0" class="status"></p></a></td>
-      </tr>
-    </tbody>
-  </table> -->
 </div>
-
-
-
-
-
 
 
 {% endblock %}

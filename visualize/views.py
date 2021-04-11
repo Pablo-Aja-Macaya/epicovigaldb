@@ -2,6 +2,10 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from collections import Counter
 from django_tables2 import RequestConfig
+from django.shortcuts import redirect
+from django.contrib import messages
+from django.forms.models import model_to_dict
+from django.urls import reverse
 
 from upload.models import Region, Sample
 from upload.models import SampleMetaData 
@@ -11,6 +15,107 @@ from .models import *
 # from .models import CompletedTestsTable, SampleTable, RegionTable, SampleMetaDataTable, SingleCheckTest, VariantsTest
 # from .models import LineagesTable, PicardTable, NextcladeTable, NGSTable, VariantsTable, SingleCheckTable
 # from .models import SampleFilter, MetaDataFilter,CompletedTestsFilter
+
+@login_required(login_url="/accounts/login") 
+def edit_form(request, id_uvigo, tipo):
+    lineage, clade, fecha_muestra, localizacion = Sample.objects.filter(id_uvigo=id_uvigo).values('lineagestest__lineage','nextcladetest__clade','fecha_muestra', 'id_region__localizacion')[0].values()
+    
+    def get_models(tipo):
+        dicc = {
+            # Metadatos
+            'Sample':{
+                'form_model':SampleForm,
+                'model':Sample,
+                'tittle':'Edición de metadatos comunes'
+            },
+            'SampleMetaData':{
+                'form_model':SampleMetaDataForm,
+                'model':SampleMetaData,
+                'tittle':'Edición de metadatos extra'
+            },
+            'Region':{
+                'form_model':RegionForm,
+                'model':Region,
+                'tittle':'Edición de regiones'
+            },
+            ## Tests
+            'SingleCheckTest':{
+                'form_model':SingleCheckForm,
+                'model':SingleCheckTest,
+                'tittle':'Edición de test: SingleCheck'
+            },
+            'PicardTest':{
+                'form_model':PicardForm,
+                'model':PicardTest,
+                'tittle':'Edición de test: Picard'
+            },
+            'NextcladeTest':{
+                'form_model':NextcladeForm,
+                'model':NextcladeTest,
+                'tittle':'Edición de test: Nextclade'
+            },
+            'LineagesTest':{
+                'form_model':LineagesForm,
+                'model':LineagesTest,
+                'tittle':'Edición de test: Pangolin'
+            },
+            'NGSstatsTest':{
+                'form_model':NGSStatssForm,
+                'model':NGSstatsTest,
+                'tittle':'Edición de test: Pangolin'
+            },
+        }
+        form_model = dicc[tipo]['form_model']
+        model = dicc[tipo]['model']
+        tittle = dicc[tipo]['tittle']
+        return form_model, model, tittle
+
+    form_model, model, tittle = get_models(tipo)
+
+    if request.method=='POST':
+        form = form_model(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+            datos = form.cleaned_data
+
+            if tipo == 'Sample':
+                datos.pop('id_uvigo',None)
+                defaults = {'id_uvigo':id_uvigo, **form.cleaned_data}
+                _, created = model.objects.update_or_create(
+                        id_uvigo = id_uvigo,
+                        defaults = defaults
+
+                    )
+            else:
+                datos['id_uvigo']=Sample.objects.get(id_uvigo=id_uvigo)
+                _, created = model.objects.update_or_create(
+                        id_uvigo = Sample.objects.get(id_uvigo=id_uvigo),
+                        defaults = datos
+
+                    )             
+            messages.success(request, 'Cambios guardados')
+            return redirect(reverse('specific_sample', args=(id_uvigo,)))
+    else:
+        try:
+            obj = model.objects.get(id_uvigo=id_uvigo)
+        except:
+            obj = model(id_uvigo=Sample.objects.get(id_uvigo=id_uvigo))
+
+        form = form_model(initial=model_to_dict(obj))
+
+    context = {
+        'id_uvigo':id_uvigo, 
+        'lineage':lineage, 
+        'clade':clade,
+        'fecha_muestra':fecha_muestra,
+        'localizacion':localizacion,
+        'form':form,
+        'url_muestra':reverse('specific_sample', args=(id_uvigo,)),
+        'url_form':reverse('edit_form', args=(id_uvigo,tipo)),
+        'tittle':tittle,
+        # 'url_prueba':reverse('edit_form', args=(id_uvigo,tipo))
+    }
+    return render(request, 'visualize/edit_form.html', context)
 
 def get_completed_tests():
     '''
@@ -29,14 +134,68 @@ def get_completed_tests():
         lista2.append(i)
     return lista2
 
+@login_required(login_url="/accounts/login")
+def specific_sample(request, id_uvigo): 
+    # Datos generales
+    lineage, clade, fecha_muestra, localizacion = Sample.objects.filter(id_uvigo=id_uvigo).values('lineagestest__lineage','nextcladetest__clade','fecha_muestra', 'id_region__localizacion')[0].values()
+    prev_url = request.META.get('HTTP_REFERER')
+    if not prev_url:
+        prev_url = '/visualize/general'
+
+    # Tablas
+    sample_table = SampleTable(Sample.objects.filter(id_uvigo=id_uvigo))
+    samplemetadata_table = SampleMetaDataTable(SampleMetaData.objects.filter(id_uvigo=id_uvigo))
+
+    variants_table = VariantsTable(VariantsTest.objects.filter(id_uvigo=id_uvigo))
+    singlecheck_table = SingleCheckTable(SingleCheckTest.objects.filter(id_uvigo=id_uvigo))
+    picard_table = PicardTable(PicardTest.objects.filter(id_uvigo=id_uvigo))
+    ngs_table = NGSTable(NGSstatsTest.objects.filter(id_uvigo=id_uvigo))
+    nextclade_table = NextcladeTable(NextcladeTest.objects.filter(id_uvigo=id_uvigo))
+    lineages_table = LineagesTable(LineagesTest.objects.filter(id_uvigo=id_uvigo))
+    form_url = reverse('edit_form', args=(id_uvigo,'Sample'))
+    context = {
+        # Datos generales
+        'id_uvigo':id_uvigo, 
+        'lineage':lineage, 
+        'clade':clade,
+        'fecha_muestra':fecha_muestra,
+        'localizacion':localizacion,
+        'prev_url':prev_url,
+        # Tablas
+        'tablas':{
+            'Metadatos comunes' : {form_url : sample_table},
+            'Metadatos extra':{
+                reverse('edit_form', args=(id_uvigo,'SampleMetaData')) : samplemetadata_table
+            },
+            'SingleCheck':{
+                reverse('edit_form', args=(id_uvigo,'SingleCheckTest')) : singlecheck_table
+            },
+            'Picard':{
+                reverse('edit_form', args=(id_uvigo,'PicardTest')) : picard_table}
+            ,
+            'NGSStats':{
+                reverse('edit_form', args=(id_uvigo,'NGSstatsTest'))  : ngs_table
+            },
+            'Nextclade':{
+                reverse('edit_form', args=(id_uvigo,'NextcladeTest')) : nextclade_table
+                },
+            'Pangolin':{
+                reverse('edit_form', args=(id_uvigo,'LineagesTest')) : lineages_table
+                },
+            'iVar':{
+                '#' : variants_table
+            },
+            },
+        }
+    return render(request, 'visualize/sample_profile.html', context)
+
 @login_required(login_url="/accounts/login") 
 def general(request):  
     table = CompletedTestsTable(get_completed_tests())
     RequestConfig(request).configure(table)
-    table.paginate(page=request.GET.get("page", 1), per_page=50)    
+    table.paginate(page=request.GET.get("page", 1), per_page=50)
 
     return render(request, 'visualize/general.html', {'table':table, 'filter':filter})
-    
 
 # Para metadatos
 @login_required(login_url="/accounts/login")
@@ -114,42 +273,6 @@ def variants(request):
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
     return render(request, 'visualize/variants.html', {'table':table})
 
-@login_required(login_url="/accounts/login")
-def specific_sample(request, id_uvigo): 
-    # Datos generales
-    lineage, clade, fecha_muestra, localizacion = Sample.objects.filter(id_uvigo=id_uvigo).values('lineagestest__lineage','nextcladetest__clade','fecha_muestra', 'id_region__localizacion')[0].values()
-    
-    # Tablas
-    sample_table = SampleTable(Sample.objects.filter(id_uvigo=id_uvigo))
-    samplemetadata_table = SampleMetaDataTable(SampleMetaData.objects.filter(id_uvigo=id_uvigo))
-
-    variants_table = VariantsTable(VariantsTest.objects.filter(id_uvigo=id_uvigo))
-    singlecheck_table = SingleCheckTable(SingleCheckTest.objects.filter(id_uvigo=id_uvigo))
-    picard_table = PicardTable(PicardTest.objects.filter(id_uvigo=id_uvigo))
-    ngs_table = NGSTable(NGSstatsTest.objects.filter(id_uvigo=id_uvigo))
-    nextclade_table = NextcladeTable(NextcladeTest.objects.filter(id_uvigo=id_uvigo))
-    lineages_table = LineagesTable(LineagesTest.objects.filter(id_uvigo=id_uvigo))
-    
-    context = {
-        # Datos generales
-        'id_uvigo':id_uvigo, 
-        'lineage':lineage, 
-        'clade':clade,
-        'fecha_muestra':fecha_muestra,
-        'localizacion':localizacion,
-        # Tablas
-        'tablas':{
-            'Metadatos comunes':sample_table,
-            'Metadatos extra':samplemetadata_table,
-            'SingleCheck':singlecheck_table,
-            'Picard':picard_table,
-            'NGSStats':ngs_table,
-            'Nextclade':nextclade_table,
-            'Pangolin':lineages_table,
-            'iVar':variants_table,
-            },
-        }
-    return render(request, 'visualize/sample_profile.html', context)
 
 
 ##############
@@ -717,15 +840,15 @@ def variants_column_graph(request, fecha_inicial, fecha_final, variant):
 
 
 
-dicc = {
-    'B.1':{
-        'name':'B.1',
-        'data':{
-            'CHUVI':{'name': 'CHUVI', 'y': 100, 'drilldown': 'chuvi-B.1'},
-            'CHUAC':{'name': 'CHUAC', 'y': 60, 'drilldown': 'chuac-B.1'},
-        }
-    }
-}
+# dicc = {
+#     'B.1':{
+#         'name':'B.1',
+#         'data':{
+#             'CHUVI':{'name': 'CHUVI', 'y': 100, 'drilldown': 'chuvi-B.1'},
+#             'CHUAC':{'name': 'CHUAC', 'y': 60, 'drilldown': 'chuac-B.1'},
+#         }
+#     }
+# }
 
 # from django.db.models import Count
 

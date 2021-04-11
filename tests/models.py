@@ -65,12 +65,12 @@ class NextcladeTest(models.Model): #.csv
     id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE) # a partir de columna 'seqName'
     # id_process = models.CharField(max_length=40)
 
-    total_missing = models.IntegerField()
-    clade = models.TextField()
-    qc_private_mutations_status = models.TextField()
-    qc_missing_data_status = models.TextField()
-    qc_snp_clusters_status = models.TextField()
-    qc_mixed_sites_status = models.TextField()
+    total_missing = models.IntegerField(default=None, null=True, blank=True)
+    clade = models.CharField(max_length=30, default=None, blank=True)
+    qc_private_mutations_status = models.CharField(max_length=30, default=None, blank=True)
+    qc_missing_data_status = models.CharField(max_length=30, default=None, blank=True)
+    qc_snp_clusters_status = models.CharField(max_length=30, default=None, blank=True)
+    qc_mixed_sites_status = models.CharField(max_length=30, default=None, blank=True)
 
     date = models.DateTimeField(auto_now=True)
 

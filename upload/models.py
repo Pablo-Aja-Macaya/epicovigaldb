@@ -4,10 +4,10 @@ class Region(models.Model):
     id_region = models.AutoField(primary_key=True)
     cp = models.IntegerField()
     localizacion = models.CharField(max_length=50) 
-    pais = models.TextField(max_length=50, default='SPAIN') 
-    region = models.TextField(max_length=50, default='EUROPE') 
-    latitud = models.TextField(max_length=50, default=None)
-    longitud = models.TextField(max_length=50, default=None)
+    pais = models.CharField(max_length=50, default='SPAIN') 
+    region = models.CharField(max_length=50, default='EUROPE') 
+    latitud = models.TextField(max_length=50, default=None, null=True)
+    longitud = models.TextField(max_length=50, default=None, null=True)
    
     class Meta:
         unique_together = ('cp','localizacion')
@@ -43,14 +43,14 @@ class SampleMetaData(models.Model):
     id_muestra = models.CharField(max_length=20, default=None, blank=True)
     
     
-    hospitalizacion = models.CharField(max_length=1)
-    uci = models.CharField(max_length=1)
+    hospitalizacion = models.CharField(max_length=1, default=None, null=True, blank=True)
+    uci = models.CharField(max_length=1, default=None, null=True, blank=True)
     
-    ct_orf1ab = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True)
-    ct_gen_e = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True)
-    ct_gen_n = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True)
-    ct_redrp = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True)
-    ct_s = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True)
+    ct_orf1ab = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True, blank=True)
+    ct_gen_e = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True, blank=True)
+    ct_gen_n = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True, blank=True)
+    ct_redrp = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True, blank=True)
+    ct_s = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True, blank=True)
 
     fecha_envio_cdna = models.DateField(blank=True, null=True)
     fecha_run_ngs = models.DateField(blank=True, null=True)

@@ -4,9 +4,24 @@
 {% block content %}
 
 <div class="container-lg">
+
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      {{ message|safe }}
+    </div>
+    {% endfor %}
+  {% endif %}
   <div class="btn-group">
-    <a href="{% url 'general' %}"><button type="button"  class="btn btn-link" > &lt Volver a apartado de visualización</button></a>
+    <a href="{{prev_url}}"><button type="button"  class="btn btn-outline-primary" > &lt Atrás</button></a>
   </div>
+  <div class="btn-group">
+    <a href="{% url 'general' %}"><button type="button"  class="btn btn-outline-primary" > Volver a tablas</button></a>
+  </div>
+
     <div class="card mb-3" style="max-width: 100%; border-style: none;" >
         <hr style="height:2px;border:none;color:#333;background-color:#333;">
         <div class="row no-gutters pt-3 pb-3">
@@ -39,15 +54,23 @@
   <div class="row justify-content-center">
     <div class="col-auto">
         <h3 class='pb-3'><strong>Tablas</strong></h3>
-        {% for nombre_tabla,tabla in tablas.items %}
-        <div class="pb-3">
-            <div class="card mb-3 " style="max-width: 100%; background-color: rgb(247, 253, 255);" >            
-                <div class="card-body">
-                    <h4 class="card-title"><strong>{{ nombre_tabla }}</strong></h4>
-                    {% render_table tabla %}
-                </div>
-            </div>
-        </div>
+        {% for nombre_tabla,contenido in tablas.items %}
+          {% for url,tabla in contenido.items %}
+          <div class="pb-3">
+              <div class="card mb-3 " style="max-width: 100%; background-color: rgb(247, 253, 255);" >            
+                  <div class="card-body">
+                      <h4 class="card-title">
+                        <strong>{{ nombre_tabla }} - </strong> 
+                        <a href={{url}}>
+                          <button type="button" class="btn btn-warning btn-sm" ><strong>Editar</strong></button>
+                        </a>
+                        <!-- <button type="button" class="btn btn-danger btn-sm" ><strong>Borrar</strong></button> -->
+                      </h4>
+                      {% render_table tabla %}
+                  </div>
+              </div>
+          </div>
+          {% endfor %}
         {% endfor %}
     </div>
   </div>

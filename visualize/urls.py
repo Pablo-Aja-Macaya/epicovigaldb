@@ -5,6 +5,7 @@ from visualize import views
 
 urlpatterns = [
     path('general', views.general, name='general'),
+    path('edit/<str:id_uvigo>+<str:tipo>', views.edit_form, name='edit_form'),
     path('sample/<str:id_uvigo>', views.specific_sample, name='specific_sample'),
     # Metadatos
     path('regions', views.regions, name='regions'),
