@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-lg pb-4">
+    <div class="btn-group">
+        <a href="{% url 'general' %}"><button type="button"  class="btn btn-outline-primary" >&lt Volver a tablas</button></a>
+    </div>
+    <h3 class='pb-3 pt-3'><strong>Gráficas</strong></h3>
+    <form id='cambio_fechas' action={{url}} method="POST">
+        {% csrf_token %}
+        <div class='row center-text justify-content-center'>
+            <div class="col-5">
+                <div class="form-group row">
+                    <label for="fecha_inicial_input" class="col-2 col-form-label">Inicial</label>
+                    <div class="col-10">
+                    <input class="form-control" type="date" name='fecha_inicial' value={{fecha_inicial}} id="fecha_inicial_input">
+                    </div>
+                </div>
+            </div>
+            <div class="col-5">
+                <div class="form-group row">
+                    <label for="fecha_final_input" class="col-2 col-form-label">Final</label>
+                    <div class="col-10">
+                        <input class="form-control" type="date" name='fecha_final' value={{fecha_final}} id="fecha_final_input">
+                    </div>
+                </div>
+            </div>
+            <div class="col-2">
+                <a href="javascript:{document.getElementById('cambio_fechas').submit()}">
+                        <button type="submit" class="boton_carga" onclick="this.classList.toggle('boton_carga--loading')"> <!-- data-toggle="collapse" data-target="#collapseLoading" aria-expanded="false" aria-controls="collapseExample" --> 
+                        <span class="boton_carga__text">Actualizar</span>
+                        </button>
+                    </a>
+            </div>
+        </div>
+    </form>
+    <hr>
+</div>
+
+
+
+<div class='container-fluid'>
+    
+    <div class="row justify-content-center">
+        <div class="col">
+            <div id="hospital_graph" data-url="{% url 'hospital_graph' fecha_inicial=fecha_inicial fecha_final=fecha_final %}"></div>
+        </div>
+        <div class="col">
+            <div id="linajes_hospitales_graph" data-url="{% url 'linajes_hospitales_graph' fecha_inicial=fecha_inicial fecha_final=fecha_final %}"></div>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col">
+            <div id="linajes_porcentaje_total" data-url="{% url 'linajes_porcentaje_total' fecha_inicial=fecha_inicial fecha_final=fecha_final %}" ></div>
+        </div>
+        <div class="col">
+            <div id="concellos_gal_graph" data-url="{% url 'concellos_gal_graph' fecha_inicial=fecha_inicial fecha_final=fecha_final %}" style="height: 700px;"></div>
+        </div>
+    </div>
+</div> 
+
+
+
+
+  <script>
+    $.ajax({
+      url: $("#linajes_porcentaje_total").attr("data-url"),
+      dataType: 'json',
+      success: function (data) {
+        Highcharts.chart("linajes_porcentaje_total", data);
+      }
+    });
+  </script>
+  <script>
+    $.ajax({
+      url: $("#linajes_hospitales_graph").attr("data-url"),
+      dataType: 'json',
+      success: function (data) {
+        Highcharts.chart("linajes_hospitales_graph", data);
+      }
+    });
+  </script>
+  <script>
+    $.ajax({
+      url: $("#concellos_gal_graph").attr("data-url"),
+      dataType: 'json',
+      success: function (data) {
+        Highcharts.mapChart("concellos_gal_graph", data);
+      }
+    });
+  </script>
+  <script>
+    $.ajax({
+      url: $("#hospital_graph").attr("data-url"),
+      dataType: 'json',
+      success: function (data) {
+        Highcharts.chart("hospital_graph", data);
+      }
+    });
+  </script>
+  <script>
+    $.ajax({
+      url: $("#variants_line_graph").attr("data-url"),
+      dataType: 'json',
+      success: function (data) {
+        Highcharts.chart("variants_line_graph", data);
+      }
+    });
+    $.ajax({
+      url: $("#variants_line_graph2").attr("data-url"),
+      dataType: 'json',
+      success: function (data) {
+        Highcharts.chart("variants_line_graph2", data);
+      }
+    });
+  </script>
+  <script>
+    $.ajax({
+      url: $("#variants_column_graph").attr("data-url"),
+      dataType: 'json',
+      success: function (data) {
+        Highcharts.chart("variants_column_graph", data);
+      }
+    });
+  </script>
+
+{% endblock %}

@@ -17,6 +17,29 @@ from .models import *
 # from .models import SampleFilter, MetaDataFilter,CompletedTestsFilter
 
 @login_required(login_url="/accounts/login") 
+def get_graphs(request):
+    if request.method=='POST':
+        fecha_inicial = request.POST.get('fecha_inicial')
+        fecha_final = request.POST.get('fecha_final')
+
+        if not fecha_inicial:
+            fecha_inicial = '2020-01-01'        
+        if not fecha_final:
+            fecha_final = '2022-01-01'
+    else:
+        fecha_inicial = '2020-01-01'
+        fecha_final = '2022-01-01'
+    
+    context = {
+        'url':reverse('get_graphs'),
+        'fecha_inicial':fecha_inicial,
+        'fecha_final':fecha_final
+        }
+    return render(request, 'visualize/graphs.html', context)
+
+
+
+@login_required(login_url="/accounts/login") 
 def edit_form(request, id_uvigo, tipo):
     lineage, clade, fecha_muestra, localizacion = Sample.objects.filter(id_uvigo=id_uvigo).values('lineagestest__lineage','nextcladetest__clade','fecha_muestra', 'id_region__localizacion')[0].values()
     
@@ -284,6 +307,8 @@ from django.db.models import Count
 from datetime import date, datetime
 import geojson
 from random import randint
+
+
 
 credits = {
     'enabled': True,'text':
