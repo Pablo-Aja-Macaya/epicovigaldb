@@ -5,7 +5,7 @@ class FullSampleForm(forms.Form):
     id_uvigo = forms.CharField(required=True)
     id_accession = forms.CharField(required=False)
     original_name = forms.CharField(required=False)
-    categoria_muestra = forms.ChoiceField(choices=((None,None),('aleatoria','aleatoria'),('vigilancia','vigilancia')),required=False)
+    categoria_muestra = forms.ChoiceField(choices=((None,None),('aleatoria','aleatoria'),('vigilancia','vigilancia'),('no aleatoria','no aleatoria'),('muestras pruebas','muestras pruebas'),('prueba seq','prueba seq')),required=False)
     edad = forms.IntegerField(required=False)
     sexo = forms.ChoiceField(choices=((None,None),('H','H'),('M','M')),required=False)
     patient_status = forms.ChoiceField(choices=((None,None),('S','S'),('N','N')),required=False)
