@@ -2,8 +2,8 @@ from django.db import models
 
 class Region(models.Model):
     id_region = models.AutoField(primary_key=True)
-    cp = models.IntegerField()
-    localizacion = models.CharField(max_length=50) 
+    cp = models.IntegerField(null=True)
+    localizacion = models.CharField(max_length=50, null=True) 
     pais = models.CharField(max_length=50, default='SPAIN') 
     region = models.CharField(max_length=50, default='EUROPE') 
     latitud = models.TextField(max_length=50, default=None, null=True)
@@ -36,12 +36,11 @@ class Sample(models.Model):
 class SampleMetaData(models.Model):
     id = models.AutoField(primary_key=True)
     id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE)
-    id_paciente = models.CharField(max_length=20, default=None, blank=True)
-    id_hospital = models.CharField(max_length=20, default=None, blank=True)
-    numero_envio = models.IntegerField(default=0, blank=True)
-    id_tubo = models.CharField(max_length=20, default=None, blank=True)
-    id_muestra = models.CharField(max_length=20, default=None, blank=True)
-    
+    id_paciente = models.CharField(max_length=20, default=None, blank=True, null=True)
+    id_hospital = models.CharField(max_length=20, default=None, blank=True, null=True)
+    numero_envio = models.IntegerField(default=0, blank=True, null=True)
+    id_tubo = models.CharField(max_length=20, default=None, blank=True, null=True)
+    id_muestra = models.CharField(max_length=20, default=None, blank=True, null=True)
     
     hospitalizacion = models.CharField(max_length=1, default=None, null=True, blank=True)
     uci = models.CharField(max_length=1, default=None, null=True, blank=True)

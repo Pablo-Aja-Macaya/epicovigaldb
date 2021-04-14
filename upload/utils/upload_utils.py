@@ -151,9 +151,9 @@ def upload_sample_hospital(stream):
                         id_uvigo = id_uvigo,
                         defaults = {
                             'id_uvigo' : id_uvigo,
-                            'id_accession' : 'NULL',
+                            'id_accession' : None,
                             'id_region' : region_reference,
-                            'original_name' : 'NULL',
+                            'original_name' : None,
                             'categoria_muestra':categoria_muestra,
                             'edad' : edad,
                             'sexo' : sexo[:1].upper(),

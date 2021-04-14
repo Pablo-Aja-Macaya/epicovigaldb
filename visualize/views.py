@@ -12,9 +12,7 @@ from upload.models import SampleMetaData
 
 from tests.models import LineagesTest, PicardTest, NextcladeTest, NGSstatsTest
 from .models import *
-# from .models import CompletedTestsTable, SampleTable, RegionTable, SampleMetaDataTable, SingleCheckTest, VariantsTest
-# from .models import LineagesTable, PicardTable, NextcladeTable, NGSTable, VariantsTable, SingleCheckTable
-# from .models import SampleFilter, MetaDataFilter,CompletedTestsFilter
+from .forms import *
 
 @login_required(login_url="/accounts/login") 
 def get_graphs(request):
@@ -36,8 +34,6 @@ def get_graphs(request):
         'fecha_final':fecha_final
         }
     return render(request, 'visualize/graphs.html', context)
-
-
 
 @login_required(login_url="/accounts/login") 
 def edit_form(request, id_uvigo, tipo):
@@ -145,7 +141,7 @@ def get_completed_tests():
     Devuelve para cada muestra si se ha hecho cada test
     '''
     # lista = Sample.objects.values('id_uvigo','lineagestest','nextcladetest','ngsstatstest','picardtest','singlechecktest','variantstest')
-    lista = Sample.objects.values('id_uvigo').distinct().values('id_uvigo','lineagestest','nextcladetest','ngsstatstest','picardtest','singlechecktest','variantstest__id_uvigo')
+    lista = Sample.objects.values('id_uvigo').distinct().values('id_uvigo','lineagestest','nextcladetest','ngsstatstest','picardtest','singlechecktest','variantstest__id_uvigo').order_by('id_uvigo')
     lista2 = []
     for i in lista:
         fields = ['lineagestest','nextcladetest','ngsstatstest','picardtest','singlechecktest','variantstest__id_uvigo']
@@ -332,6 +328,15 @@ COLOR_LIST = [
     '#ffe4c4','#ffb6c1',
 ]
 
+def get_graph_json_link(request, graph_base_url, fecha_inicial, fecha_final):
+    # Devuelve un icono con el enlace de la gráfica si el usuario está loggeado
+    if request.user.is_authenticated:
+        url = reverse(graph_base_url, args=(fecha_inicial,fecha_final))
+        json_link = f'<a href="{url}"><p style="color: rgb(61, 61, 255);">&#9741</p></a>'
+        return json_link
+    else:
+        return ''
+
 def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
     thresh = 2 # para eliminar variantes 
     linajes_count = Sample.objects.filter(categoria_muestra='aleatoria',fecha_muestra__range=[fecha_inicial, fecha_final])\
@@ -352,13 +357,15 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
 
     # print(lista_linajes)
     # print(lista_valores)
+    json_link = get_graph_json_link(request,'linajes_porcentaje_total', fecha_inicial, fecha_final)
+
     chart = {
         'chart': {
             'height': 400,
             'type': 'bar'
         },
         'title': {
-            'text': f'Variantes en Galicia ({fecha_inicial} | {fecha_final})' # ({fecha_inicial} | {fecha_final})
+            'text': f'Variantes en Galicia ({fecha_inicial} | {fecha_final}) {json_link}' # ({fecha_inicial} | {fecha_final})
         },
         'subtitle': {
             'text': f'Variantes que aparecen, al menos, {thresh} veces (Muestras aleatorias, sin incluir al ICVS).'
@@ -480,14 +487,14 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
     #         'data':[1,2,3]
     #     }
     # }
-
+    json_link = get_graph_json_link(request,'linajes_hospitales_graph', fecha_inicial, fecha_final)
     chart = {
         'chart': {
             'height': 500,
             'type': 'bar'
         },
         'title': {
-            'text': f'Variantes por hospital ({fecha_inicial} | {fecha_final})' # ({fecha_inicial} | {fecha_final})
+            'text': f'Variantes por hospital ({fecha_inicial} | {fecha_final}) {json_link}' # ({fecha_inicial} | {fecha_final})
         },
         'subtitle': {
             'text': f'Variantes que aparecen, al menos, {thresh} veces en algún hospital (Muestras aleatorias).'
@@ -592,7 +599,7 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
             .filter(id_region__localizacion__gte=2)\
             .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
             .order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
-            
+    json_link = get_graph_json_link(request,'concellos_gal_graph', fecha_inicial, fecha_final)
     chart = {
         'chart':{
             'map':geojson_data,
@@ -602,7 +609,7 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
             'useGPUTranslations': True
         },
         'title': {
-            'text': f'Geolocalización ({fecha_inicial} | {fecha_final})' # ({fecha_inicial} | {fecha_final})
+            'text': f'Geolocalización ({fecha_inicial} | {fecha_final}) {json_link}' # ({fecha_inicial} | {fecha_final})
         },
         'subtitle': {
             'text': f'Muestras aleatorias en cada concello.'
@@ -658,11 +665,12 @@ def hospital_graph(request, fecha_inicial, fecha_final):
         c = hospitales.filter(id_hospital = h).count()
         answer.append({'name':h, 'y':int(c)})
 
+    json_link = get_graph_json_link(request,'hospital_graph', fecha_inicial, fecha_final)
     chart = {
         'chart': {
             'type': 'pie',
         },
-        'title': {'text': f'Origen de muestras ({fecha_inicial} | {fecha_final})'},
+        'title': {'text': f'Origen de muestras ({fecha_inicial} | {fecha_final}) {json_link}'},
         'subtitle': {
             'text': f'Origen de muestras aleatorias recibidas (Incluyendo secuenciadas y no secuenciadas)'
         },

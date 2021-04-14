@@ -12,64 +12,47 @@
   </ul>
   <p></p>
 
-  <div class="alert alert-warning" role="alert">
-    Funcionalidad no implementada todavía
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
+  <div class="row justify-content-center">
+    <div class="col-12">
+      <h3 class='pb-3'><strong>Subida manual</strong></h3>
+
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          {{ message|safe }}
+        </div>
+        {% endfor %}
+      {% endif %}      
+      <div class="container-fluid pb-3">
+        <div class="card">
+          <div class="card-body">
+            <ul class="list-unstyled">
+              <li><strong>Formatos de datos a tener en cuenta:</strong></li>
+                <ul>
+                  <li>El atributo id_uvigo debe ser 'EPI.*.N' (asterisco significa cualquier cosa y la N cualquier número).</li>
+                  <li>Fechas en estilo 'YYYY-mm-dd' (14 de febrero de 2021 sería 2021-02-14). También acepta formato mm/dd/YYYY (14 de febrero de 2021 sería 02/14/2021)</li>
+                </ul>
+            </ul>
+          </div>
+        </div>      
+      </div>
+      <form action={{url_form}} method="POST">
+        {% csrf_token %}
+        <div class="table-responsive">
+          <table class='table table-hover table-striped ' >
+          {{ form.as_table }} 
+          </table>          
+        </div>
+        <div class="row justify-content-center">
+          <button type="submit" value="Submit" class="btn btn-primary" >Actualizar</button>
+        </div>
+      </form>                
+    </div>
   </div>
 
-  <form>
-    <div class="form-row">
-      <div class="form-group col-md-6">
-        <label for="inputEmail4">Sample ID</label>
-        <input type="text" class="form-control" id="inputEmail4">
-      </div>
-      <div class="form-group col-md-6">
-        <label for="inputPassword4">Atributo 2</label>
-        <input type="text" class="form-control" id="inputPassword4">
-      </div>
-      <div class="form-group col-md-6">
-        <label for="inputPassword4">Atributo 2.5</label>
-        <input type="text" class="form-control" id="inputPassword4">
-      </div>
-    </div>
-    <div class="form-group">
-      <label for="inputAddress">Atributo 3</label>
-      <input type="text" class="form-control" id="inputAddress" placeholder="placeholder">
-    </div>
-    <div class="form-group">
-      <label for="inputAddress2">Atributo 4</label>
-      <input type="text" class="form-control" id="inputAddress2" placeholder="placeholder">
-    </div>
-    <div class="form-row">
-      <div class="form-group col-md-6">
-        <label for="inputCity">Atributo 5</label>
-        <input type="text" class="form-control" id="inputCity">
-      </div>
-      <div class="form-group col-md-4">
-        <label for="inputState">Atributo 6</label>
-        <select id="inputState" class="form-control">
-          <option selected>Choose...</option>
-          <option>option 1</option>
-          <option>option 2</option>
-        </select>
-      </div>
-      <div class="form-group col-md-2">
-        <label for="inputZip">Atributo 7</label>
-        <input type="text" class="form-control" id="inputZip">
-      </div>
-    </div>
-    <div class="form-group">
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="gridCheck">
-        <label class="form-check-label" for="gridCheck">
-          Check
-        </label>
-      </div>
-    </div>
-    <button type="submit" class="btn btn-primary " disabled>Upload</button>
-  </form>
 </div>
 
 {% endblock %}

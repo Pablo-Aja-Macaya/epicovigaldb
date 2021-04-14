@@ -3,17 +3,87 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.contrib import messages
 import io
+import re
 import urllib.request
 
 from .utils import upload_utils
 from .tasks import find_coords
+from .forms import FullSampleForm
+from django.urls import reverse
+from .models import *
+
 
 
 # Create your views here.
 @login_required(login_url="/accounts/login")
 def upload_manual(request):
     # tasks = Task.objects
-    return render(request, 'upload/manual.html')
+    if request.method=='POST':
+        form = FullSampleForm(request.POST)
+        if form.is_valid():
+            datos = form.cleaned_data
+            print(datos)
+            sample_name = re.search(r'EPI\..+\.\d+.\.',datos.get('id_uvigo')+'.')
+            if sample_name:
+                region_fields = ['cp','localizacion','pais','region','latitud','longitud']
+                defaults_region = {i:datos.get(i) for i in region_fields}
+
+                sample_fields = [
+                    'id_uvigo','id_accession','id_region','original_name',
+                    'categoria_muestra','edad','sexo','patient_status','nodo_secuenciacion',
+                    'fecha_muestra','observaciones'
+                ]
+                defaults_sample = {i:datos.get(i) for i in sample_fields}
+
+                samplemetadata_fields = [
+                    'id_uvigo','id_paciente','id_hospital','numero_envio',
+                    'id_tubo','id_muestra','hospitalizacion','uci',
+                    'ct_orf1ab','ct_gen_e','ct_gen_n','ct_redrp','ct_s',
+                    'fecha_sintomas','fecha_diagnostico','fecha_entrada',
+                    'fecha_envio_cdna','fecha_run_ngs','fecha_entrada_fastq'                
+                ]
+                defaults_samplemetadata = {i:datos.get(i) for i in samplemetadata_fields}
+
+                try:
+                    _, created = Region.objects.update_or_create(
+                            cp = datos.get('cp'),
+                            localizacion = datos.get('localizacion'),
+                            defaults = defaults_region
+
+                        )
+                    region_reference = Region.objects.get(cp=datos.get('cp'), localizacion=datos.get('localizacion'))
+                    defaults_sample['id_region'] = region_reference
+                    _, created = Sample.objects.update_or_create(
+                            id_uvigo = datos.get('id_uvigo'),
+                            defaults = defaults_sample
+
+                        )
+                    sample_reference = Sample.objects.get(id_uvigo=datos.get('id_uvigo'))
+                    defaults_samplemetadata['id_uvigo'] = sample_reference
+                    _, created = SampleMetaData.objects.update_or_create(
+                            id_uvigo = sample_reference,
+                            defaults = defaults_samplemetadata
+
+                        )
+                    enlace_muestra = reverse('specific_sample', args=(datos.get('id_uvigo'),))
+                    enlace = f'<a href="{enlace_muestra}">{datos.get("id_uvigo")}</a>'
+                    messages.success(request, f'Cambios guardados. Perfil de muestra: {enlace}')
+                    return redirect(reverse('manual'))                        
+                except Exception as e:
+                    messages.warning(request, f'Error en alguno de los datos ({e})')
+                    return redirect(reverse('manual')) 
+
+            else:
+                messages.warning(request, 'Error en nombre de muestra')
+                return redirect(reverse('manual'))                
+    else:
+        form = FullSampleForm()
+
+    context = {
+        'form':form,
+        'url_form':reverse('manual')
+    }
+    return render(request, 'upload/manual.html', context)
 
 @login_required(login_url="/accounts/login")
 def upload_csv(request):

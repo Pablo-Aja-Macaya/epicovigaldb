@@ -35,6 +35,18 @@
   <div class="row justify-content-center">
     <div class="col-12">
       <h3 class='pb-3'><strong>{{tittle}}</strong></h3>
+      <div class="container-fluid pb-3">
+        <div class="card">
+          <div class="card-body">
+            <ul class="list-unstyled">
+              <li><strong>Formatos de datos a tener en cuenta:</strong></li>
+                <ul>
+                  <li>Fechas en estilo 'YYYY-mm-dd' (14 de febrero de 2021 sería 2021-02-14).</li>
+                </ul>
+            </ul>
+          </div>
+        </div>      
+      </div>
       <form action={{url_form}} method="POST">
         {% csrf_token %}
         <div class="table-responsive">
@@ -45,7 +57,6 @@
         <div class="row justify-content-center">
           <button type="submit" value="Submit" class="btn btn-primary" >Actualizar</button>
         </div>
-
       </form>                
     </div>
   </div>
