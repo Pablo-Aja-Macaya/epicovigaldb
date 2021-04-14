@@ -3,19 +3,34 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.contrib import messages
+from django.urls import reverse
 
 from .models import send_results_processing, update
-
+from .forms import SelectTestForm
 
 
 # Create your views here.
 @login_required(login_url="/accounts/login")
 def tests(request):
-    return render(request, 'tests/selection.html')
+    if request.method=='POST':
+        form = SelectTestForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+            datos = form.cleaned_data
+            messages.success(request, 'Cambios guardados')
+            return redirect(reverse('selection'))
+    else:
+        form = SelectTestForm()
+
+    context = {
+        'form':form,
+        'url_form':reverse('selection'),
+    }
+    return render(request, 'tests/selection.html', context)
 
 @login_required(login_url="/accounts/login")
 def upload_test_results(request):
-    return render(request, 'tests//upload_test_results.html')
+    return render(request, 'tests/upload_test_results.html')
 
 @login_required(login_url="/accounts/login")
 def send_selection(request):

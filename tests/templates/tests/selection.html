@@ -38,160 +38,19 @@
 
    
   <div class="container-lg pb-4">
-    <h2><strong>Run tests</strong></h2>
-    <br>
-
-    <!-- <form id="select_tests" method="POST" action="{% url 'send_selection' %}">
+    <h2><strong>Ejecución de tests</strong></h2>
+    <p>Sólo se enseñan las muestras ya secuenciadas.</p>
+    <form action={{url_form}} method="POST">
       {% csrf_token %}
-      <fieldset class="form-group">
-        <div class="row">
-          <legend class="col-form-label col-sm-2 pt-0">Select tests</legend>
-          <div class="col-sm-10">
-            {% with 'All Picard SingleCheck NGSStats NextClade iVar Lineages' as list %}
-              {% for i in list.split %}
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="inlineCheckbox{{i}}" name="{{i}}" value="{{i}}">
-                  <label class="form-check-label" for="inlineCheckbox{{i}}">{{i}}</label>
-                </div>
-              {% endfor %}
-            {% endwith %}
-          </div>
-        </div>
-      </fieldset>
-      <hr></hr>
-      <fieldset class="form-group">
-        <div class="row">
-          <legend class="col-form-label col-sm-2 pt-0">Select samples</legend>
-          <div class="col-sm-10">
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="origin" id="gridRadios1" value="csv" checked>
-              <label class="form-check-label" for="gridRadios1">
-                Select samples via CSV
-              </label>
-            </div>
-            <div class="form-check disabled">
-              <input class="form-check-input" type="radio" name="origin" id="gridRadios2" value="manual" disabled>
-              <label class="form-check-label" for="gridRadios2">
-                Select samples manually
-              </label>
-            </div>
-            <div class="form-check disabled">
-              <input class="form-check-input" type="radio" name="origin" id="gridRadios3" value="untested" disabled>
-              <label class="form-check-label" for="gridRadios3">
-                Run on untested files
-              </label>
-            </div>
-          </div>
-        </div>
-      </fieldset>
-        <div class="form-group row justify-content-center">
-            <a href="javascript:{document.getElementById('select_tests').submit()}"><button type="submit" class="btn btn-primary" data-toggle="collapse" data-target="#collapseLoading" aria-expanded="false" aria-controls="collapseExample"">Run tests</button></a>
-        </div>
-    </form> -->
-
-
-    <form id="select_tests" method="POST" action="{% url 'send_selection' %}">
-      {% csrf_token %}
-      <fieldset class="form-group">
-        <div class="row">
-          <legend class="col-form-label col-sm-2 pt-0">Select tests</legend>
-
-          <div class="custom-control custom-radio pr-3">
-            <input type="radio" id="customRadio1" name="customRadio" class="custom-control-input" >
-            <label class="custom-control-label" for="customRadio1">Run all tests</label>
-          </div>
-          <div class="custom-control custom-radio">
-            <input type="radio" id="customRadio2" name="customRadio" class="custom-control-input" data-toggle="collapse" data-target="#collapseTests" aria-expanded="false" aria-controls="collapseTests">
-            <label class="custom-control-label" for="customRadio2">Select tests to run</label>
-          </div>
-
-
-          <div class="col-sm-4 pl-3" >
-            <div class="collapse" id="collapseTests">
-            {% with 'Picard SingleCheck NGSStats NextClade iVar Lineages' as list %}
-              {% for i in list.split %}
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="inlineCheckbox{{i}}" name="{{i}}" value="{{i}}">
-                  <label class="form-check-label" for="inlineCheckbox{{i}}">{{i}}</label>
-                </div>
-              {% endfor %}
-            {% endwith %}
-            </div>
-          </div>
-
-        </div>
-      </fieldset>
-      <hr></hr>
-      <fieldset class="form-group">
-        <div class="row">
-          <legend class="col-form-label col-sm-2 pt-0">Select samples</legend>
-          <div class="col-sm-10">
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="origin" id="gridRadios1" value="csv" data-toggle="collapse" data-target="#csvOrigin" aria-expanded="false" aria-controls="csvOrigin">
-              <label class="form-check-label" for="gridRadios1">
-                Select samples via CSV
-              </label>
-            </div>
-            <div class="row collapse pt-3" id="csvOrigin">
-              <div class="form-group row">
-                <div class="col-sm-4">Select file</div>
-                <div class="col-lg-12">
-                  <div class="custom-file ">
-                    <input type="file" class="custom-file-input" name="document" id="inputGroupFile02" ">
-                    <label class="custom-file-label" for="inputGroupFile04">Choose file</label>
-                    <small id="inputHelpBlock" class="form-text text-muted">
-                      The csv must have the same structure as the <a href="#" data-toggle="modal" data-target="#exampleModal"><strong>example</strong></a>.
-                    </small>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="origin" id="gridRadios2" value="manualOrigin" data-toggle="collapse" data-target="#manualOrigin" aria-expanded="false" aria-controls="manualOrigin">
-              <label class="form-check-label" for="gridRadios2">
-                Select samples manually
-              </label>
-            </div>
-            <div class="row collapse pt-3" id="manualOrigin">
-              <div class="form-group">
-                <label for="exampleFormControlSelect1">Example select</label>
-                <select class="form-control" id="exampleFormControlSelect1">
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="origin" id="gridRadios3" value="untested">
-              <label class="form-check-label" for="gridRadios3">
-                Run on untested files
-              </label>
-            </div>
-          </div>
-        </div>
-      </fieldset>
-        <div class="form-group row justify-content-center">
-            <a href="javascript:{document.getElementById('select_tests').submit()}"><button type="submit" class="btn btn-primary" data-toggle="collapse" data-target="#collapseLoading" aria-expanded="false" aria-controls="collapseExample"">Run tests</button></a>
-        </div>
-    </form>
-
-
-    <!-- Menú de carga colapsable -->
-    <div class="collapse" id="collapseLoading">
-      <div class="card card-body border-0">  
-        <div class="d-flex justify-content-center text-center">
-          <div class="spinner-border text-primary" style="width: 5rem; height: 5rem;" role="status">
-            <span class="sr-only">Loading...</span>   
-          </div>   
-        </div>
-        <div class="d-flex justify-content-center text-center pt-3">   
-        <strong>Loading</strong>
-        </div>  
+      <div class="table-responsive">
+        <table class='table table-hover table-striped ' >
+        {{ form.as_table }} 
+        </table>          
       </div>
-    </div>
+      <div class="row justify-content-center">
+        <button type="submit" value="Submit" class="btn btn-primary" >Actualizar</button>
+      </div>
+    </form>  
   </div>
 </div>
 
