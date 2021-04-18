@@ -560,7 +560,7 @@ def update():
     folder_base = TESTS_FOLDER_BASE
 
     subfolders = []
-    target_folders = ['picard','nextclade','pangolin','ngs','variants','singlecheck']
+    target_folders = ['nextclade','pangolin','reportData','variants']# 'ngs' 'picard','singlecheck' (estos 3 están dentro de 'reportData')
     for i in target_folders:
         subfolders.append(folder_base + i +'/') # cada uno es un /path/to/target_folder/ ... ej: /path/to/nextclade/
     
