@@ -86,13 +86,13 @@ class VariantsTest(models.Model): #.tsv
     row = models.IntegerField()
 
     pos = models.IntegerField()
-    ref = models.CharField(max_length=10)
-    alt = models.CharField(max_length=10)
+    ref = models.CharField(max_length=20)
+    alt = models.CharField(max_length=20)
     alt_freq = models.DecimalField(max_digits=7, decimal_places=6) 
-    ref_codon = models.CharField(max_length=10)
-    ref_aa = models.CharField(max_length=10)
-    alt_codon = models.CharField(max_length=10)
-    alt_aa = models.CharField(max_length=10)
+    ref_codon = models.CharField(max_length=20)
+    ref_aa = models.CharField(max_length=20)
+    alt_codon = models.CharField(max_length=20)
+    alt_aa = models.CharField(max_length=20)
 
     date = models.DateTimeField(auto_now=True)
 
