@@ -226,7 +226,7 @@ def regions(request):
     
 @login_required(login_url="/accounts/login")
 def samples(request):
-    data = Sample.objects.all()
+    data = Sample.objects.all().order_by('id_uvigo')
     filter = SampleFilter(request.GET, queryset=data)
     data = filter.qs
 
@@ -239,7 +239,7 @@ def samples(request):
 
 @login_required(login_url="/accounts/login")
 def metadata(request):
-    data = SampleMetaData.objects.all()
+    data = SampleMetaData.objects.all().order_by('id_uvigo')
     filter = MetaDataFilter(request.GET, queryset=data)
     data = filter.qs
     
@@ -252,42 +252,42 @@ def metadata(request):
 # Para resultados
 @login_required(login_url="/accounts/login")
 def lineages(request):
-    table = LineagesTable(LineagesTest.objects.all())
+    table = LineagesTable(LineagesTest.objects.all().order_by('id_uvigo'))
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
     return render(request, 'visualize/lineages.html', {'table':table})
 
 @login_required(login_url="/accounts/login")
 def nextclade(request):
-    table = NextcladeTable(NextcladeTest.objects.all())
+    table = NextcladeTable(NextcladeTest.objects.all().order_by('id_uvigo'))
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
     return render(request, 'visualize/nextclade.html', {'table':table})
 
 @login_required(login_url="/accounts/login")
 def ngsstats(request):
-    table = NGSTable(NGSstatsTest.objects.all())
+    table = NGSTable(NGSstatsTest.objects.all().order_by('id_uvigo'))
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
     return render(request, 'visualize/ngsstats.html', {'table':table})
 
 @login_required(login_url="/accounts/login")
 def picard(request):
-    table = PicardTable(PicardTest.objects.all())
+    table = PicardTable(PicardTest.objects.all().order_by('id_uvigo'))
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
     return render(request, 'visualize/picard.html', {'table':table})
 
 @login_required(login_url="/accounts/login")
 def singlecheck(request):
-    table = SingleCheckTable(SingleCheckTest.objects.all())
+    table = SingleCheckTable(SingleCheckTest.objects.all().order_by('id_uvigo'))
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
     return render(request, 'visualize/singlecheck.html', {'table':table})
 
 @login_required(login_url="/accounts/login")
 def variants(request):
-    table = VariantsTable(VariantsTest.objects.all())
+    table = VariantsTable(VariantsTest.objects.all().order_by('id_uvigo'))
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
     return render(request, 'visualize/variants.html', {'table':table})
