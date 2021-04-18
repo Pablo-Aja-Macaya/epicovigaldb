@@ -248,16 +248,18 @@ def detect_file(header):
             if name_org in header:
                 #print(True, test)
                 probs[test] += 1
-    
-    return max(probs, key=probs.get)
-                
 
-
+    # Conseguir test con el mayor número de columnas comunes con el archivo
+    possible_test = max(probs, key=probs.get)
+    # Si no ha habido ninguna columna común significará que lo más probable es que sea de SingleCheck (no tiene nombres de columnas)
+    if probs[possible_test] == 0:
+        return 'SingleCheckTest'
+    else:
+        return possible_test
 
 def find_sample_name(string):
     # Encontrar si una cadena contiene 'EPI.*.X', si es así ese será el nombre de la muestra
     sample_name = re.search(r'EPI\..+\.\d+.\.',string+'.')
-    print(string, sample_name)
     if sample_name:
         return sample_name.group()[:-1]
     else:
@@ -304,7 +306,7 @@ def upload_picard(reader, sample_name):
         pct_target_bases_10x = float(line.get('pct_target_bases_10x','').replace(',','.'))
         pct_target_bases_100x = float(line.get('pct_target_bases_100x','').replace(',','.'))
 
-        if id_uvigo:
+        if id_uvigo and id_uvigo[:3]=='EPI':
             sample_reference = comprobar_existencia(id_uvigo)
             _, created = PicardTest.objects.update_or_create(
                 id_uvigo=sample_reference,
@@ -340,7 +342,7 @@ def upload_singlecheck(io_string, delimiter):
         gini_coefficient = lista[gini_coefficient_index]
         mad = lista[mad_index]      
 
-        if id_uvigo:
+        if id_uvigo and id_uvigo[:3]=='EPI':
             sample_reference = comprobar_existencia(id_uvigo)
             _, created = SingleCheckTest.objects.update_or_create(
                 id_uvigo=sample_reference,
@@ -361,7 +363,7 @@ def upload_ngsstats(reader):
         total_reads = int(line.get('total_reads','').replace(',','.'))
         mapped = int(line.get('mapped','').replace(',','.'))
         trimmed = int(line.get('trimmed','').replace(',','.'))
-        if id_uvigo:
+        if id_uvigo and id_uvigo[:3]=='EPI':
             sample_reference = comprobar_existencia(id_uvigo)
             _, created = NGSstatsTest.objects.update_or_create(
                 id_uvigo=sample_reference,
@@ -385,7 +387,7 @@ def upload_nextclade(reader):
         qc_snp_clusters_status = line.get('qc_snp_clusters_status')
         qc_mixed_sites_status = line.get('qc_mixed_sites_status')
 
-        if id_uvigo:
+        if id_uvigo and id_uvigo[:3]=='EPI':
             sample_reference = comprobar_existencia(id_uvigo)
 
             _, created = NextcladeTest.objects.update_or_create(
@@ -409,12 +411,10 @@ def upload_variants(reader, sample_name):
     row = 0
     ## HAY QUE ARREGLAR ESTA SUBIDA
     ## HABRA QUE HACER LLAVE PRIMARIA DE id_uvigo y cada fila?
-    if id_uvigo:
+    if id_uvigo and id_uvigo[:3]=='EPI':
         #### METODO 1 - MAS RAPIDO QUE EL update_or_create, se reduce el tiempo al 30% en principio
         lista_objs_update = []
         lista_objs_create = []
-        import time
-        start = time.time()
         for line in reader:
             pos = line.get('pos')
             ref = line.get('ref')
@@ -465,43 +465,8 @@ def upload_variants(reader, sample_name):
         VariantsTest.objects.bulk_update(lista_objs_update, update_fields, batch_size=100)
         
         # BULK CREATE
-        VariantsTest.objects.bulk_create(lista_objs_create, batch_size=100, ignore_conflicts=True)         
-        
-        end = time.time()
-        print('Tiempo:',end-start)
-        ### METODO 2 - MAS LENTO EN PRINCIPIO
-        # start = time.time()
-        # for line in reader:
-        #     pos = line.get('pos')
-        #     ref = line.get('ref')
-        #     alt = line.get('alt')
-        #     alt_freq = line.get('alt_freq')
-        #     ref_codon = line.get('ref_codon')
-        #     ref_aa = line.get('ref_aa')
-        #     alt_codon = line.get('alt_codon')
-        #     alt_aa = line.get('alt_aa')
+        VariantsTest.objects.bulk_create(lista_objs_create, batch_size=100, ignore_conflicts=True)           
 
-        #     sample_reference = comprobar_existencia(id_uvigo)
-        #     _, created = VariantsTest.objects.update_or_create(
-        #         id_uvigo=sample_reference,
-        #         row=row,
-        #         defaults={
-        #             'id_uvigo' : sample_reference,
-        #             'id_process' : id_process,
-        #             'row' : row,
-        #             'pos' : pos,
-        #             'ref' : ref,
-        #             'alt' : alt,
-        #             'alt_freq' : alt_freq,
-        #             'ref_codon' : ref_codon,
-        #             'ref_aa' : ref_aa,
-        #             'alt_codon' : alt_codon,
-        #             'alt_aa' : alt_aa,                    
-        #         }
-        #     )           
-        #     row += 1
-        # end = time.time()
-        # print('Total variantes',end-start)     
 
 def upload_lineages(reader):
     for line in reader:
@@ -512,7 +477,7 @@ def upload_lineages(reader):
         countries = line.get('most_common_countries','').split(',')
         pangolearn_version = line.get('pangolearn_version')
 
-        if id_uvigo:
+        if id_uvigo and id_uvigo[:3]=='EPI':
             sample_reference = comprobar_existencia(id_uvigo)
             _, created = LineagesTest.objects.update_or_create(
                 id_uvigo=sample_reference,
@@ -530,17 +495,6 @@ def upload_lineages(reader):
                 c = Country(name=country.strip())
                 c.save()
                 lineage_reference.most_common_countries.add(c)
-            # for country in countries:
-            #     country = country.strip()
-            #     _, created = LineagesMostCommonCountries.objects.update_or_create(
-            #         id_uvigo=lineage_reference,
-            #         defaults={
-            #             'id_uvigo' : lineage_reference,
-            #             # 'id_process' : id_process,
-            #             'country' : country,
-                
-            #         }
-            #     )
 
 ################################
 def select_test(test, file, sample_name, fieldnames, dialect):
@@ -621,9 +575,7 @@ def update():
             file_history = pickle.load(f)
         
         for folder in subfolders:
-            print(folder)
             files = glob.glob(folder+'*')
-
             for f in files:
                 fname = pathlib.Path(f)
                 mtime = fname.stat().st_mtime # Time of most recent content modification expressed in seconds.
@@ -652,12 +604,14 @@ def update():
                         
                         new += 1
                 except Exception as e:
-                    print(f'Existe algún error en el archivo: {fname}')
-                    print(traceback.print_exc())
+                    # print(f'Existe algún error en el archivo: {fname}')
+                    # print(traceback.print_exc())
+                    # print(fname.name)
+                    file_history.pop(fname.name, None)
                     errors += 1
 
-            with open(pckl_folder+pckl, 'wb') as fichero:
-                pickle.dump(file_history, fichero)
+                with open(pckl_folder+pckl, 'wb') as fichero:
+                    pickle.dump(file_history, fichero)
     
     # Si no hay un pckl coger todos los archivos y actualziar la base de datos
     # después hacer un pckl
@@ -678,12 +632,14 @@ def update():
                     new += 1
 
                 except Exception as e:
-                    print(f'Existe algún error en el archivo: {fname}')
-                    print(traceback.print_exc())
+                    # print(f'Existe algún error en el archivo: {fname}')
+                    # print(traceback.print_exc())
+                    file_history.pop(fname.name, None)
                     errors += 1
 
-            with open(pckl_folder+pckl, 'wb') as fichero:
-                pickle.dump(file_history, fichero)
+
+                with open(pckl_folder+pckl, 'wb') as fichero:
+                    pickle.dump(file_history, fichero)
     
     return unchanged, updated, new, errors
 
