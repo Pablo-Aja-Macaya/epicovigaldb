@@ -22,31 +22,61 @@
     <a href="{% url 'general' %}"><button type="button"  class="btn btn-outline-primary" > Volver a tablas</button></a>
   </div>
 
-    <div class="card mb-3" style="max-width: 100%; border-style: none;" >
-        <hr style="height:2px;border:none;color:#333;background-color:#333;">
-        <div class="row no-gutters pt-3 pb-3">
-            
-          <div class="col-md-4 my-auto pl-4">
-            <div class="card-body">
-                <h3 class="card-title"><strong>{{ id_uvigo }}</strong></h3>
-              </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card-body">
-              <p class="card-text"><strong>Clado:</strong> {{ clade }}</p>
-              <p class="card-text"><strong>Linaje:</strong> {{ lineage }}</p>
-
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card-body">
-                <p class="card-text"><strong>Fecha muestra:</strong> {{ fecha_muestra }}</p>
-                <p class="card-text"><strong>Localización:</strong> {{ localizacion }}</p>
-            </div>
+  <div class="card mb-3" style="max-width: 100%; border-style: none;" >
+      <hr style="height:2px;border:none;color:#333;background-color:#333;">
+      <div class="row no-gutters pt-3 pb-3">
+        <div class="col-md-4 my-auto pl-4">
+          <div class="card-body">
+              <h3 class="card-title"><strong>{{ id_uvigo }}</strong></h3>
           </div>
         </div>
-        <hr style="height:2px;border:none;color:#333;background-color:#333;">
+        <div class="col-md-3">
+          <div class="card-body">
+            <p class="card-text"><strong>Clado:</strong> {{ clade }}</p>
+            <p class="card-text"><strong>Linaje:</strong> {{ lineage }}</p>
+
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card-body">
+              <p class="card-text"><strong>Fecha muestra:</strong> {{ fecha_muestra }}</p>
+              <p class="card-text"><strong>Localización:</strong> {{ localizacion }}</p>
+          </div>
+        </div>
+        <div class="col-md-1 my-auto">
+          <button type="button" class="btn btn-danger btn-sm"  data-toggle="modal" data-target="#drop_sample_modal"><strong>Borrar</strong></button>
+        </div>
+      </div>
+      <hr style="height:2px;border:none;color:#333;background-color:#333;">
+  </div>
+</div>
+
+<!-- Modal de borrado -->
+<div class="modal fade" id="drop_sample_modal" tabindex="-1" aria-labelledby="drop_sample_modal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="drop_sample_modal"><strong>Borrado completo de [MUESTRA]</strong></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger" role="alert">
+          <strong>¿Seguro que quieres borrar por completo esta muestra? El borrado es irreversible e incluye tanto los metadatos como los resultados.</strong>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Atrás</button>
+        
+        <form action="{% url 'drop_sample' %}" method="POST">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Borrar</button>
+          <input type="hidden" name="sample" value={{id_uvigo}}>
+        </form> 
+      </div>
     </div>
+  </div>
 </div>
 
 
@@ -64,7 +94,6 @@
                         <a href={{url}}>
                           <button type="button" class="btn btn-warning btn-sm" ><strong>Editar</strong></button>
                         </a>
-                        <!-- <button type="button" class="btn btn-danger btn-sm" ><strong>Borrar</strong></button> -->
                       </h4>
                       {% render_table tabla %}
                   </div>

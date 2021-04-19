@@ -36,6 +36,16 @@ def get_graphs(request):
     return render(request, 'visualize/graphs.html', context)
 
 @login_required(login_url="/accounts/login") 
+def drop_sample_cascade(request):
+    id_uvigo = request.POST.get('sample')
+    sample = Sample.objects.get(id_uvigo=id_uvigo)
+    sample.delete()
+    
+    messages.success(request, 'Todos los datos de {id_uvigo} han sido borrados.')
+    return redirect(reverse('general'))
+
+
+@login_required(login_url="/accounts/login") 
 def edit_form(request, id_uvigo, tipo):
     lineage, clade, fecha_muestra, localizacion = Sample.objects.filter(id_uvigo=id_uvigo).values('lineagestest__lineage','nextcladetest__clade','fecha_muestra', 'id_region__localizacion')[0].values()
     
@@ -81,7 +91,7 @@ def edit_form(request, id_uvigo, tipo):
             'NGSstatsTest':{
                 'form_model':NGSStatssForm,
                 'model':NGSstatsTest,
-                'tittle':'Edición de test: Pangolin'
+                'tittle':'Edición de test: NGSStats'
             },
         }
         form_model = dicc[tipo]['form_model']
@@ -105,6 +115,7 @@ def edit_form(request, id_uvigo, tipo):
                         defaults = defaults
 
                     )
+            ## ARREGLAR EDICIÖN DE PANGOLIN
             else:
                 datos['id_uvigo']=Sample.objects.get(id_uvigo=id_uvigo)
                 _, created = model.objects.update_or_create(
