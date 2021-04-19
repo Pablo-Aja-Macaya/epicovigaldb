@@ -71,6 +71,8 @@ def upload_sample_hospital(stream):
     repl = str.maketrans("ÁÉÍÓÚ","AEIOU") # para quitar acentos
     
     lista_fallos = []
+    entradas_para_actualizar = []
+    entradas_para_crear = []
     for line in reader:
         try:
             id_uvigo = line.get('id_uvigo')
@@ -135,64 +137,124 @@ def upload_sample_hospital(stream):
                 loc = 'A ' + loc[:-4]
 
             # Insertado en la base de datos
-            # if not Region.objects.filter(cp=cp, localizacion=loc).exists():
-            _, created = Region.objects.update_or_create(
-                    cp = int(cp),
-                    localizacion = loc,
-                    pais = 'SPAIN',
-                    region = 'EUROPE',
-                    # latitud = 0,
-                    # longitud = 0
-                )
-
-            region_reference = Region.objects.get(cp=cp, localizacion=loc)
-            if id_uvigo:
-                _, created = Sample.objects.update_or_create(
-                        id_uvigo = id_uvigo,
-                        defaults = {
-                            'id_uvigo' : id_uvigo,
-                            'id_accession' : None,
-                            'id_region' : region_reference,
-                            'original_name' : None,
-                            'categoria_muestra':categoria_muestra,
-                            'edad' : edad,
-                            'sexo' : sexo[:1].upper(),
-                            'patient_status' : hospitalizacion,
-                            'nodo_secuenciacion' : nodo_secuenciacion,
-                            'fecha_muestra' : f_muestra,
-                            'observaciones' : observaciones                        
-                        }
-
+            if not Region.objects.filter(cp=cp, localizacion=loc).exists():
+                _, created = Region.objects.update_or_create(
+                        cp = int(cp),
+                        localizacion = loc,
+                        pais = 'SPAIN',
+                        region = 'EUROPE',
+                        # latitud = 0,
+                        # longitud = 0
                     )
-                sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
-                _, created = SampleMetaData.objects.update_or_create(
-                        id_uvigo = sample_reference,
-                        defaults = {
-                            'id_uvigo' : sample_reference,
-                            'id_paciente' : id_paciente,
-                            'id_hospital' : id_hospital,
-                            'numero_envio' : numero_envio,
-                            'id_tubo' : id_tubo,
-                            'id_muestra' : id_muestra,
-                            'hospitalizacion' : hospitalizacion[:1], 
-                            'uci' : uci[:1],
-                            'ct_orf1ab' : orf1ab,
-                            'ct_gen_e' : gen_e,
-                            'ct_gen_n' : gen_n,
-                            'ct_redrp' : rdrp,
-                            'ct_s' : ct_s,
-                            'fecha_sintomas' : f_sintomas,
-                            'fecha_diagnostico' : f_diagnostico,
-                            'fecha_entrada' : f_entrada_uv,
-                            'fecha_envio_cdna' : f_envio_cdna,
-                            'fecha_run_ngs' : f_run_ngs,
-                            'fecha_entrada_fastq' : f_entrada_fastq                        
-                        }
 
-                    ) 
+            obj = Sample.objects.get(id_uvigo=id_uvigo)
+            region_reference = Region.objects.get(cp=cp, localizacion=loc)
+            # Para actualizar
+            if obj: 
+                obj.id_accession = None
+                obj.id_region = region_reference
+                obj.original_name = None
+                obj.categoria_muestra = categoria_muestra
+                obj.edad = edad
+                obj.sexo = sexo[:1].upper()
+                obj.patient_status = hospitalizacion
+                obj.nodo_secuenciacion = nodo_secuenciacion
+                obj.fecha_muestra = f_muestra
+                obj.observaciones = observaciones                     
+                try:
+                    obj.full_clean() # se comprueba si el objeto se ajusta a las reglas de su modelo
+                    entradas_para_actualizar.append(obj)
+                except Exception as e:
+                    print(e)
+                    lista_fallos.append(id_uvigo)
+                
+            # Para crear
+            else:
+                obj = Sample(
+                id_uvigo = id_uvigo,
+                id_accession = None,
+                id_region = region_reference,
+                original_name = None,
+                categoria_muestra = categoria_muestra,
+                edad = edad,
+                sexo = sexo[:1].upper(),
+                patient_status = hospitalizacion,
+                nodo_secuenciacion = nodo_secuenciacion,
+                fecha_muestra = f_muestra,
+                observaciones = observaciones                     
+                )
+                try:
+                    obj.full_clean() # se comprueba si el objeto se ajusta a las reglas de su modelo
+                    entradas_para_crear.append(obj)
+                except Exception as e:
+                    #print(e)
+                    lista_fallos.append(id_uvigo)
+            # region_reference = Region.objects.get(cp=cp, localizacion=loc)
+            # if id_uvigo:
+            #     _, created = Sample.objects.update_or_create(
+            #             id_uvigo = id_uvigo,
+            #             defaults = {
+            #                 'id_uvigo' : id_uvigo,
+            #                 'id_accession' : None,
+            #                 'id_region' : region_reference,
+            #                 'original_name' : None,
+            #                 'categoria_muestra':categoria_muestra,
+            #                 'edad' : edad,
+            #                 'sexo' : sexo[:1].upper(),
+            #                 'patient_status' : hospitalizacion,
+            #                 'nodo_secuenciacion' : nodo_secuenciacion,
+            #                 'fecha_muestra' : f_muestra,
+            #                 'observaciones' : observaciones                        
+            #             }
+
+            #         )
+            #     sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
+            #     _, created = SampleMetaData.objects.update_or_create(
+            #             id_uvigo = sample_reference,
+            #             defaults = {
+            #                 'id_uvigo' : sample_reference,
+            #                 'id_paciente' : id_paciente,
+            #                 'id_hospital' : id_hospital,
+            #                 'numero_envio' : numero_envio,
+            #                 'id_tubo' : id_tubo,
+            #                 'id_muestra' : id_muestra,
+            #                 'hospitalizacion' : hospitalizacion[:1], 
+            #                 'uci' : uci[:1],
+            #                 'ct_orf1ab' : orf1ab,
+            #                 'ct_gen_e' : gen_e,
+            #                 'ct_gen_n' : gen_n,
+            #                 'ct_redrp' : rdrp,
+            #                 'ct_s' : ct_s,
+            #                 'fecha_sintomas' : f_sintomas,
+            #                 'fecha_diagnostico' : f_diagnostico,
+            #                 'fecha_entrada' : f_entrada_uv,
+            #                 'fecha_envio_cdna' : f_envio_cdna,
+            #                 'fecha_run_ngs' : f_run_ngs,
+            #                 'fecha_entrada_fastq' : f_entrada_fastq                        
+            #             }
+
+            #         ) 
         except Exception as e:
             print(e)
             lista_fallos.append(id_uvigo)
+
+    # BULK UPDATE
+    update_fields = [
+        'id_accession',
+        'id_region',
+        'original_name',
+        'categoria_muestra',
+        'edad',
+        'sexo',
+        'patient_status',
+        'nodo_secuenciacion',
+        'fecha_muestra',
+        'observaciones',
+    ]
+    print('actualizando')
+    Sample.objects.bulk_update(entradas_para_actualizar, update_fields, batch_size=100)
+    # BULK CREATE
+    Sample.objects.bulk_create(entradas_para_crear, batch_size=100)
 
     return lista_fallos, lista_columnas_inesperadas
 
