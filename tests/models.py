@@ -258,12 +258,17 @@ def detect_file(header):
         return possible_test
 
 def find_sample_name(string):
-    # Encontrar si una cadena contiene 'EPI.*.X', si es así ese será el nombre de la muestra
-    sample_name = re.search(r'EPI\..+\.\d+.\.',string+'.')
-    if sample_name:
-        return sample_name.group()[:-1]
-    else:
-        return None
+    # Encontrar si una cadena contiene alguna de las siguientes cosas:
+        # Posibilidades:  EPI.X.N , SERGAS.X.N y VAL.X.N
+    formats = [r'EPI\..+\.\d+.\.', r'SERGAS\..+\.\d+.\.', r'VAL\..+\.\d+.\.']
+    accept = False
+    # Probar las posibilidades, si encaja alguna se devuelve el nombre obtenido
+    for i in formats:
+        sample_name = re.search(i,string+'.')
+        if sample_name:
+            return sample_name.group()[:-1]
+    # Si ninguna encaja se devuelve None
+    return None
 
 
 def comprobar_existencia(id_uvigo):
@@ -298,7 +303,7 @@ def comprobar_existencia(id_uvigo):
 ### Subida según test #####
 def upload_picard(reader, sample_name):
     for line in reader:
-        id_uvigo = sample_name
+        id_uvigo = find_sample_name(sample_name)
         # id_process = 'U-XXX'
         mean_target_coverage = float(line.get('mean_target_coverage','').replace(',','.'))
         median_target_coverage = float(line.get('median_target_coverage','').replace(',','.'))
@@ -306,7 +311,7 @@ def upload_picard(reader, sample_name):
         pct_target_bases_10x = float(line.get('pct_target_bases_10x','').replace(',','.'))
         pct_target_bases_100x = float(line.get('pct_target_bases_100x','').replace(',','.'))
 
-        if id_uvigo and id_uvigo[:3]=='EPI':
+        if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
             _, created = PicardTest.objects.update_or_create(
                 id_uvigo=sample_reference,
@@ -342,7 +347,7 @@ def upload_singlecheck(io_string, delimiter):
         gini_coefficient = lista[gini_coefficient_index]
         mad = lista[mad_index]      
 
-        if id_uvigo and id_uvigo[:3]=='EPI':
+        if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
             _, created = SingleCheckTest.objects.update_or_create(
                 id_uvigo=sample_reference,
@@ -358,12 +363,12 @@ def upload_singlecheck(io_string, delimiter):
 
 def upload_ngsstats(reader):
     for line in reader:
-        id_uvigo = line.get('id_uvigo') # igual hay que poner aquí find_sample_name() también
+        id_uvigo = find_sample_name(line.get('id_uvigo')) # igual hay que poner aquí find_sample_name() también
         # id_process = 'U-XXX'
         total_reads = int(line.get('total_reads','').replace(',','.'))
         mapped = int(line.get('mapped','').replace(',','.'))
         trimmed = int(line.get('trimmed','').replace(',','.'))
-        if id_uvigo and id_uvigo[:3]=='EPI':
+        if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
             _, created = NGSstatsTest.objects.update_or_create(
                 id_uvigo=sample_reference,
@@ -387,7 +392,7 @@ def upload_nextclade(reader):
         qc_snp_clusters_status = line.get('qc_snp_clusters_status')
         qc_mixed_sites_status = line.get('qc_mixed_sites_status')
 
-        if id_uvigo and id_uvigo[:3]=='EPI':
+        if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
 
             _, created = NextcladeTest.objects.update_or_create(
@@ -406,12 +411,10 @@ def upload_nextclade(reader):
 
 
 def upload_variants(reader, sample_name):
-    id_uvigo = sample_name
+    id_uvigo = find_sample_name(sample_name)
     # id_process = 'U-XXX'
     row = 0
-    ## HAY QUE ARREGLAR ESTA SUBIDA
-    ## HABRA QUE HACER LLAVE PRIMARIA DE id_uvigo y cada fila?
-    if id_uvigo and id_uvigo[:3]=='EPI':
+    if id_uvigo:
         #### METODO 1 - MAS RAPIDO QUE EL update_or_create, se reduce el tiempo al 30% en principio
         lista_objs_update = []
         lista_objs_create = []
@@ -477,7 +480,7 @@ def upload_lineages(reader):
         countries = line.get('most_common_countries','').split(',')
         pangolearn_version = line.get('pangolearn_version')
 
-        if id_uvigo and id_uvigo[:3]=='EPI':
+        if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
             _, created = LineagesTest.objects.update_or_create(
                 id_uvigo=sample_reference,
@@ -554,7 +557,7 @@ def update():
     from epicovigal.local_settings import TESTS_PCKL_FOLDER, TESTS_FOLDER_BASE
     # Update database if there are new files in a folder or these have been modified
     pckl = 'objs.pkl'
-
+    error_log_file = '~/test_update_error_log.txt'
     # en local
     pckl_folder = TESTS_PCKL_FOLDER
     folder_base = TESTS_FOLDER_BASE
@@ -587,7 +590,6 @@ def update():
                         if file_history[fname.name] != mtime:
                             with open(fname, 'rt') as fichero:
                                 update_database(fichero, fname)
-
                             # Se guarda en el diccionario la nueva fecha de modificación
                             file_history[fname.name] = mtime
                             updated += 1
@@ -601,12 +603,16 @@ def update():
                         # insertar los datos del archivo en la base de datos
                         with open(fname, 'rt') as fichero:
                             update_database(fichero, fname)
-                        
                         new += 1
+
                 except Exception as e:
                     # print(f'Existe algún error en el archivo: {fname}')
                     # print(traceback.print_exc())
                     # print(fname.name)
+                    with open(error_log_file, 'at') as log:
+                        log.write('\n', '='*100)
+                        log.write(f'Existe algún error en el archivo: {fname}')
+                        log.write(traceback.format_exc())
                     file_history.pop(fname.name, None)
                     errors += 1
 
@@ -636,7 +642,10 @@ def update():
                     # print(traceback.print_exc())
                     file_history.pop(fname.name, None)
                     errors += 1
-
+                    with open(error_log_file, 'at') as log:
+                        log.write('\n', '='*100)
+                        log.write(f'Existe algún error en el archivo: {fname}')
+                        log.write(traceback.format_exc())
 
                 with open(pckl_folder+pckl, 'wb') as fichero:
                     pickle.dump(file_history, fichero)
