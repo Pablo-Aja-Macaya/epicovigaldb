@@ -37,12 +37,13 @@ def get_graphs(request):
 
 @login_required(login_url="/accounts/login") 
 def drop_sample_cascade(request):
-    id_uvigo = request.POST.get('sample')
-    sample = Sample.objects.get(id_uvigo=id_uvigo)
-    sample.delete()
-    
-    messages.success(request, 'Todos los datos de {id_uvigo} han sido borrados.')
-    return redirect(reverse('general'))
+    if request.method=='POST':
+        id_uvigo = request.POST.get('sample')
+        sample = Sample.objects.get(id_uvigo=id_uvigo)
+        sample.delete()
+        
+        messages.success(request, f'Todos los datos de {id_uvigo} han sido borrados.')
+        return redirect(reverse('general'))
 
 
 @login_required(login_url="/accounts/login") 
