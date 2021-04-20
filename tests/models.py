@@ -610,7 +610,8 @@ def update():
                     # print(traceback.print_exc())
                     # print(fname.name)
                     with open(error_log_file, 'at') as log:
-                        log.write('\n', '='*100)
+                        log.write('\n')
+                        log.write('='*100)
                         log.write(f'Existe algún error en el archivo: {fname}')
                         log.write(traceback.format_exc())
                     file_history.pop(fname.name, None)
