@@ -557,7 +557,7 @@ def update():
     from epicovigal.local_settings import TESTS_PCKL_FOLDER, TESTS_FOLDER_BASE
     # Update database if there are new files in a folder or these have been modified
     pckl = 'objs.pkl'
-    error_log_file = '~/test_update_error_log.txt'
+    error_log_file = './test_update_error_log.txt'
     # en local
     pckl_folder = TESTS_PCKL_FOLDER
     folder_base = TESTS_FOLDER_BASE
