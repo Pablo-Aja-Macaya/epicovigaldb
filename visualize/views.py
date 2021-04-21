@@ -110,7 +110,7 @@ def edit_form(request, id_uvigo, tipo):
 
             if tipo == 'Sample':
                 datos.pop('id_uvigo',None)
-                defaults = {'id_uvigo':id_uvigo, **form.cleaned_data}
+                defaults = {'id_uvigo':id_uvigo, **datos}
                 _, created = model.objects.update_or_create(
                         id_uvigo = id_uvigo,
                         defaults = defaults
@@ -148,12 +148,16 @@ def edit_form(request, id_uvigo, tipo):
     }
     return render(request, 'visualize/edit_form.html', context)
 
-def get_completed_tests():
+def get_completed_tests(search=None):
     '''
     Devuelve para cada muestra si se ha hecho cada test
     '''
     # lista = Sample.objects.values('id_uvigo','lineagestest','nextcladetest','ngsstatstest','picardtest','singlechecktest','variantstest')
-    lista = Sample.objects.values('id_uvigo').distinct().values('id_uvigo','lineagestest','nextcladetest','ngsstatstest','picardtest','singlechecktest','variantstest__id_uvigo').order_by('id_uvigo')
+    if not search:
+        lista = Sample.objects.values('id_uvigo').distinct().values('id_uvigo','lineagestest','nextcladetest','ngsstatstest','picardtest','singlechecktest','variantstest__id_uvigo').order_by('id_uvigo')
+    else:
+        lista = Sample.objects.values('id_uvigo').filter(id_uvigo__contains = search).distinct().values('id_uvigo','lineagestest','nextcladetest','ngsstatstest','picardtest','singlechecktest','variantstest__id_uvigo').order_by('id_uvigo')
+
     lista2 = []
     for i in lista:
         fields = ['lineagestest','nextcladetest','ngsstatstest','picardtest','singlechecktest','variantstest__id_uvigo']
@@ -221,10 +225,16 @@ def specific_sample(request, id_uvigo):
     return render(request, 'visualize/sample_profile.html', context)
 
 @login_required(login_url="/accounts/login") 
-def general(request):  
-    table = CompletedTestsTable(get_completed_tests())
-    RequestConfig(request).configure(table)
-    table.paginate(page=request.GET.get("page", 1), per_page=50)
+def general(request):
+    if request.method=='POST':
+        search = request.POST.get('sample')
+        table = CompletedTestsTable(get_completed_tests(search))
+        RequestConfig(request).configure(table)
+        table.paginate(page=request.GET.get("page", 1), per_page=1000)
+    else:
+        table = CompletedTestsTable(get_completed_tests())
+        RequestConfig(request).configure(table)
+        table.paginate(page=request.GET.get("page", 1), per_page=50)    
 
     return render(request, 'visualize/general.html', {'table':table, 'filter':filter})
 

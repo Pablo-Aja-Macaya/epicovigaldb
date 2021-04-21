@@ -26,15 +26,6 @@
 
 <div class="container-lg">
   {% include 'visualize_tabs.html' %}
-
-  <h2>Resumen</h2>
-  <div class="row justify-content-center">
-    <div class="btn-group">
-      <a href="{% url 'get_graphs' %}"><button type="button"  class="btn btn-primary" > Visualizar gráficas</button></a>
-    </div>    
-  </div>
-
-  <hr>
   {% if messages %}
       {% for message in messages %}
       <div class="alert alert-{{ message.tags }}" role="alert">
@@ -45,10 +36,27 @@
       </div>
       {% endfor %}
   {% endif %}
+  <h2>Resumen</h2>
+  <div class="row justify-content-center">
+    <div class="btn-group">
+      <a href="{% url 'get_graphs' %}"><button type="button"  class="btn btn-primary" > Visualizar gráficas</button></a>
+    </div>    
+  </div>
+
+  <hr>
+
 
   <h2>Tabla de tests realizados</h2>
   <p>Esta tabla indica, para cada muestra, qué tests se han realizado.</p>
+
   <div class="container-fluid pb-4 pt-3 justify-content-center">
+    <div class='row center-text justify-content-center pb-2'>
+      <form action="{% url 'general' %}" method="POST">
+        {% csrf_token %}
+          <input type="text" name="sample" >   
+          <button type="submit" class="btn btn-primary">Buscar</button>    
+      </form>
+    </div>
     <div class="row justify-content-center">
       <div class="col-auto">
         {% render_table table %}

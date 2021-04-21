@@ -48,7 +48,7 @@ class SampleMetaData(models.Model):
     ct_orf1ab = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True, blank=True)
     ct_gen_e = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True, blank=True)
     ct_gen_n = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True, blank=True)
-    ct_redrp = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True, blank=True)
+    ct_rdrp = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True, blank=True)
     ct_s = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True, blank=True)
 
     fecha_envio_cdna = models.DateField(blank=True, null=True)

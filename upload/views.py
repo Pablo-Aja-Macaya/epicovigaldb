@@ -11,7 +11,7 @@ from .tasks import find_coords
 from .forms import FullSampleForm
 from django.urls import reverse
 from .models import *
-
+from .utils.upload_utils import clean_location, find_sample_name
 
 
 # Create your views here.
@@ -22,11 +22,11 @@ def upload_manual(request):
         form = FullSampleForm(request.POST)
         if form.is_valid():
             datos = form.cleaned_data
-            print(datos)
-            sample_name = re.search(r'EPI\..+\.\d+.\.',datos.get('id_uvigo')+'.')
+            sample_name = find_sample_name(datos.get('id_uvigo'))
             if sample_name:
                 region_fields = ['cp','localizacion','pais','region','latitud','longitud']
                 defaults_region = {i:datos.get(i) for i in region_fields}
+                defaults_region['localizacion'] = clean_location(defaults_region['localizacion'])
 
                 sample_fields = [
                     'id_uvigo','id_accession','id_region','original_name',
@@ -38,7 +38,7 @@ def upload_manual(request):
                 samplemetadata_fields = [
                     'id_uvigo','id_paciente','id_hospital','numero_envio',
                     'id_tubo','id_muestra','hospitalizacion','uci',
-                    'ct_orf1ab','ct_gen_e','ct_gen_n','ct_redrp','ct_s',
+                    'ct_orf1ab','ct_gen_e','ct_gen_n','ct_rdrp','ct_s',
                     'fecha_sintomas','fecha_diagnostico','fecha_entrada',
                     'fecha_envio_cdna','fecha_run_ngs','fecha_entrada_fastq'                
                 ]
@@ -138,23 +138,38 @@ def upload(request):
 def update_from_google(request):
     from epicovigal.local_settings import GS_DATA_KEY as key
     from epicovigal.local_settings import GS_DATA_GID as gid
-    
-    enlace = f'https://docs.google.com/spreadsheets/d/{key}/export?format=tsv&gid={gid}'
-    with urllib.request.urlopen(enlace) as google_sheet:
-        data = google_sheet.read().decode('UTF-8')
-        io_string = io.StringIO(data)
-        fallos, columnas_inesperadas = upload_utils.upload_sample_hospital(io_string)
-        #find_coords.delay() # esto se hace por detrás con celery        
+    from epicovigal.local_settings import GS_DATA_GID_LIST as gid_list
 
-    if fallos:
-        warning = f'<strong>Columnas inesperadas</strong>: {columnas_inesperadas}. <strong>Error en muestras:</strong> {fallos}, puede que tengan fechas incorrectas o algún fallo de formato. Completando nuevas coordenadas por detrás.'
+    print(gid_list)
+    
+    
+    fallos_totales = []
+    columnas_inesperadas_totales = []
+    for gid in gid_list:
+        enlace = f'https://docs.google.com/spreadsheets/d/{key}/export?format=tsv&gid={gid}'
+        with urllib.request.urlopen(enlace) as google_sheet:
+            data = google_sheet.read().decode('UTF-8')
+            io_string = io.StringIO(data)
+            fallos, columnas_inesperadas = upload_utils.upload_sample_hospital(io_string)
+            fallos_totales += fallos
+            columnas_inesperadas_totales += columnas_inesperadas
+            #find_coords.delay() # esto se hace por detrás con celery        
+
+    if fallos_totales and columnas_inesperadas_totales:
+        warning = f'<strong>Columnas inesperadas</strong>: {columnas_inesperadas_totales}. <strong>Error en muestras:</strong> {fallos_totales}, puede que tengan fechas incorrectas o algún fallo de formato.'
         messages.warning(request, warning)
         return redirect('csv') 
-        # return render(request, 'upload/csv.html', {'warning':warning})
+    elif fallos_totales:
+        warning = f'<strong>Error en muestras:</strong> {fallos_totales}, puede que tengan fechas incorrectas o algún fallo de formato.'
+        messages.warning(request, warning)
+        return redirect('csv')         
+    elif fallos_totales:
+        warning = f'<strong>Columnas inesperadas</strong>: {columnas_inesperadas_totales}'
+        messages.warning(request, warning)
+        return redirect('csv')    
     else:
         message = 'Se ha completado la actualización desde GoogleSheets'
         messages.success(request, message)
         return redirect('csv') 
-        # return render(request, 'upload/csv.html', {'message':message})
 
 
