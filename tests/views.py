@@ -9,7 +9,7 @@ from .models import send_results_processing, update
 from .forms import SelectTestForm
 
 
-# Create your views here.
+
 @login_required(login_url="/accounts/login")
 def tests(request):
     if request.method=='POST':

@@ -540,6 +540,27 @@ def send_results_processing(file):
 
 #######################################
 ### Actualización desde carpeta
+
+def read_log(log_file):
+    with open(log_file,'rt') as log:
+        lista = []
+        for line in log:
+            dicc = eval(line)
+            lista.append(dicc)
+    return lista
+
+
+def write_log(log_file, fname, traceback, error):
+    error_log_file = log_file
+    with open(error_log_file, 'at') as log:
+        dicc = {
+        'archivo':fname,
+        'error':error,
+        'traceback':str(traceback.format_exc()).replace('"',' ').replace("'", ' ')
+        }
+        log.write(str(dicc)+'\n')
+
+
 def update_database(fichero, fname):
     dialect = csv.Sniffer().sniff(fichero.readline())
     fichero.seek(0)
@@ -558,7 +579,10 @@ def update():
     # Update database if there are new files in a folder or these have been modified
     pckl = 'objs.pkl'
     error_log_file = './test_update_error_log.txt'
-    # en local
+    with open(error_log_file,'wt') as f: # se elimina el log anterior
+        pass
+    
+    # En local
     pckl_folder = TESTS_PCKL_FOLDER
     folder_base = TESTS_FOLDER_BASE
 
@@ -611,14 +635,7 @@ def update():
                         new += 1
 
                 except Exception as e:
-                    # print(f'Existe algún error en el archivo: {fname}')
-                    # print(traceback.print_exc())
-                    # print(fname.name)
-                    with open(error_log_file, 'at') as log:
-                        log.write('\n')
-                        log.write('='*100)
-                        log.write(f'Existe algún error en el archivo: {fname}')
-                        log.write(traceback.format_exc())
+                    write_log(error_log_file, fname, traceback, e)
                     file_history.pop(fname.name, None)
                     errors += 1
 
@@ -644,14 +661,10 @@ def update():
                     new += 1
 
                 except Exception as e:
-                    # print(f'Existe algún error en el archivo: {fname}')
-                    # print(traceback.print_exc())
+                    write_log(error_log_file, fname, traceback, e)
                     file_history.pop(fname.name, None)
                     errors += 1
-                    with open(error_log_file, 'at') as log:
-                        log.write('\n', '='*100)
-                        log.write(f'Existe algún error en el archivo: {fname}')
-                        log.write(traceback.format_exc())
+
 
                 with open(pckl_folder+pckl, 'wb') as fichero:
                     pickle.dump(file_history, fichero)

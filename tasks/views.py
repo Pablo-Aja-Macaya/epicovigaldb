@@ -6,24 +6,6 @@ from .models import Team, Team_Component
 from tests.models import NextcladeTest, LineagesTest
 from upload.models import SampleMetaData
 
-def read_log():
-    with open('/home/pabs/MasterBioinformatica/TFM/prueba_log_.txt','rt') as log:
-        lista = []
-        for line in log:
-            dicc = eval(line)
-            print(dicc)
-            lista.append(dicc)
-    return lista
-# In [57]: with open(file, 'wt') as log:
-#     ...:     try:
-#     ...:         int('p')
-#     ...:     except Exception as e:
-#     ...:         dicc = {
-#     ...:             'archivo':'EPI.BLABLA.200',
-#     ...:             'error':e,
-#     ...:             'traceback':str(traceback.format_exc()).replace('"',' ').replace("'", ' ')
-#     ...:         }
-#     ...:         log.write(str(dicc))
 
 #@login_required(login_url="/accounts/login")
 def home(request):
@@ -37,7 +19,7 @@ def home(request):
     else:
         tasks = Task.objects.filter(show_to='all')
         url = 'tasks/visitor_home.html'
-    context = {'tasks':tasks, 'sample_count':sample_count, 'sequenced_count':sequenced_count, 'lineage_count':lineage_count}#, 'log':read_log()}
+    context = {'tasks':tasks, 'sample_count':sample_count, 'sequenced_count':sequenced_count, 'lineage_count':lineage_count}
     return render(request, url, context)
 
 def consorcio(request):    
