@@ -27,7 +27,7 @@ def coords(place):
 
 @app.task
 def find_coords():
-    data = Region.objects.filter(longitud=None) |  Region.objects.filter(longitud='NULL')
+    data = Region.objects.filter(longitud=None) |  Region.objects.filter(longitud='NULL') | Region.objects.filter(longitud='0')
     for obj in data:
         lat = obj.latitud
         long = obj.longitud

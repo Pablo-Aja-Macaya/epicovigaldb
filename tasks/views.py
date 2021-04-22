@@ -37,7 +37,7 @@ def home(request):
     else:
         tasks = Task.objects.filter(show_to='all')
         url = 'tasks/visitor_home.html'
-    context = {'tasks':tasks, 'sample_count':sample_count, 'sequenced_count':sequenced_count, 'lineage_count':lineage_count, 'log':read_log()}
+    context = {'tasks':tasks, 'sample_count':sample_count, 'sequenced_count':sequenced_count, 'lineage_count':lineage_count}#, 'log':read_log()}
     return render(request, url, context)
 
 def consorcio(request):    
