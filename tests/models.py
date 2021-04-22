@@ -581,6 +581,11 @@ def update():
             files = glob.glob(folder+'*')
             for f in files:
                 fname = pathlib.Path(f)
+                
+                if '_filtered.tsv' in str(fname):
+                    # El programa se salta estos archivos porque dan error seguro
+                    continue
+
                 mtime = fname.stat().st_mtime # Time of most recent content modification expressed in seconds.
                 try:
                     # Si el nombre del archivo ya se ha visto en el pasado
