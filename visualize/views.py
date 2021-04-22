@@ -241,7 +241,7 @@ def general(request):
 # Para metadatos
 @login_required(login_url="/accounts/login")
 def regions(request):
-    table = RegionTable(Region.objects.all())
+    table = RegionTable(Region.objects.all().order_by('localizacion'))
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
     return render(request, 'visualize/regions.html', {'table':table})   
