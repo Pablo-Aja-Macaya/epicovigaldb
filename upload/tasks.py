@@ -23,28 +23,31 @@ def coords(place):
         location = geolocator.geocode(place)
         return location.latitude,location.longitude
     except:
-        return 'NULL','NULL'
+        return None,None
 
 @app.task
 def find_coords():
-    data = Region.objects.all()
-    for line in data:
-        country = line.pais
-        loc = line.localizacion
-        cp = line.cp
-        lat = line.latitud
+    data = Region.objects.filter(longitud=None) |  Region.objects.filter(longitud='NULL')
+    for obj in data:
+        lat = obj.latitud
+        long = obj.longitud
 
+        country = obj.pais
+        loc = obj.localizacion
+        cp = obj.cp
 
         if len(loc)>2:
             lat, long = coords(str(cp)+' '+ loc + ' ' + country)
-            line.latitud = lat
-            line.longitud = long
-            line.save()
-            print(f'Updated {cp}, {loc}')   
+            obj.latitud = lat
+            obj.longitud = long
+            obj.save()
+            print(f'Updated {cp}, {loc}, {lat}, {long}')   
         else:
-            line.latitud = 'NULL'
-            line.longitud = 'NULL'
-            line.save()                 
+            obj.latitud = None
+            obj.longitud = None
+            print(obj)
+            obj.save()                
+ 
     print('Finished updating coordinates')
 
 

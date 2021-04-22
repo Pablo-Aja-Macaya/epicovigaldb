@@ -137,11 +137,8 @@ def upload(request):
 @login_required(login_url="/accounts/login")
 def update_from_google(request):
     from epicovigal.local_settings import GS_DATA_KEY as key
-    from epicovigal.local_settings import GS_DATA_GID as gid
-    from epicovigal.local_settings import GS_DATA_GID_LIST as gid_list
-
-    print(gid_list)
-    
+    # from epicovigal.local_settings import GS_DATA_GID as gid
+    from epicovigal.local_settings import GS_DATA_GID_LIST as gid_list    
     
     fallos_totales = []
     columnas_inesperadas_totales = []
