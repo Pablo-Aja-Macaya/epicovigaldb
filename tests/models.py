@@ -554,8 +554,8 @@ def write_log(log_file, fname, traceback, error):
     error_log_file = log_file
     with open(error_log_file, 'at') as log:
         dicc = {
-        'archivo':fname,
-        'error':error,
+        'archivo':str(fname),
+        'error':str(error),
         'traceback':str(traceback.format_exc()).replace('"',' ').replace("'", ' ')
         }
         log.write(str(dicc)+'\n')
