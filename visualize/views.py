@@ -462,10 +462,10 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
         .annotate(Count('lineagestest__lineage'))\
         .exclude(lineagestest__lineage='None')
 
-    linajes_otros = linajes_count.filter(lineagestest__lineage__count__lte=5)\
+    linajes_otros = linajes_count.filter(lineagestest__lineage__count__lte=thresh)\
                                 .order_by('lineagestest__lineage__count')\
                                 .values_list('lineagestest__lineage', flat=True)
-    linajes_principales = linajes_count.filter(lineagestest__lineage__count__gt=5)\
+    linajes_principales = linajes_count.filter(lineagestest__lineage__count__gt=thresh)\
                                     .order_by('lineagestest__lineage__count')\
                                     .values_list('lineagestest__lineage', flat=True)
 
