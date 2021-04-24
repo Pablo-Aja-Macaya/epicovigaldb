@@ -462,8 +462,12 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
         .annotate(Count('lineagestest__lineage'))\
         .exclude(lineagestest__lineage='None')
 
-    linajes_otros = linajes_count.filter(lineagestest__lineage__count__lte=thresh).values_list('lineagestest__lineage', flat=True)
-    linajes_principales = linajes_count.filter(lineagestest__lineage__count__gt=thresh).values_list('lineagestest__lineage', flat=True)
+    linajes_otros = linajes_count.filter(lineagestest__lineage__count__lte=5)\
+                                .order_by('lineagestest__lineage__count')\
+                                .values_list('lineagestest__lineage', flat=True)
+    linajes_principales = linajes_count.filter(lineagestest__lineage__count__gt=5)\
+                                    .order_by('lineagestest__lineage__count')\
+                                    .values_list('lineagestest__lineage', flat=True)
 
     # Se hace un set ordenado de los códigos de hospitales (CHUAC, CHUS...)
     lista_hospitales = [i['samplemetadata__id_hospital'] for i in linajes_count_with_hosp]
@@ -542,11 +546,13 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
                 else:
                     drilldown_dicc[drilldown_id]['data'][linaje]['y'] += count
 
-    # series_dicc = OrderedDict(sorted(series_dicc.items()))
+    # Ordenar series_dicc para que los linajes con más cantidad aparezcan a la izquierda de la gráfica
+    orden = ['Otros']
+    orden += linajes_principales
+    series_dicc = OrderedDict(sorted(series_dicc.items(),key=lambda pair: orden.index(pair[0])))
+    # Transformar diccionarios en listas
     for i in series_dicc.keys():
-        # series_dicc[i]['data'] = OrderedDict(sorted(series_dicc[i]['data'].items()))
         series_dicc[i]['data'] = list(series_dicc[i]['data'].values())
-        # series_dicc[i]['data'] = sorted(series_dicc[i]['data'], key=lambda k: k['y'], reverse=True)
     for i in drilldown_dicc.keys():
         drilldown_dicc[i]['data'] = list(drilldown_dicc[i]['data'].values())
         drilldown_dicc[i]['data'] = sorted(drilldown_dicc[i]['data'], key=lambda k: k['y'], reverse=True)
@@ -955,8 +961,12 @@ def variants_column_graph(request, fecha_inicial, fecha_final, variant):
 #     .annotate(Count('lineagestest__lineage'))\
 #     .exclude(lineagestest__lineage='None')
 
-# linajes_otros = linajes_count.filter(lineagestest__lineage__count__lte=5).values_list('lineagestest__lineage', flat=True)
-# linajes_principales = linajes_count.filter(lineagestest__lineage__count__gt=5).values_list('lineagestest__lineage', flat=True)
+# linajes_otros = linajes_count.filter(lineagestest__lineage__count__lte=5)\
+#                             .order_by('lineagestest__lineage__count')\
+#                             .values_list('lineagestest__lineage', flat=True)
+# linajes_principales = linajes_count.filter(lineagestest__lineage__count__gt=5)\
+#                                 .order_by('lineagestest__lineage__count')\
+#                                 .values_list('lineagestest__lineage', flat=True)
 
 # # Se hace un set ordenado de los códigos de hospitales (CHUAC, CHUS...)
 # lista_hospitales = [i['samplemetadata__id_hospital'] for i in linajes_count_with_hosp]
@@ -1014,7 +1024,9 @@ def variants_column_graph(request, fecha_inicial, fecha_final, variant):
 #                 drilldown_dicc[drilldown_id]['data'][linaje]['y'] += count
 
 
-# # series_dicc = OrderedDict(sorted(series_dicc.items()))
+# orden = ['Otros']
+# orden += linajes_principales
+# series_dicc = OrderedDict(sorted(series_dicc.items(),key=lambda pair: orden.index(pair[0])))
 # for i in series_dicc.keys():
 #     series_dicc[i]['data'] = list(series_dicc[i]['data'].values())
 # for i in drilldown_dicc.keys():
