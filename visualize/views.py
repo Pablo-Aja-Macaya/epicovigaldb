@@ -499,7 +499,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
                 series_dicc[linaje] = {
                     'name':linaje,
                     'data':{
-                        hosp:{'name':hosp, 'y':count}#, 'drilldown':drilldown_id}
+                        hosp:{'name':hosp, 'y':count, 'drilldown':drilldown_id}
                     }
                 }
             # Si se ha visto la variante
@@ -507,11 +507,12 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
                 if hosp in series_dicc[linaje]['data'].keys():
                     series_dicc[linaje]['data'][hosp]['y'] +=count
                 else:
-                    series_dicc[linaje]['data'][hosp]={'name':hosp, 'y':count}#, 'drilldown':drilldown_id}
+                    series_dicc[linaje]['data'][hosp]={'name':hosp, 'y':count, 'drilldown':drilldown_id}
         
         # Linaje no superó el umbral de conteo impuesto
         elif linaje in linajes_otros:
             drilldown_id = hosp+'-'+'Otros'
+            name = hosp+'-'+linaje
             # Si todavía no se ha visto el hospital
             if hosp not in series_dicc['Otros']['data'].keys():
                 series_dicc['Otros']['data'][hosp] = {
@@ -523,7 +524,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
                     'id':drilldown_id,
                     'name':'Otros',
                     'stacking':'normal',
-                    'data':{linaje:{'name':linaje, 'y':count}},
+                    'data':{linaje:{'name':name, 'y':count}},
                     'tooltip':{
                         'headerFormat': '<span style="font-size:10px"><strong>{series.name}</strong></span><table>',
                         'pointFormat': '<tr><td style="color:{series.color};padding:0;"><strong>{point.name}:</strong> </td>' +
@@ -542,22 +543,46 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
             else:
                 series_dicc['Otros']['data'][hosp]['y'] +=count
                 if linaje not in drilldown_dicc[drilldown_id]['data'].keys():
-                    drilldown_dicc[drilldown_id]['data'][linaje] = {'name':linaje, 'y':count}
+                    drilldown_dicc[drilldown_id]['data'][linaje] = {'name':name, 'y':count}
                 else:
                     drilldown_dicc[drilldown_id]['data'][linaje]['y'] += count
 
     # Ordenar series_dicc para que los linajes con más cantidad aparezcan a la izquierda de la gráfica
     orden = ['Otros']
     orden += linajes_principales
-    series_dicc = OrderedDict(sorted(series_dicc.items(),key=lambda pair: orden.index(pair[0])))
+    series_dicc = OrderedDict(sorted(series_dicc.items(),key=lambda pair: orden.index(pair[0]),reverse=True))
     # Transformar diccionarios en listas
     for i in series_dicc.keys():
         series_dicc[i]['data'] = list(series_dicc[i]['data'].values())
     for i in drilldown_dicc.keys():
         drilldown_dicc[i]['data'] = list(drilldown_dicc[i]['data'].values())
         drilldown_dicc[i]['data'] = sorted(drilldown_dicc[i]['data'], key=lambda k: k['y'], reverse=True)
-        
-    
+
+    for lin in series_dicc.keys():
+        if lin != 'Otros':
+            for d in series_dicc[lin]['data']:
+                drilldown_id = d['drilldown']
+                drilldown_dicc[drilldown_id] = {
+                    'id':drilldown_id,
+                    'name':lin,
+                    'data':[{'name':drilldown_id, 'y':d['y']}],
+                    'stacking':'normal',
+                    'tooltip':{
+                        'headerFormat': '<span style="font-size:10px"><strong>{series.name}</strong></span><table>',
+                        'pointFormat': '<tr><td style="color:{series.color};padding:0;"><strong>{point.name}:</strong> </td>' +
+                            '<td style="padding:0"> <strong>&nbsp;{point.y}</strong> </td></tr>',
+                        'footerFormat': '</table>',
+                        'shared': True,
+                        'backgroundColor':'#FFFFFF',
+                        'useHTML': True
+                    },       
+                    'dataLabels': {
+                        'enabled': True,
+                        'format': '{point.y}'
+                    }, 
+                }
+
+    drilldown_dicc = OrderedDict(sorted(drilldown_dicc.items()))
     json_link = get_graph_json_link(request,'linajes_hospitales_graph', fecha_inicial, fecha_final)
     
     chart = {
@@ -1032,6 +1057,14 @@ def variants_column_graph(request, fecha_inicial, fecha_final, variant):
 # for i in drilldown_dicc.keys():
 #     drilldown_dicc[i]['data'] = list(drilldown_dicc[i]['data'].values())
 
+# for lin in series_dicc.keys():
+#     if lin != 'Otros':
+#         for d in series_dicc[lin]['data']:
+#             drilldown_dicc[d['drilldown']] = {
+#                 'id':d['drilldown'],
+#                 'name':lin,
+#                 'data':[{'name':lin, 'y':d['y']}]
+#             }
 
 # drilldown_dicc = {
 #     'HOSP-Otros':{
