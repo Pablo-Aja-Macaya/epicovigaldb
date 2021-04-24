@@ -594,7 +594,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
             'text': f'Variantes por hospital ({fecha_inicial} | {fecha_final}) {json_link}' # ({fecha_inicial} | {fecha_final})
         },
         'subtitle': {
-            'text': f'Categoría: {categoria}. Umbral: {thresh}'
+            'text': f'Pulsa sobre el nombre de un hospital para ver todos los linajes. Categoría: {categoria}. Umbral: {thresh}'
         },
         'xAxis': {
             'type':'category'
@@ -650,6 +650,9 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
         'credits': credits,
         'series': list(series_dicc.values()),
         'drilldown':{
+            'activeAxisLabelStyle': {
+                'textDecoration': None,
+            },
             'series':list(drilldown_dicc.values())
         }
         # }
