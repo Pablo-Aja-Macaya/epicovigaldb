@@ -361,16 +361,20 @@ def get_graph_json_link(request, graph_base_url, fecha_inicial, fecha_final):
         return ''
 
 def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
-    thresh = 2 # para eliminar variantes 
-    linajes_count = Sample.objects.filter(categoria_muestra='aleatoria',fecha_muestra__range=[fecha_inicial, fecha_final])\
+    thresh = 4 # para eliminar variantes 
+    linajes = Sample.objects.filter(categoria_muestra='aleatoria',fecha_muestra__range=[fecha_inicial, fecha_final])
+
+    linajes_count = linajes\
         .values('lineagestest__lineage','samplemetadata__id_hospital')\
         .exclude(lineagestest__lineage__isnull=True)\
         .exclude(samplemetadata__id_hospital='ICVS')\
         .values('lineagestest__lineage')\
         .order_by('lineagestest__lineage')\
         .annotate(Count('lineagestest__lineage'))\
+        .order_by('lineagestest__lineage__count').reverse()\
         .exclude(lineagestest__lineage='None')\
-        .exclude(lineagestest__lineage__count__lt = thresh)
+        .exclude(lineagestest__lineage__count__lte=thresh)
+
 
     lista_linajes = []
     lista_valores = []
@@ -969,324 +973,17 @@ def variants_column_graph(request, fecha_inicial, fecha_final, variant):
 #     }
 # }
 
-# from django.db.models import Count
-# from upload.models import Sample
-# from collections import OrderedDict
-# linajes = Sample.objects.filter(categoria_muestra='aleatoria',fecha_muestra__range=['2020-01-01', '2030-01-01'])
+from django.db.models import Count
+from upload.models import Sample
+from collections import OrderedDict
+linajes = Sample.objects.filter(categoria_muestra='aleatoria',fecha_muestra__range=['2020-01-01', '2030-01-01'])
 
-# linajes_count_with_hosp = linajes\
-#     .values('lineagestest__lineage','samplemetadata__id_hospital')\
-#     .exclude(lineagestest__lineage__isnull=True)\
-#     .order_by('lineagestest__lineage', 'samplemetadata__id_hospital')\
-#     .annotate(Count('lineagestest__lineage'))\
-#     .exclude(lineagestest__lineage='None')
-
-# # Esto cuenta sólo cuánto hay de cada linaje
-# linajes_count = linajes\
-#     .values('lineagestest__lineage')\
-#     .exclude(lineagestest__lineage__isnull=True)\
-#     .order_by('lineagestest__lineage')\
-#     .annotate(Count('lineagestest__lineage'))\
-#     .exclude(lineagestest__lineage='None')
-
-# linajes_otros = linajes_count.filter(lineagestest__lineage__count__lte=5)\
-#                             .order_by('lineagestest__lineage__count')\
-#                             .values_list('lineagestest__lineage', flat=True)
-# linajes_principales = linajes_count.filter(lineagestest__lineage__count__gt=5)\
-#                                 .order_by('lineagestest__lineage__count')\
-#                                 .values_list('lineagestest__lineage', flat=True)
-
-# # Se hace un set ordenado de los códigos de hospitales (CHUAC, CHUS...)
-# lista_hospitales = [i['samplemetadata__id_hospital'] for i in linajes_count_with_hosp]
-# lista_hospitales = sorted(set(lista_hospitales))
-
-
-# drilldown_dicc = {}
-# series_dicc = {}
-# series_dicc['Otros'] = {'name':'Otros','data':{}}
-# for i in linajes_count_with_hosp:
-#     hosp = i['samplemetadata__id_hospital']
-#     linaje = i['lineagestest__lineage']
-#     count = i['lineagestest__lineage__count']
-#     # pos_hosp = lista_hospitales.index(hosp) # posición del hospital en el set de hospitales
-    
-#     # Linaje superó el umbral de conteo impuesto
-#     if linaje in linajes_principales:
-#         drilldown_id = hosp+'-'+linaje
-#         # Si todavía no se ha visto la variante
-#         if linaje not in series_dicc.keys():
-#             series_dicc[linaje] = {
-#                 'name':linaje,
-#                 'data':{
-#                     hosp:{'name':hosp, 'y':count, 'drilldown':drilldown_id}
-#                 }
-#             }
-#         # Si se ha visto la variante
-#         else: 
-#             if hosp in series_dicc[linaje]['data'].keys():
-#                 series_dicc[linaje]['data'][hosp]['y'] +=count
-#             else:
-#                 series_dicc[linaje]['data'][hosp]={'name':hosp, 'y':count, 'drilldown':drilldown_id}
-    
-#     # Linaje no superó el umbral de conteo impuesto
-#     elif linaje in linajes_otros:
-#         drilldown_id = hosp+'-'+'Otros'
-#         # Si todavía no se ha visto el hospital
-#         if hosp not in series_dicc['Otros']['data'].keys():
-#             series_dicc['Otros']['data'][hosp] = {
-#                 'name':hosp, 
-#                 'y':count, 
-#                 'drilldown':drilldown_id
-#             }
-#             drilldown_dicc[drilldown_id] = {
-#                 'id':drilldown_id,
-#                 'name':'Otros',
-#                 'data':{linaje:{'name':linaje, 'y':count}}
-#             }
-#         # Si se ha visto el hospital
-#         else:
-#             series_dicc['Otros']['data'][hosp]['y'] +=count
-#             if linaje not in drilldown_dicc[drilldown_id]['data'].keys():
-#                 drilldown_dicc[drilldown_id]['data'][linaje] = {'name':linaje, 'y':count}
-#             else:
-#                 drilldown_dicc[drilldown_id]['data'][linaje]['y'] += count
-
-
-# orden = ['Otros']
-# orden += linajes_principales
-# series_dicc = OrderedDict(sorted(series_dicc.items(),key=lambda pair: orden.index(pair[0])))
-# for i in series_dicc.keys():
-#     series_dicc[i]['data'] = list(series_dicc[i]['data'].values())
-# for i in drilldown_dicc.keys():
-#     drilldown_dicc[i]['data'] = list(drilldown_dicc[i]['data'].values())
-
-# for lin in series_dicc.keys():
-#     if lin != 'Otros':
-#         for d in series_dicc[lin]['data']:
-#             drilldown_dicc[d['drilldown']] = {
-#                 'id':d['drilldown'],
-#                 'name':lin,
-#                 'data':[{'name':lin, 'y':d['y']}]
-#             }
-
-# drilldown_dicc = {
-#     'HOSP-Otros':{
-#         'id':'HOSP-Otros',
-#         'name':'Otros',
-#         'data':{
-#             'LINAJE':{'name':'LINAJE','y':1}
-#         }
-#     }
-# }
-
-# def load_series():
-#     series_dicc = {}
-#     for i in linajes_count:
-#         hosp = i['samplemetadata__id_hospital']
-#         linaje = i['lineagestest__lineage']
-#         count = i['lineagestest__lineage__count']
-#         # pos_hosp = lista_hospitales.index(hosp) # posición del hospital en el set de hospitales
-        
-#         # Si todavía no se ha visto la variante
-#         if linaje not in series_dicc.keys():
-#             series_dicc[linaje] = {
-#                 'name':linaje,
-#                 'data':{
-#                     hosp:{'name':hosp, 'y':count, 'drilldown':hosp+'-'+linaje}
-#                 }
-#             }
-#         # Si se ha visto la variante
-#         else: 
-#             if hosp in series_dicc[linaje]['data'].keys():
-#                 series_dicc[linaje]['data'][hosp]['y'] +=count
-#             else:
-#                 series_dicc[linaje]['data'][hosp]={'name':hosp, 'y':count, 'drilldown':hosp+'-'+linaje}
-
-#     otros_dicc = {}
-#     principales_dicc = {}
-#     for i in series_dicc.keys():
-#         series_dicc[i]['data'] = list(series_dicc[i]['data'].values())
-#         # Si sólo aparece en un hospital
-#         if len(series_dicc[i]['data'])<2:
-#             keep = False
-#             for n,d in enumerate(series_dicc[i]['data']):
-#                 # Si aparece 3 o menos veces en ese hospital
-#                 if series_dicc[i]['data'][n]['y'] <= 3:
-#                     drill_id = series_dicc[i]['data'][n]['drilldown'] 
-#                     series_dicc[i]['data'][n]['drilldown'] = drill_id.split('-')[0]+'-otros'
-#                     print(i, series_dicc[i]['data'][n])
-#                     otros_dicc[i] = series_dicc[i]
-
-
-#         # Si aparece en varios será más importante y no estará en el apartado 'otros'
-#         else:
-#             principales_dicc[i] = series_dicc[i]
-    
-#     return series_dicc, principales_dicc, otros_dicc
-
-# def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
-#     # Query que cuenta las veces que aparece una variante en cada hospital
-#     # Estructura:
-#     # <QuerySet [{'lineagestest__lineage': 'B.1.177', 'samplemetadata__id_hospital': 'CHUF', 'lineagestest__lineage__count': 1}, 
-#     # {'lineagestest__lineage': 'B.1.177', 'samplemetadata__id_hospital': 'HULA', 'lineagestest__lineage__count': 1}]>
-#     linajes_count = Sample.objects.filter(categoria_muestra='aleatoria',fecha_muestra__range=[fecha_inicial, fecha_final])\
-#         .values('lineagestest__lineage','samplemetadata__id_hospital')\
-#         .exclude(lineagestest__lineage__isnull=True)\
-#         .order_by('lineagestest__lineage', 'samplemetadata__id_hospital')\
-#         .annotate(Count('lineagestest__lineage'))\
-#         .exclude(lineagestest__lineage='None')
-#     # .exclude(lineagestest__lineage__count__lt = thresh)
-
-#     # Se hace un set ordenado de los códigos de hospitales (CHUAC, CHUS...)
-#     lista_hospitales = [i['samplemetadata__id_hospital'] for i in linajes_count]
-#     lista_hospitales = sorted(set(lista_hospitales))
-
-#     series_dicc = {}
-#     for i in linajes_count:
-#         # print(i)
-#         hosp = i['samplemetadata__id_hospital']
-#         linaje = i['lineagestest__lineage']
-#         count = i['lineagestest__lineage__count']
-#         pos_hosp = lista_hospitales.index(hosp) # posición del hospital en el set de hospitales
-        
-#         # Si todavía no se ha visto la variante
-#         if linaje not in series_dicc.keys():
-#             # Se inicializa una lista de Nones 
-#             tmp_list = [None for i in range(len(lista_hospitales))]
-#             # En la posición del hospital se pone el valor para ese hospital
-#             tmp_list[pos_hosp] = count
-#             series_dicc[linaje] = {
-#                 'name':linaje,
-#                 'data':tmp_list
-#             }
-#         # Si se ha visto la variante
-#         else:
-#             # Si ya hay una cuenta para cierto hospital (en esta posición None a pasado a ser un número)
-#             if series_dicc[linaje]['data'][pos_hosp]:
-#                 series_dicc[linaje]['data'][pos_hosp] += count
-#             # Si este hospital todavía no se ha visto
-#             else:
-#                 series_dicc[linaje]['data'][pos_hosp] = count
-
-    
-#     # Quitar variantes que no aparecen más de N veces en ningún hospital 
-#     thresh = 3
-#     series_dicc_mod = {}
-#     for i in series_dicc.keys():
-#         keep = False
-#         for n in series_dicc[i]['data']:
-#             if n and n>thresh:
-#                 keep=True
-#         if keep == True:
-#             series_dicc_mod[i] = series_dicc[i]
-#             series_dicc_mod[i]['drilldown'] = i
-
-#     # print(series_dicc_mod)
-#     # Estructura de series_dicc
-#     # dicc = {
-#     #     'linaje1':{
-#     #         'name':'linaje1',
-#     #         'data':[1,2,3]
-#     #     },
-#     #     'linaje2':{
-#     #         'name':'linaje2',
-#     #         'data':[1,2,3]
-#     #     }
-#     # }
-#     json_link = get_graph_json_link(request,'linajes_hospitales_graph', fecha_inicial, fecha_final)
-#     chart = {
-#         'chart': {
-#             'height': 500,
-#             'type': 'bar'
-#         },
-#         'title': {
-#             'text': f'Variantes por hospital ({fecha_inicial} | {fecha_final}) {json_link}' # ({fecha_inicial} | {fecha_final})
-#         },
-#         'subtitle': {
-#             'text': f'Variantes que aparecen, al menos, {thresh} veces en algún hospital (Muestras aleatorias).'
-#         },
-#         'xAxis': {
-#             'categories': lista_hospitales,
-#             'title': {
-#                 'text': None
-#             },
-#             'labels': {
-#                 'style': {
-#                     'fontWeight': 'bold',
-#                     # 'color': 'red'
-#                 }
-#             }
-#         },
-#         'yAxis': {
-#             'min': 0,
-#             'title': {
-#                 'text': 'Porcentaje',
-#                 'align': 'middle'
-#             },
-#             'labels': {
-#                 'overflow': 'justify'
-#             }
-#         },
-#         'tooltip': {
-#             'headerFormat': '<span style="font-size:10px"><strong>{point.key}</strong></span><table>',
-#             'pointFormat': '<tr><td style="color:{series.color};padding:0;"><strong>{series.name}:</strong> </td>' +
-#                 '<td style="padding:0"> <strong>&nbsp;{point.y}</strong> ({point.percentage:.0f}%) </td></tr>',
-#             'footerFormat': '</table>',
-#             'shared': True,
-#             'backgroundColor':'#FFFFFF',
-#             'useHTML': True
-#         },
-#         'plotOptions': {
-#             'bar': {
-#                 'dataLabels': {
-#                     'enabled': True,
-#                     'format': '{point.percentage:.0f}%'
-#                 }
-#             },
-#             'series': {
-#                 # 'groupPadding': 10,
-#                 'stacking': 'percent',
-#                 'pointPadding': 1,
-#                 'pointWidth': 20,
-#                 'animation': False
-#             }
-#         },
-#         'legend': {
-#             'layout': 'horizontal',
-#             'align': 'center',
-#             'verticalAlign': 'bottom',
-#             'x': 10,
-#             # 'y': 60,
-#             # 'floating': True,
-#             # 'borderWidth': 0.5,
-#             # 'shadow': True
-#         },
-#         # 'colors': COLOR_LIST,
-#         'credits': credits,
-#         'series': list(series_dicc_mod.values()),
-#         'drilldown':{
-#             'series':[{
-#                     # 'name':'B.1',
-#                     'id':'B.1',
-#                     'data':[
-#                         ["v58.0",1.02],
-#                         ["v57.0",7.36],                        
-#                     ]
-#                 }
-#             ]
-
-#         }
-#         # {
-#         #     'name': 'Error B.1',
-#         #     'type': 'errorbar',
-#         #     'yAxis': 0,
-#         #     'data': [[None,None], [None,None], [None,None], [None,None], [None,None], [0.5,1.5], [None,None]],
-#         #     # 'tooltip': {
-#         #     #     'pointFormat': 'Rango error: {point.low}-{point.high}'
-#         #     # },
-#         #     'stemWidth': 1,
-#         #     'whiskerLength': 5
-#         # },
-        
-#     }
-#     return JsonResponse(chart)
+linajes_count = linajes\
+    .values('lineagestest__lineage','samplemetadata__id_hospital')\
+    .exclude(lineagestest__lineage__isnull=True)\
+    .exclude(samplemetadata__id_hospital='ICVS')\
+    .values('lineagestest__lineage')\
+    .order_by('lineagestest__lineage')\
+    .annotate(Count('lineagestest__lineage'))\
+    .order_by('lineagestest__lineage__count')\
+    .exclude(lineagestest__lineage='None')
