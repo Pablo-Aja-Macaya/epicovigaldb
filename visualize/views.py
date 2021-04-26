@@ -591,7 +591,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
 
     drilldown_dicc = OrderedDict(sorted(drilldown_dicc.items()))
     json_link = get_graph_json_link(request,'linajes_hospitales_graph', fecha_inicial, fecha_final)
-    chart_height = 600
+    chart_height = 700
     chart = {
         'chart': {
             'height': chart_height,
