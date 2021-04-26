@@ -447,7 +447,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
 
 
 def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
-    percentil = 75
+    percentil = 85
     categoria = 'aleatoria'
     linajes = Sample.objects.filter(categoria_muestra=categoria,fecha_muestra__range=[fecha_inicial, fecha_final])
 
