@@ -657,6 +657,10 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
             'activeAxisLabelStyle': {
                 'textDecoration': None,
             },
+            'activeDataLabelStyle': {
+                'textDecoration': 'none',
+                'color':'white'
+            },
             'series':list(drilldown_dicc.values())
         }
         # }
