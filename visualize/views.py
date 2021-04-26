@@ -326,7 +326,7 @@ from django.db.models import Count
 from datetime import date, datetime
 import geojson
 from random import randint
-
+from numpy import percentile
 
 
 credits = {
@@ -447,7 +447,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
 
 
 def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
-    thresh = 9
+    percentil = 75
     categoria = 'aleatoria'
     linajes = Sample.objects.filter(categoria_muestra=categoria,fecha_muestra__range=[fecha_inicial, fecha_final])
 
@@ -466,12 +466,16 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
         .annotate(Count('lineagestest__lineage'))\
         .exclude(lineagestest__lineage='None')
 
+    value_list = linajes_count.order_by('lineagestest__lineage__count').values_list('lineagestest__lineage__count',flat=True).reverse()
+    thresh = percentile(value_list,percentil)
+    print(thresh)
     linajes_otros = linajes_count.filter(lineagestest__lineage__count__lte=thresh)\
                                 .order_by('lineagestest__lineage__count')\
                                 .values_list('lineagestest__lineage', flat=True)
     linajes_principales = linajes_count.filter(lineagestest__lineage__count__gt=thresh)\
                                     .order_by('lineagestest__lineage__count')\
                                     .values_list('lineagestest__lineage', flat=True)
+
 
     # Se hace un set ordenado de los códigos de hospitales (CHUAC, CHUS...)
     lista_hospitales = [i['samplemetadata__id_hospital'] for i in linajes_count_with_hosp]
@@ -588,10 +592,10 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
 
     drilldown_dicc = OrderedDict(sorted(drilldown_dicc.items()))
     json_link = get_graph_json_link(request,'linajes_hospitales_graph', fecha_inicial, fecha_final)
-    
+    chart_height = 600
     chart = {
         'chart': {
-            'height': 500,
+            'height': chart_height,
             'type': 'bar'
         },
         'title': {
@@ -636,7 +640,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
                 # 'groupPadding': 10,
                 'stacking': 'percent',
                 'pointPadding': 1,
-                'pointWidth': 20,
+                'pointWidth': 25,
                 'animation': False
             }
         },
@@ -660,6 +664,12 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
             'activeDataLabelStyle': {
                 'textDecoration': 'none',
                 'color':'white'
+            },
+            'drillUpButton':{
+                'position':{
+                    # 'x':0,
+                    'y':chart_height-200
+                }
             },
             'series':list(drilldown_dicc.values())
         }
