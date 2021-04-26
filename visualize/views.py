@@ -467,8 +467,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
         .exclude(lineagestest__lineage='None')
 
     value_list = linajes_count.order_by('lineagestest__lineage__count').values_list('lineagestest__lineage__count',flat=True).reverse()
-    thresh = percentile(value_list,percentil)
-    print(thresh)
+    thresh = int(percentile(value_list,percentil))
     linajes_otros = linajes_count.filter(lineagestest__lineage__count__lte=thresh)\
                                 .order_by('lineagestest__lineage__count')\
                                 .values_list('lineagestest__lineage', flat=True)
