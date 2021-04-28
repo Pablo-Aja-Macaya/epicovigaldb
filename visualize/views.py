@@ -362,7 +362,8 @@ def get_graph_json_link(request, graph_base_url, fecha_inicial, fecha_final):
 
 def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
     thresh = 4 # para eliminar variantes 
-    linajes = Sample.objects.filter(categoria_muestra='aleatoria',fecha_muestra__range=[fecha_inicial, fecha_final])
+    categoria = 'aleatoria'
+    linajes = Sample.objects.filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
 
     linajes_count = linajes\
         .values('lineagestest__lineage','samplemetadata__id_hospital')\
@@ -395,7 +396,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
             'text': f'Variantes en Galicia ({fecha_inicial} | {fecha_final}) {json_link}' # ({fecha_inicial} | {fecha_final})
         },
         'subtitle': {
-            'text': f'Variantes que aparecen, al menos, {thresh} veces (Muestras aleatorias, sin incluir al ICVS).'
+            'text': f'Variantes que aparecen, al menos, {thresh} veces.'
         },
         'xAxis': {
             'categories': lista_linajes,
@@ -449,7 +450,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
 def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
     percentil = 85
     categoria = 'aleatoria'
-    linajes = Sample.objects.filter(categoria_muestra=categoria,fecha_muestra__range=[fecha_inicial, fecha_final])
+    linajes = Sample.objects.filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
 
     linajes_count_with_hosp = linajes\
         .values('lineagestest__lineage','samplemetadata__id_hospital')\
@@ -689,6 +690,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
     return JsonResponse(chart)
 
 def concellos_gal_graph(request, fecha_inicial, fecha_final):
+    categoria = 'aleatoria'
     map_file = './mapas_galicia/GaliciaConcellos_Simple.geojson'
     map_file = './mapas_galicia/GaliciaConcellos_reduccion.geojson'
     
@@ -697,7 +699,7 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
         geojson_data = geojson.load(map) # mapa
     
     # Datos: [{'NomeMAY':'A CORUÑA', 'value':10}, {'NomeMAY':'SANTIAGO', 'value':15}...]
-    data = list(Sample.objects.filter(categoria_muestra='aleatoria')\
+    data = list(Sample.objects.filter(id_uvigo__contains='EPI', categoria_muestra=categoria).exclude(id_uvigo__contains='ICVS')\
             .values('id_region__localizacion')\
             .filter(id_region__localizacion__gte=2)\
             .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
@@ -760,7 +762,8 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
     return JsonResponse(chart)
 
 def hospital_graph(request, fecha_inicial, fecha_final):
-    hospitales = SampleMetaData.objects.filter(id_uvigo_id__categoria_muestra='aleatoria',id_uvigo__fecha_muestra__range=[fecha_inicial,fecha_final]).values('id_hospital')
+    categoria = 'aleatoria'
+    hospitales = SampleMetaData.objects.filter(id_uvigo_id__categoria_muestra=categoria, id_uvigo__fecha_muestra__range=[fecha_inicial,fecha_final]).exclude(id_hospital='ICVS').exclude(id_uvigo_id__id_uvigo__contains='SERGAS').values('id_hospital')
     posibles_hospitales = hospitales.distinct()
     answer = []
     for i in posibles_hospitales:
