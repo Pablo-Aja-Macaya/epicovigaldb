@@ -1,3 +1,4 @@
+from os import X_OK
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from collections import Counter
@@ -17,22 +18,55 @@ from .forms import *
 
 @login_required(login_url="/accounts/login") 
 def get_graphs(request):
-    if request.method=='POST':
-        fecha_inicial = request.POST.get('fecha_inicial')
-        fecha_final = request.POST.get('fecha_final')
+    # if request.method=='POST':
+    #     fecha_inicial = request.POST.get('fecha_inicial')
+    #     fecha_final = request.POST.get('fecha_final')
 
-        if not fecha_inicial:
-            fecha_inicial = '2020-01-01'        
-        if not fecha_final:
-            fecha_final = '2022-01-01'
+    #     if not fecha_inicial:
+    #         fecha_inicial = '2020-01-01'        
+    #     if not fecha_final:
+    #         fecha_final = '2022-01-01'
+    # else:
+    #     fecha_inicial = '2020-01-01'
+    #     fecha_final = '2022-01-01'
+
+    if request.method=='POST':
+        form = GraphsForm(request.POST)
+        if form.is_valid():
+            f = form.cleaned_data
+            fecha_inicial = f['fecha_inicial'].strftime("%Y-%m-%d") 
+            fecha_final = f['fecha_final'].strftime("%Y-%m-%d") 
+            categoria = f['categoria']
+            filtro = f['filtro']
+            if not filtro:
+                args = (fecha_inicial,fecha_final,categoria)
+            else:
+                args = (fecha_inicial,fecha_final,categoria,filtro)
+            url_origen = reverse('hospital_graph',args=args)
+            url_linajes_hospital = reverse('linajes_hospitales_graph',args=args)
+            url_linajes = reverse('linajes_porcentaje_total',args=args)
+            url_concellos = reverse('concellos_gal_graph',args=args)            
     else:
+        
         fecha_inicial = '2020-01-01'
         fecha_final = '2022-01-01'
-    
+        categoria = 'aleatoria'
+        inicial = {'fecha_inicial':fecha_inicial, 'fecha_final':fecha_final}
+        form = GraphsForm(initial=inicial)
+
+        url_origen = reverse('hospital_graph',args=(fecha_inicial,fecha_final))
+        url_linajes_hospital = reverse('linajes_hospitales_graph',args=(fecha_inicial,fecha_final))
+        url_linajes = reverse('linajes_porcentaje_total',args=(fecha_inicial,fecha_final))
+        url_concellos = reverse('concellos_gal_graph',args=(fecha_inicial,fecha_final))
+
+
     context = {
-        'url':reverse('get_graphs'),
-        'fecha_inicial':fecha_inicial,
-        'fecha_final':fecha_final
+        'url_form':reverse('get_graphs'),
+        'url_origen' : url_origen,
+        'url_linajes_hospital' : url_linajes_hospital,
+        'url_linajes' : url_linajes,
+        'url_concellos' : url_concellos,
+        'form':form
         }
     return render(request, 'visualize/graphs.html', context)
 
@@ -106,7 +140,6 @@ def edit_form(request, id_uvigo, tipo):
     if request.method=='POST':
         form = form_model(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
             datos = form.cleaned_data
 
             if tipo == 'Sample':
@@ -351,346 +384,358 @@ COLOR_LIST = [
     '#ffe4c4','#ffb6c1',
 ]
 
-def get_graph_json_link(request, graph_base_url, fecha_inicial, fecha_final):
+def get_graph_json_link(request, graph_base_url, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None):
     # Devuelve un icono con el enlace de la gráfica si el usuario está loggeado
     if request.user.is_authenticated:
-        url = reverse(graph_base_url, args=(fecha_inicial,fecha_final))
+        args = [fecha_inicial,fecha_final,categoria]
+        if filtro:
+            args.append(filtro)
+        url = reverse(graph_base_url, args=args)
         json_link = f'<a href="{url}"><p style="color: rgb(61, 61, 255);">&#9741</p></a>'
         return json_link
     else:
         return ''
 
-def linajes_porcentaje_total(request, fecha_inicial, fecha_final):
-    thresh = 4 # para eliminar variantes 
-    categoria = 'aleatoria'
-    linajes = Sample.objects.filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
+def linajes_porcentaje_total(request, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None):
+    try:
+        thresh = 4 # para eliminar variantes 
+        if filtro:
+            linajes = Sample.objects.filter(id_uvigo__contains=filtro).filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
+        else:
+            linajes = Sample.objects.filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
 
-    linajes_count = linajes\
-        .values('lineagestest__lineage','samplemetadata__id_hospital')\
-        .exclude(lineagestest__lineage__isnull=True)\
-        .exclude(samplemetadata__id_hospital='ICVS')\
-        .values('lineagestest__lineage')\
-        .order_by('lineagestest__lineage')\
-        .annotate(Count('lineagestest__lineage'))\
-        .order_by('lineagestest__lineage__count').reverse()\
-        .exclude(lineagestest__lineage='None')\
-        .exclude(lineagestest__lineage__count__lte=thresh)
+        linajes_count = linajes\
+            .values('lineagestest__lineage','samplemetadata__id_hospital')\
+            .exclude(lineagestest__lineage__isnull=True)\
+            .exclude(samplemetadata__id_hospital='ICVS')\
+            .values('lineagestest__lineage')\
+            .order_by('lineagestest__lineage')\
+            .annotate(Count('lineagestest__lineage'))\
+            .order_by('lineagestest__lineage__count').reverse()\
+            .exclude(lineagestest__lineage='None')\
+            .exclude(lineagestest__lineage__count__lte=thresh)
 
 
-    lista_linajes = []
-    lista_valores = []
-    for i in linajes_count:
-        lista_valores.append(i['lineagestest__lineage__count'])
-        lista_linajes.append(i['lineagestest__lineage'])
+        lista_linajes = []
+        lista_valores = []
+        for i in linajes_count:
+            lista_valores.append(i['lineagestest__lineage__count'])
+            lista_linajes.append(i['lineagestest__lineage'])
 
-    # print(lista_linajes)
-    # print(lista_valores)
-    json_link = get_graph_json_link(request,'linajes_porcentaje_total', fecha_inicial, fecha_final)
+        # print(lista_linajes)
+        # print(lista_valores)
+        json_link = get_graph_json_link(request,'linajes_porcentaje_total', fecha_inicial, fecha_final, categoria, filtro)
 
-    chart = {
-        'chart': {
-            'height': 400,
-            'type': 'bar'
-        },
-        'title': {
-            'text': f'Variantes en Galicia ({fecha_inicial} | {fecha_final}) {json_link}' # ({fecha_inicial} | {fecha_final})
-        },
-        'subtitle': {
-            'text': f'Variantes que aparecen, al menos, {thresh} veces.'
-        },
-        'xAxis': {
-            'categories': lista_linajes,
-            'title': {
-                'text': ''
+        chart = {
+            'chart': {
+                'height': 400,
+                'type': 'bar'
             },
-            'labels': {
-                'style': {
-                    'fontWeight': 'bold',
-                    # 'color': 'red'
-                }
-            }
-        },
-        'tooltip': {
-            # 'valueSuffix': ' %'
-        },
-        'yAxis': {
-            'min': 0,
             'title': {
-                'text': 'Cantidad',
-                'align': 'middle'
+                'text': f'Variantes en Galicia ({fecha_inicial} | {fecha_final}) {json_link}' # ({fecha_inicial} | {fecha_final})
             },
-            'labels': {
-                'overflow': 'justify'
-            }
-        },
-        'plotOptions': {
-            'bar': {
-                'dataLabels': {
-                    'enabled': True,
-                    'format': '{point.y}'
+            'subtitle': {
+                'text': f'Variantes que aparecen, al menos, {thresh} veces.'
+            },
+            'xAxis': {
+                'categories': lista_linajes,
+                'title': {
+                    'text': ''
                 },
-                
-            },
-            'series': {
-                'pointWidth': 8,
-                'animation': False
-            }
-        },
-        'credits':credits,
-        'series': [{
-            'name':'Cantidad',
-            'showInLegend': False, 
-            'data': lista_valores
-        }
-        ]
-    }
-    return JsonResponse(chart)
-
-
-def linajes_hospitales_graph(request, fecha_inicial, fecha_final):
-    percentil = 85
-    categoria = 'aleatoria'
-    linajes = Sample.objects.filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
-
-    linajes_count_with_hosp = linajes\
-        .values('lineagestest__lineage','samplemetadata__id_hospital')\
-        .exclude(lineagestest__lineage__isnull=True)\
-        .order_by('lineagestest__lineage', 'samplemetadata__id_hospital')\
-        .annotate(Count('lineagestest__lineage'))\
-        .exclude(lineagestest__lineage='None')
-
-    # Esto cuenta sólo cuánto hay de cada linaje
-    linajes_count = linajes\
-        .values('lineagestest__lineage')\
-        .exclude(lineagestest__lineage__isnull=True)\
-        .order_by('lineagestest__lineage')\
-        .annotate(Count('lineagestest__lineage'))\
-        .exclude(lineagestest__lineage='None')
-
-    value_list = linajes_count.order_by('lineagestest__lineage__count').values_list('lineagestest__lineage__count',flat=True).reverse()
-    thresh = int(percentile(value_list,percentil))
-    linajes_otros = linajes_count.filter(lineagestest__lineage__count__lte=thresh)\
-                                .order_by('lineagestest__lineage__count')\
-                                .values_list('lineagestest__lineage', flat=True)
-    linajes_principales = linajes_count.filter(lineagestest__lineage__count__gt=thresh)\
-                                    .order_by('lineagestest__lineage__count')\
-                                    .values_list('lineagestest__lineage', flat=True)
-
-
-    # Se hace un set ordenado de los códigos de hospitales (CHUAC, CHUS...)
-    lista_hospitales = [i['samplemetadata__id_hospital'] for i in linajes_count_with_hosp]
-    lista_hospitales = sorted(set(lista_hospitales))
-
-    drilldown_dicc = {}
-    # drilldown_dicc = {
-    #     'HOSP-Otros':{
-    #         'id':'HOSP-Otros',
-    #         'name':'Otros',
-    #         'data':{
-    #             'LINAJE':{'name':'LINAJE','y':1}
-    #         }
-    #     }
-    # }
-    series_dicc = {}
-    series_dicc['Otros'] = {'name':'Otros','data':{}}
-    for i in linajes_count_with_hosp:
-        hosp = i['samplemetadata__id_hospital']
-        linaje = i['lineagestest__lineage']
-        count = i['lineagestest__lineage__count']
-        # pos_hosp = lista_hospitales.index(hosp) # posición del hospital en el set de hospitales
-        
-        # Linaje superó el umbral de conteo impuesto
-        if linaje in linajes_principales:
-            drilldown_id = hosp+'-'+linaje
-            # Si todavía no se ha visto la variante
-            if linaje not in series_dicc.keys():
-                series_dicc[linaje] = {
-                    'name':linaje,
-                    'data':{
-                        hosp:{'name':hosp, 'y':count, 'drilldown':drilldown_id}
+                'labels': {
+                    'style': {
+                        'fontWeight': 'bold',
+                        # 'color': 'red'
                     }
                 }
-            # Si se ha visto la variante
-            else: 
-                if hosp in series_dicc[linaje]['data'].keys():
-                    series_dicc[linaje]['data'][hosp]['y'] +=count
-                else:
-                    series_dicc[linaje]['data'][hosp]={'name':hosp, 'y':count, 'drilldown':drilldown_id}
-        
-        # Linaje no superó el umbral de conteo impuesto
-        elif linaje in linajes_otros:
-            drilldown_id = hosp+'-'+'Otros'
-            name = hosp+'-'+linaje
-            # Si todavía no se ha visto el hospital
-            if hosp not in series_dicc['Otros']['data'].keys():
-                series_dicc['Otros']['data'][hosp] = {
-                    'name':hosp, 
-                    'y':count, 
-                    'drilldown':drilldown_id
+            },
+            'tooltip': {
+                # 'valueSuffix': ' %'
+            },
+            'yAxis': {
+                'min': 0,
+                'title': {
+                    'text': 'Cantidad',
+                    'align': 'middle'
+                },
+                'labels': {
+                    'overflow': 'justify'
                 }
-                drilldown_dicc[drilldown_id] = {
-                    'id':drilldown_id,
-                    'name':'Otros',
-                    'stacking':'normal',
-                    'data':{linaje:{'name':name, 'y':count}},
-                    'tooltip':{
-                        'headerFormat': '<span style="font-size:10px"><strong>{series.name}</strong></span><table>',
-                        'pointFormat': '<tr><td style="color:{series.color};padding:0;"><strong>{point.name}:</strong> </td>' +
-                            '<td style="padding:0"> <strong>&nbsp;{point.y}</strong> </td></tr>',
-                        'footerFormat': '</table>',
-                        'shared': True,
-                        'backgroundColor':'#FFFFFF',
-                        'useHTML': True
-                    },       
+            },
+            'plotOptions': {
+                'bar': {
                     'dataLabels': {
                         'enabled': True,
                         'format': '{point.y}'
-                    },  
+                    },
+                    
+                },
+                'series': {
+                    'pointWidth': 8,
+                    'animation': False
                 }
-            # Si se ha visto el hospital
-            else:
-                series_dicc['Otros']['data'][hosp]['y'] +=count
-                if linaje not in drilldown_dicc[drilldown_id]['data'].keys():
-                    drilldown_dicc[drilldown_id]['data'][linaje] = {'name':name, 'y':count}
-                else:
-                    drilldown_dicc[drilldown_id]['data'][linaje]['y'] += count
-
-    # Ordenar series_dicc para que los linajes con más cantidad aparezcan a la izquierda de la gráfica
-    orden = ['Otros']
-    orden += linajes_principales
-    series_dicc = OrderedDict(sorted(series_dicc.items(),key=lambda pair: orden.index(pair[0]),reverse=True))
-    # Transformar diccionarios en listas
-    for i in series_dicc.keys():
-        series_dicc[i]['data'] = list(series_dicc[i]['data'].values())
-    for i in drilldown_dicc.keys():
-        drilldown_dicc[i]['data'] = list(drilldown_dicc[i]['data'].values())
-        drilldown_dicc[i]['data'] = sorted(drilldown_dicc[i]['data'], key=lambda k: k['y'], reverse=True)
-
-    for lin in series_dicc.keys():
-        if lin != 'Otros':
-            for d in series_dicc[lin]['data']:
-                drilldown_id = d['drilldown']
-                drilldown_dicc[drilldown_id] = {
-                    'id':drilldown_id,
-                    'name':lin,
-                    'data':[{'name':drilldown_id, 'y':d['y']}],
-                    'stacking':'normal',
-                    'tooltip':{
-                        'headerFormat': '<span style="font-size:10px"><strong>{series.name}</strong></span><table>',
-                        'pointFormat': '<tr><td style="color:{series.color};padding:0;"><strong>{point.name}:</strong> </td>' +
-                            '<td style="padding:0"> <strong>&nbsp;{point.y}</strong> </td></tr>',
-                        'footerFormat': '</table>',
-                        'shared': True,
-                        'backgroundColor':'#FFFFFF',
-                        'useHTML': True
-                    },       
-                    'dataLabels': {
-                        'enabled': True,
-                        'format': '{point.y}'
-                    }, 
-                }
-
-    drilldown_dicc = OrderedDict(sorted(drilldown_dicc.items()))
-    json_link = get_graph_json_link(request,'linajes_hospitales_graph', fecha_inicial, fecha_final)
-    chart_height = 700
-    chart = {
-        'chart': {
-            'height': chart_height,
-            'type': 'bar'
-        },
-        'title': {
-            'text': f'Variantes por hospital ({fecha_inicial} | {fecha_final}) {json_link}' # ({fecha_inicial} | {fecha_final})
-        },
-        'subtitle': {
-            'text': f'Pulsa sobre el nombre de un hospital para ver todos los linajes. Categoría: {categoria}. Umbral: {thresh}'
-        },
-        'xAxis': {
-            'type':'category'
-        },
-        'yAxis': {
-            'min': 0,
-            'title': {
-                'text': 'Porcentaje',
-                'align': 'middle'
             },
-            'labels': {
-                'overflow': 'justify'
+            'credits':credits,
+            'series': [{
+                'name':'Cantidad',
+                'showInLegend': False, 
+                'data': lista_valores
             }
-        },
-        'lang': {
-            'drillUpText': '<strong><< Atrás</strong>'
-        },   
-        'tooltip': {
-            'headerFormat': '<span style="font-size:10px"><strong>{point.key}</strong></span><table>',
-            'pointFormat': '<tr><td style="color:{series.color};padding:0;"><strong>{series.name}:</strong> </td>' +
-                '<td style="padding:0"> <strong>&nbsp;{point.y}</strong> ({point.percentage:.0f}%) </td></tr>',
-            'footerFormat': '</table>',
-            'shared': True,
-            'backgroundColor':'#FFFFFF',
-            'useHTML': True
-        },
-        'plotOptions': {
-            'bar': {
-                'dataLabels': {
-                    'enabled': True,
-                    'format': '{point.percentage:.0f}%'
-                }
-            },
-            'series': {
-                # 'groupPadding': 10,
-                'stacking': 'percent',
-                'pointPadding': 1,
-                'pointWidth': 25,
-                'animation': False
-            }
-        },
-        'legend': {
-            'layout': 'horizontal',
-            'align': 'center',
-            'verticalAlign': 'bottom',
-            'x': 10,
-            # 'y': 60,
-            # 'floating': True,
-            # 'borderWidth': 0.5,
-            # 'shadow': True
-        },
-        # 'colors': COLOR_LIST,
-        'credits': credits,
-        'series': list(series_dicc.values()),
-        'drilldown':{
-            'activeAxisLabelStyle': {
-                'textDecoration': None,
-            },
-            'activeDataLabelStyle': {
-                'textDecoration': 'none',
-                'color':'white'
-            },
-            'drillUpButton':{
-                'position':{
-                    # 'x':0,
-                    'y':chart_height-200
-                }
-            },
-            'series':list(drilldown_dicc.values())
+            ]
         }
-        # }
-        # {
-        #     'name': 'Error B.1',
-        #     'type': 'errorbar',
-        #     'yAxis': 0,
-        #     'data': [[None,None], [None,None], [None,None], [None,None], [None,None], [0.5,1.5], [None,None]],
-        #     # 'tooltip': {
-        #     #     'pointFormat': 'Rango error: {point.low}-{point.high}'
-        #     # },
-        #     'stemWidth': 1,
-        #     'whiskerLength': 5
-        # },
-        
-    }
+    except:
+        chart = {}
     return JsonResponse(chart)
 
-def concellos_gal_graph(request, fecha_inicial, fecha_final):
-    categoria = 'aleatoria'
+
+def linajes_hospitales_graph(request, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None):
+    try:
+        percentil = 85
+        if filtro:
+            linajes = Sample.objects.filter(id_uvigo__contains=filtro).filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
+        else:
+            linajes = Sample.objects.filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
+
+        linajes_count_with_hosp = linajes\
+            .values('lineagestest__lineage','samplemetadata__id_hospital')\
+            .exclude(lineagestest__lineage__isnull=True)\
+            .order_by('lineagestest__lineage', 'samplemetadata__id_hospital')\
+            .annotate(Count('lineagestest__lineage'))\
+            .exclude(lineagestest__lineage='None')
+
+        # Esto cuenta sólo cuánto hay de cada linaje
+        linajes_count = linajes\
+            .values('lineagestest__lineage')\
+            .exclude(lineagestest__lineage__isnull=True)\
+            .order_by('lineagestest__lineage')\
+            .annotate(Count('lineagestest__lineage'))\
+            .exclude(lineagestest__lineage='None')
+
+        value_list = linajes_count.order_by('lineagestest__lineage__count').values_list('lineagestest__lineage__count',flat=True).reverse()
+        thresh = int(percentile(value_list,percentil))
+        linajes_otros = linajes_count.filter(lineagestest__lineage__count__lte=thresh)\
+                                    .order_by('lineagestest__lineage__count')\
+                                    .values_list('lineagestest__lineage', flat=True)
+        linajes_principales = linajes_count.filter(lineagestest__lineage__count__gt=thresh)\
+                                        .order_by('lineagestest__lineage__count')\
+                                        .values_list('lineagestest__lineage', flat=True)
+
+
+        # Se hace un set ordenado de los códigos de hospitales (CHUAC, CHUS...)
+        lista_hospitales = [i['samplemetadata__id_hospital'] for i in linajes_count_with_hosp]
+        lista_hospitales = sorted(set(lista_hospitales))
+
+        drilldown_dicc = {}
+        # drilldown_dicc = {
+        #     'HOSP-Otros':{
+        #         'id':'HOSP-Otros',
+        #         'name':'Otros',
+        #         'data':{
+        #             'LINAJE':{'name':'LINAJE','y':1}
+        #         }
+        #     }
+        # }
+        series_dicc = {}
+        series_dicc['Otros'] = {'name':'Otros','data':{}}
+        for i in linajes_count_with_hosp:
+            hosp = i['samplemetadata__id_hospital']
+            linaje = i['lineagestest__lineage']
+            count = i['lineagestest__lineage__count']
+            # pos_hosp = lista_hospitales.index(hosp) # posición del hospital en el set de hospitales
+            
+            # Linaje superó el umbral de conteo impuesto
+            if linaje in linajes_principales:
+                drilldown_id = hosp+'-'+linaje
+                # Si todavía no se ha visto la variante
+                if linaje not in series_dicc.keys():
+                    series_dicc[linaje] = {
+                        'name':linaje,
+                        'data':{
+                            hosp:{'name':hosp, 'y':count, 'drilldown':drilldown_id}
+                        }
+                    }
+                # Si se ha visto la variante
+                else: 
+                    if hosp in series_dicc[linaje]['data'].keys():
+                        series_dicc[linaje]['data'][hosp]['y'] +=count
+                    else:
+                        series_dicc[linaje]['data'][hosp]={'name':hosp, 'y':count, 'drilldown':drilldown_id}
+            
+            # Linaje no superó el umbral de conteo impuesto
+            elif linaje in linajes_otros:
+                drilldown_id = hosp+'-'+'Otros'
+                name = hosp+'-'+linaje
+                # Si todavía no se ha visto el hospital
+                if hosp not in series_dicc['Otros']['data'].keys():
+                    series_dicc['Otros']['data'][hosp] = {
+                        'name':hosp, 
+                        'y':count, 
+                        'drilldown':drilldown_id
+                    }
+                    drilldown_dicc[drilldown_id] = {
+                        'id':drilldown_id,
+                        'name':'Otros',
+                        'stacking':'normal',
+                        'data':{linaje:{'name':name, 'y':count}},
+                        'tooltip':{
+                            'headerFormat': '<span style="font-size:10px"><strong>{series.name}</strong></span><table>',
+                            'pointFormat': '<tr><td style="color:{series.color};padding:0;"><strong>{point.name}:</strong> </td>' +
+                                '<td style="padding:0"> <strong>&nbsp;{point.y}</strong> </td></tr>',
+                            'footerFormat': '</table>',
+                            'shared': True,
+                            'backgroundColor':'#FFFFFF',
+                            'useHTML': True
+                        },       
+                        'dataLabels': {
+                            'enabled': True,
+                            'format': '{point.y}'
+                        },  
+                    }
+                # Si se ha visto el hospital
+                else:
+                    series_dicc['Otros']['data'][hosp]['y'] +=count
+                    if linaje not in drilldown_dicc[drilldown_id]['data'].keys():
+                        drilldown_dicc[drilldown_id]['data'][linaje] = {'name':name, 'y':count}
+                    else:
+                        drilldown_dicc[drilldown_id]['data'][linaje]['y'] += count
+
+        # Ordenar series_dicc para que los linajes con más cantidad aparezcan a la izquierda de la gráfica
+        orden = ['Otros']
+        orden += linajes_principales
+        series_dicc = OrderedDict(sorted(series_dicc.items(),key=lambda pair: orden.index(pair[0]),reverse=True))
+        # Transformar diccionarios en listas
+        for i in series_dicc.keys():
+            series_dicc[i]['data'] = list(series_dicc[i]['data'].values())
+        for i in drilldown_dicc.keys():
+            drilldown_dicc[i]['data'] = list(drilldown_dicc[i]['data'].values())
+            drilldown_dicc[i]['data'] = sorted(drilldown_dicc[i]['data'], key=lambda k: k['y'], reverse=True)
+
+        for lin in series_dicc.keys():
+            if lin != 'Otros':
+                for d in series_dicc[lin]['data']:
+                    drilldown_id = d['drilldown']
+                    drilldown_dicc[drilldown_id] = {
+                        'id':drilldown_id,
+                        'name':lin,
+                        'data':[{'name':drilldown_id, 'y':d['y']}],
+                        'stacking':'normal',
+                        'tooltip':{
+                            'headerFormat': '<span style="font-size:10px"><strong>{series.name}</strong></span><table>',
+                            'pointFormat': '<tr><td style="color:{series.color};padding:0;"><strong>{point.name}:</strong> </td>' +
+                                '<td style="padding:0"> <strong>&nbsp;{point.y}</strong> </td></tr>',
+                            'footerFormat': '</table>',
+                            'shared': True,
+                            'backgroundColor':'#FFFFFF',
+                            'useHTML': True
+                        },       
+                        'dataLabels': {
+                            'enabled': True,
+                            'format': '{point.y}'
+                        }, 
+                    }
+
+        drilldown_dicc = OrderedDict(sorted(drilldown_dicc.items()))
+        json_link = get_graph_json_link(request,'linajes_hospitales_graph', fecha_inicial, fecha_final, categoria, filtro)
+        chart_height = 700
+        chart = {
+            'chart': {
+                'height': chart_height,
+                'type': 'bar'
+            },
+            'title': {
+                'text': f'Variantes por hospital ({fecha_inicial} | {fecha_final}) {json_link}' # ({fecha_inicial} | {fecha_final})
+            },
+            'subtitle': {
+                'text': f'Pulsa sobre el nombre de un hospital para ver todos los linajes. Categoría: {categoria}. Umbral: {thresh}'
+            },
+            'xAxis': {
+                'type':'category'
+            },
+            'yAxis': {
+                'min': 0,
+                'title': {
+                    'text': 'Porcentaje',
+                    'align': 'middle'
+                },
+                'labels': {
+                    'overflow': 'justify'
+                }
+            },
+            'lang': {
+                'drillUpText': '<strong><< Atrás</strong>'
+            },   
+            'tooltip': {
+                'headerFormat': '<span style="font-size:10px"><strong>{point.key}</strong></span><table>',
+                'pointFormat': '<tr><td style="color:{series.color};padding:0;"><strong>{series.name}:</strong> </td>' +
+                    '<td style="padding:0"> <strong>&nbsp;{point.y}</strong> ({point.percentage:.0f}%) </td></tr>',
+                'footerFormat': '</table>',
+                'shared': True,
+                'backgroundColor':'#FFFFFF',
+                'useHTML': True
+            },
+            'plotOptions': {
+                'bar': {
+                    'dataLabels': {
+                        'enabled': True,
+                        'format': '{point.percentage:.0f}%'
+                    }
+                },
+                'series': {
+                    # 'groupPadding': 10,
+                    'stacking': 'percent',
+                    'pointPadding': 1,
+                    'pointWidth': 25,
+                    'animation': False
+                }
+            },
+            'legend': {
+                'layout': 'horizontal',
+                'align': 'center',
+                'verticalAlign': 'bottom',
+                'x': 10,
+                # 'y': 60,
+                # 'floating': True,
+                # 'borderWidth': 0.5,
+                # 'shadow': True
+            },
+            # 'colors': COLOR_LIST,
+            'credits': credits,
+            'series': list(series_dicc.values()),
+            'drilldown':{
+                'activeAxisLabelStyle': {
+                    'textDecoration': None,
+                },
+                'activeDataLabelStyle': {
+                    'textDecoration': 'none',
+                    'color':'white'
+                },
+                'drillUpButton':{
+                    'position':{
+                        # 'x':0,
+                        'y':chart_height-200
+                    }
+                },
+                'series':list(drilldown_dicc.values())
+            }
+            # }
+            # {
+            #     'name': 'Error B.1',
+            #     'type': 'errorbar',
+            #     'yAxis': 0,
+            #     'data': [[None,None], [None,None], [None,None], [None,None], [None,None], [0.5,1.5], [None,None]],
+            #     # 'tooltip': {
+            #     #     'pointFormat': 'Rango error: {point.low}-{point.high}'
+            #     # },
+            #     'stemWidth': 1,
+            #     'whiskerLength': 5
+            # },
+            
+        }
+    except:
+        chart = {}
+    return JsonResponse(chart)
+
+def concellos_gal_graph(request, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None):
     map_file = './mapas_galicia/GaliciaConcellos_Simple.geojson'
     map_file = './mapas_galicia/GaliciaConcellos_reduccion.geojson'
     
@@ -698,118 +743,141 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final):
     with open(map_file) as map:
         geojson_data = geojson.load(map) # mapa
     
-    # Datos: [{'NomeMAY':'A CORUÑA', 'value':10}, {'NomeMAY':'SANTIAGO', 'value':15}...]
-    data = list(Sample.objects.filter(id_uvigo__contains='EPI', categoria_muestra=categoria).exclude(id_uvigo__contains='ICVS')\
-            .values('id_region__localizacion')\
-            .filter(id_region__localizacion__gte=2)\
-            .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
-            .order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
-    json_link = get_graph_json_link(request,'concellos_gal_graph', fecha_inicial, fecha_final)
-    chart = {
-        'chart':{
-            'map':geojson_data,
-        },
-        'boost': {
-            'seriesThreshold': 1,
-            'useGPUTranslations': True
-        },
-        'title': {
-            'text': f'Geolocalización ({fecha_inicial} | {fecha_final}) {json_link}' # ({fecha_inicial} | {fecha_final})
-        },
-        'subtitle': {
-            'text': f'Muestras aleatorias en cada concello.'
-        },
-        'colorAxis': {
-            'tickPixelInterval': 100,
-            'stops': [[0, '#ffe5e3'], [0.65, '#f04d55'], [1, '#f50a15']],
-            # 'labels':{
-            #     'format':'{value} x'
-            # }
-        },
-        'tooltip': {
-          'headerFormat': '',
-          'pointFormat': '<b>{point.NomeMAY}</b><br>Total: {point.value}'
-        },
-        # 'mapNavigation': {
-        #     'enabled': 'true',
-        #     'buttonOptions': {
-        #         'verticalAlign': 'bottom'
-        #     }
-        # },
-        'plotOptions': {
-            'series': {
-                'animation': False
-            }
-        },
-        'credits': credits,
-        'series': [{
-            'boostThreshold': 1,
-            'data': data,
-            'keys': ['NomeMAY', 'value'],
-            'joinBy': 'NomeMAY',
-            'name': 'Muestras',
-            'states': {
-                'hover': {
-                    'color': '#a4edba'
+    try:
+        # Datos: [{'NomeMAY':'A CORUÑA', 'value':10}, {'NomeMAY':'SANTIAGO', 'value':15}...]
+        if filtro:
+            data = list(Sample.objects.filter(id_uvigo__contains=filtro).filter(id_uvigo__contains='EPI', categoria_muestra=categoria).exclude(id_uvigo__contains='ICVS')\
+                    .values('id_region__localizacion')\
+                    .filter(id_region__localizacion__gte=2)\
+                    .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
+                    .order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
+        else:
+            data = list(Sample.objects.filter(id_uvigo__contains='EPI', categoria_muestra=categoria).exclude(id_uvigo__contains='ICVS')\
+                    .values('id_region__localizacion')\
+                    .filter(id_region__localizacion__gte=2)\
+                    .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
+                    .order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
+        json_link = get_graph_json_link(request,'concellos_gal_graph', fecha_inicial, fecha_final, categoria, filtro)
+        chart = {
+            'chart':{
+                'map':geojson_data,
+            },
+            'boost': {
+                'seriesThreshold': 1,
+                'useGPUTranslations': True
+            },
+            'title': {
+                'text': f'Geolocalización ({fecha_inicial} | {fecha_final}) {json_link}' # ({fecha_inicial} | {fecha_final})
+            },
+            'subtitle': {
+                'text': f'Muestras en cada concello. Categoría: {categoria}'
+            },
+            'colorAxis': {
+                'tickPixelInterval': 100,
+                'stops': [[0, '#ffe5e3'], [0.65, '#f04d55'], [1, '#f50a15']],
+                # 'labels':{
+                #     'format':'{value} x'
+                # }
+            },
+            'tooltip': {
+            'headerFormat': '',
+            'pointFormat': '<b>{point.NomeMAY}</b><br>Total: {point.value}'
+            },
+            # 'mapNavigation': {
+            #     'enabled': 'true',
+            #     'buttonOptions': {
+            #         'verticalAlign': 'bottom'
+            #     }
+            # },
+            'plotOptions': {
+                'series': {
+                    'animation': False
                 }
             },
-            'dataLabels': {
-                'enabled': True,
-                'format': '{point.properties.postal}'
-            }           
-        }],      
-    }
-    return JsonResponse(chart)
-
-def hospital_graph(request, fecha_inicial, fecha_final):
-    categoria = 'aleatoria'
-    hospitales = SampleMetaData.objects.filter(id_uvigo_id__categoria_muestra=categoria, id_uvigo__fecha_muestra__range=[fecha_inicial,fecha_final]).exclude(id_hospital='ICVS').exclude(id_uvigo_id__id_uvigo__contains='SERGAS').values('id_hospital')
-    posibles_hospitales = hospitales.distinct()
-    answer = []
-    for i in posibles_hospitales:
-        h = list(i.values())[0]
-        c = hospitales.filter(id_hospital = h).count()
-        answer.append({'name':h, 'y':int(c)})
-
-    json_link = get_graph_json_link(request,'hospital_graph', fecha_inicial, fecha_final)
-    chart = {
-        'chart': {
-            'type': 'pie',
-        },
-        'title': {'text': f'Origen de muestras ({fecha_inicial} | {fecha_final}) {json_link}'},
-        'subtitle': {
-            'text': f'Origen de muestras aleatorias recibidas (Incluyendo secuenciadas y no secuenciadas)'
-        },
-        'tooltip': {
-            'pointFormat': '{series.name}: <b>{point.percentage:.1f}%</b>'
-        },
-        'accessibility': {
-            'point': {
-                'valueSuffix': '%'
-            }
-        },
-        'plotOptions': {
-            'pie': {
-                'allowPointSelect': True,
-                'cursor': 'pointer',
+            'credits': credits,
+            'series': [{
+                'boostThreshold': 1,
+                'data': data,
+                'keys': ['NomeMAY', 'value'],
+                'joinBy': 'NomeMAY',
+                'name': 'Muestras',
+                'states': {
+                    'hover': {
+                        'color': '#a4edba'
+                    }
+                },
                 'dataLabels': {
                     'enabled': True,
-                    'format': '<b>{point.name}</b>: {point.percentage:.1f} %'
-                }
-            },
-            'series': {
-                'animation': False
-            }
-        },
-        'credits': credits,
-        'series': [{
-            'name': 'Cantidad',
-            'data': answer # [{ name: 'CHHUVI', y: 1 }, { name: 'CHUAC', y: 1 }]
-        }]
-    }
-
+                    'format': '{point.properties.postal}'
+                }           
+            }],      
+        }
+    except:
+        chart = {}
     return JsonResponse(chart)
 
+def hospital_graph(request, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None):
+    try:
+        hospitales = SampleMetaData.objects.filter(id_uvigo_id__categoria_muestra=categoria, id_uvigo__fecha_muestra__range=[fecha_inicial,fecha_final])\
+                    .exclude(id_hospital='ICVS').exclude(id_uvigo_id__id_uvigo__contains='SERGAS')
+
+        if filtro:
+            hospitales = hospitales.filter(id_uvigo_id__id_uvigo__contains=filtro).values('id_hospital')
+        else:
+            hospitales = hospitales.values('id_hospital')
+
+        
+        posibles_hospitales = hospitales.distinct()
+        answer = []
+        for i in posibles_hospitales:
+            h = list(i.values())[0]
+            c = hospitales.filter(id_hospital = h).count()
+            answer.append({'name':h, 'y':int(c)})
+
+        json_link = get_graph_json_link(request,'hospital_graph', fecha_inicial, fecha_final, categoria, filtro)
+        chart = {
+            'chart': {
+                'type': 'pie',
+            },
+            'title': {'text': f'Origen de muestras ({fecha_inicial} | {fecha_final}) {json_link}'},
+            'subtitle': {
+                'text': f'Origen de muestras recibidas (Incluyendo secuenciadas y no secuenciadas). Categoría: {categoria}.'
+            },
+            'tooltip': {
+                'pointFormat': '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            'accessibility': {
+                'point': {
+                    'valueSuffix': '%'
+                }
+            },
+            'plotOptions': {
+                'pie': {
+                    'allowPointSelect': True,
+                    'cursor': 'pointer',
+                    'dataLabels': {
+                        'enabled': True,
+                        'format': '<b>{point.name}</b>: {point.percentage:.1f} %'
+                    }
+                },
+                'series': {
+                    'animation': False
+                }
+            },
+            'credits': credits,
+            'series': [{
+                'name': 'Cantidad',
+                'data': answer # [{ name: 'CHHUVI', y: 1 }, { name: 'CHUAC', y: 1 }]
+            }]
+        }
+    except:
+        chart = {}
+    return JsonResponse(chart)
+
+
+
+
+# No usadas
 def variants_line_graph(request, fecha_inicial, fecha_final, variant):
 
     #######################
@@ -977,29 +1045,3 @@ def variants_column_graph(request, fecha_inicial, fecha_final, variant):
     return JsonResponse(chart)
 
 
-
-
-# dicc = {
-#     'B.1':{
-#         'name':'B.1',
-#         'data':{
-#             'CHUVI':{'name': 'CHUVI', 'y': 100, 'drilldown': 'chuvi-B.1'},
-#             'CHUAC':{'name': 'CHUAC', 'y': 60, 'drilldown': 'chuac-B.1'},
-#         }
-#     }
-# }
-
-from django.db.models import Count
-from upload.models import Sample
-from collections import OrderedDict
-linajes = Sample.objects.filter(categoria_muestra='aleatoria',fecha_muestra__range=['2020-01-01', '2030-01-01'])
-
-linajes_count = linajes\
-    .values('lineagestest__lineage','samplemetadata__id_hospital')\
-    .exclude(lineagestest__lineage__isnull=True)\
-    .exclude(samplemetadata__id_hospital='ICVS')\
-    .values('lineagestest__lineage')\
-    .order_by('lineagestest__lineage')\
-    .annotate(Count('lineagestest__lineage'))\
-    .order_by('lineagestest__lineage__count')\
-    .exclude(lineagestest__lineage='None')

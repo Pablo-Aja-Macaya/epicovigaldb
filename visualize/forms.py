@@ -5,6 +5,15 @@ from upload.models import Sample, Region
 from upload.models import SampleMetaData
 from tests.models import PicardTest, NextcladeTest, NGSstatsTest, SingleCheckTest, VariantsTest
 from tests.models import LineagesTest
+
+class GraphsForm(forms.Form):
+    categorias = [(i,i) for i in Sample.objects.values_list('categoria_muestra',flat=True).distinct()]
+    fecha_inicial = forms.DateField()
+    fecha_final = forms.DateField()
+    categoria = forms.ChoiceField(choices=categorias)
+    filtro = forms.CharField(required=False)
+
+
 class SampleForm(ModelForm):
     id_uvigo = forms.CharField(required=False, disabled=True)
     # cp = forms.IntegerField(required=False)
