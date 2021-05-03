@@ -385,10 +385,12 @@ COLOR_LIST = [
     '#ffe4c4','#ffb6c1',
 ]
 
-def get_graph_json_link(request, graph_base_url, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None):
+def get_graph_json_link(request, graph_base_url, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None, umbral=None):
     # Devuelve un icono con el enlace de la gráfica si el usuario está loggeado
     if request.user.is_authenticated:
         args = [fecha_inicial,fecha_final,categoria]
+        if umbral:
+            args.append(umbral)
         if filtro:
             args.append(filtro)
         url = reverse(graph_base_url, args=args)
@@ -430,7 +432,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final, categoria='ale
 
         # print(lista_linajes)
         # print(lista_valores)
-        json_link = get_graph_json_link(request,'linajes_porcentaje_total', fecha_inicial, fecha_final, categoria, filtro)
+        json_link = get_graph_json_link(request,'linajes_porcentaje_total', fecha_inicial, fecha_final, categoria, filtro, thresh)
 
         chart = {
             'chart': {
@@ -646,7 +648,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final, categoria='ale
                     }
 
         drilldown_dicc = OrderedDict(sorted(drilldown_dicc.items()))
-        json_link = get_graph_json_link(request,'linajes_hospitales_graph', fecha_inicial, fecha_final, categoria, filtro)
+        json_link = get_graph_json_link(request,'linajes_hospitales_graph', fecha_inicial, fecha_final, categoria, filtro, thresh)
         chart_height = 700
         chart = {
             'chart': {
