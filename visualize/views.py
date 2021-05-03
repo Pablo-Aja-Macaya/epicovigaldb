@@ -37,8 +37,8 @@ def get_graphs(request):
             if filtro:
                 args.append(filtro)
             
-            args_sin_umbral = args
-            args_con_umbral = args
+            args_sin_umbral = args.copy()
+            args_con_umbral = args.copy()
 
             if umbral:
                 args_con_umbral.append(umbral)
