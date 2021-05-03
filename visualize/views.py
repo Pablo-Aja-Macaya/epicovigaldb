@@ -34,14 +34,14 @@ def get_graphs(request):
             umbral = f['umbral']
 
             args = [fecha_inicial,fecha_final,categoria]
-            if filtro:
-                args.append(filtro)
-            
             args_sin_umbral = args.copy()
             args_con_umbral = args.copy()
 
             if umbral:
                 args_con_umbral.append(umbral)
+            if filtro:
+                args_sin_umbral.append(filtro)
+                args_con_umbral.append(filtro)
 
             url_origen = reverse('hospital_graph',args=args_sin_umbral)
             url_linajes_hospital = reverse('linajes_hospitales_graph',args=args_con_umbral)
