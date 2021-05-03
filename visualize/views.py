@@ -18,18 +18,11 @@ from .forms import *
 
 @login_required(login_url="/accounts/login") 
 def get_graphs(request):
-    # if request.method=='POST':
-    #     fecha_inicial = request.POST.get('fecha_inicial')
-    #     fecha_final = request.POST.get('fecha_final')
-
-    #     if not fecha_inicial:
-    #         fecha_inicial = '2020-01-01'        
-    #     if not fecha_final:
-    #         fecha_final = '2022-01-01'
-    # else:
-    #     fecha_inicial = '2020-01-01'
-    #     fecha_final = '2022-01-01'
-
+    url_origen = ''
+    url_linajes_hospital = ''
+    url_linajes = ''
+    url_concellos = ''
+    form = ''
     if request.method=='POST':
         form = GraphsForm(request.POST)
         if form.is_valid():
@@ -38,20 +31,28 @@ def get_graphs(request):
             fecha_final = f['fecha_final'].strftime("%Y-%m-%d") 
             categoria = f['categoria']
             filtro = f['filtro']
-            if not filtro:
-                args = (fecha_inicial,fecha_final,categoria)
-            else:
-                args = (fecha_inicial,fecha_final,categoria,filtro)
-            url_origen = reverse('hospital_graph',args=args)
-            url_linajes_hospital = reverse('linajes_hospitales_graph',args=args)
-            url_linajes = reverse('linajes_porcentaje_total',args=args)
-            url_concellos = reverse('concellos_gal_graph',args=args)            
+            umbral = f['umbral']
+
+            args = [fecha_inicial,fecha_final,categoria]
+            if filtro:
+                args.append(filtro)
+            
+            args_sin_umbral = args
+            args_con_umbral = args
+
+            if umbral:
+                args_con_umbral.append(umbral)
+
+            url_origen = reverse('hospital_graph',args=args_sin_umbral)
+            url_linajes_hospital = reverse('linajes_hospitales_graph',args=args_con_umbral)
+            url_linajes = reverse('linajes_porcentaje_total',args=args_con_umbral)
+            url_concellos = reverse('concellos_gal_graph',args=args_sin_umbral)            
     else:
         
         fecha_inicial = '2020-01-01'
         fecha_final = '2022-01-01'
         categoria = 'aleatoria'
-        inicial = {'fecha_inicial':fecha_inicial, 'fecha_final':fecha_final}
+        inicial = {'fecha_inicial':fecha_inicial, 'fecha_final':fecha_final, 'categoria':'aleatoria'}
         form = GraphsForm(initial=inicial)
 
         url_origen = reverse('hospital_graph',args=(fecha_inicial,fecha_final))
@@ -396,9 +397,14 @@ def get_graph_json_link(request, graph_base_url, fecha_inicial, fecha_final, cat
     else:
         return ''
 
-def linajes_porcentaje_total(request, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None):
+def linajes_porcentaje_total(request, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None, umbral=None):
     try:
-        thresh = 4 # para eliminar variantes 
+        print(umbral, filtro)
+        if not umbral:
+            thresh = 4 # para eliminar variantes
+        else:
+            thresh = umbral
+
         if filtro:
             linajes = Sample.objects.filter(id_uvigo__contains=filtro).filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
         else:
@@ -435,7 +441,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final, categoria='ale
                 'text': f'Variantes en Galicia ({fecha_inicial} | {fecha_final}) {json_link}' # ({fecha_inicial} | {fecha_final})
             },
             'subtitle': {
-                'text': f'Variantes que aparecen, al menos, {thresh} veces.'
+                'text': f'Categoría: {categoria}. Umbral: {thresh}'
             },
             'xAxis': {
                 'categories': lista_linajes,
@@ -488,7 +494,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final, categoria='ale
     return JsonResponse(chart)
 
 
-def linajes_hospitales_graph(request, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None):
+def linajes_hospitales_graph(request, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None, umbral=None):
     try:
         percentil = 85
         if filtro:
@@ -512,7 +518,12 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final, categoria='ale
             .exclude(lineagestest__lineage='None')
 
         value_list = linajes_count.order_by('lineagestest__lineage__count').values_list('lineagestest__lineage__count',flat=True).reverse()
-        thresh = int(percentile(value_list,percentil))
+        
+        if not umbral:
+            thresh = int(percentile(value_list,percentil))
+        else:
+            thresh = umbral
+
         linajes_otros = linajes_count.filter(lineagestest__lineage__count__lte=thresh)\
                                     .order_by('lineagestest__lineage__count')\
                                     .values_list('lineagestest__lineage', flat=True)

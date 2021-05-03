@@ -32,11 +32,15 @@ urlpatterns = [
         ## Linajes por hospital
         path('linajes_hospitales_graph/<str:fecha_inicial>+<str:fecha_final>', views.linajes_hospitales_graph, name="linajes_hospitales_graph"),
         path('linajes_hospitales_graph/<str:fecha_inicial>+<str:fecha_final>/<str:categoria>', views.linajes_hospitales_graph, name="linajes_hospitales_graph"),
+        path('linajes_hospitales_graph/<str:fecha_inicial>+<str:fecha_final>/<str:categoria>/<int:umbral>', views.linajes_hospitales_graph, name="linajes_hospitales_graph"),
         path('linajes_hospitales_graph/<str:fecha_inicial>+<str:fecha_final>/<str:categoria>/<str:filtro>', views.linajes_hospitales_graph, name="linajes_hospitales_graph"),
+        path('linajes_hospitales_graph/<str:fecha_inicial>+<str:fecha_final>/<str:categoria>/<int:umbral>/<str:filtro>', views.linajes_hospitales_graph, name="linajes_hospitales_graph"),
         ## Cantidad total de cada linaje
         path('linajes_porcentaje_total/<str:fecha_inicial>+<str:fecha_final>', views.linajes_porcentaje_total, name="linajes_porcentaje_total"),
         path('linajes_porcentaje_total/<str:fecha_inicial>+<str:fecha_final>/<str:categoria>', views.linajes_porcentaje_total, name="linajes_porcentaje_total"),
+        path('linajes_porcentaje_total/<str:fecha_inicial>+<str:fecha_final>/<str:categoria>/<int:umbral>', views.linajes_porcentaje_total, name="linajes_porcentaje_total"),        
         path('linajes_porcentaje_total/<str:fecha_inicial>+<str:fecha_final>/<str:categoria>/<str:filtro>', views.linajes_porcentaje_total, name="linajes_porcentaje_total"),
+        path('linajes_porcentaje_total/<str:fecha_inicial>+<str:fecha_final>/<str:categoria>/<int:umbral>/<str:filtro>', views.linajes_porcentaje_total, name="linajes_porcentaje_total"),
 
         # Sin usar
         path('variants_line_graph/<str:fecha_inicial>+<str:fecha_final>/<str:variant>', views.variants_line_graph, name="variants_line_graph"),
