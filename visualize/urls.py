@@ -8,6 +8,7 @@ urlpatterns = [
     path('edit/<str:id_uvigo>+<str:tipo>', views.edit_form, name='edit_form'),
     path('drop', views.drop_sample_cascade, name='drop_sample'),
     path('sample/<str:id_uvigo>', views.specific_sample, name='specific_sample'),
+    path('region/<str:id_region>', views.specific_region, name='specific_region'),
     # Metadatos
     path('regions', views.regions, name='regions'),
     path('samples', views.samples, name='samples'),

@@ -21,6 +21,7 @@ class SampleTable(tables.Table):
         template_name = "table_template.html"
 
 class RegionTable(tables.Table):
+    id_region = tables.LinkColumn('specific_region', args=[A('id_region')])
     class Meta:
         model = Region
         template_name = "table_template.html"
@@ -109,14 +110,13 @@ class CompletedTestsTable(tables.Table):
 
 class SampleFilter(django_filters.FilterSet):
     id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo', lookup_expr='icontains')
-    sexo = django_filters.CharFilter(field_name = 'sexo', lookup_expr='icontains')
-    edad__gt = django_filters.NumberFilter(field_name = 'edad', lookup_expr='gt')
-    edad__lt = django_filters.NumberFilter(field_name = 'edad', lookup_expr='lt')
+    categoria_muestra = django_filters.CharFilter(field_name = 'categoria_muestra', lookup_expr='icontains')
+    nodo_secuenciacion = django_filters.CharFilter(field_name = 'nodo_secuenciacion', lookup_expr='icontains')
     fecha_muestra = django_filters.DateFromToRangeFilter(field_name = 'fecha_muestra')
 
     class Meta:
         model = Sample
-        fields = ['id_uvigo','sexo', 'edad', 'fecha_muestra']
+        fields = ['id_uvigo','categoria_muestra','nodo_secuenciacion', 'fecha_muestra']
 
 class MetaDataFilter(django_filters.FilterSet):
     id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo', lookup_expr='icontains')
@@ -125,6 +125,16 @@ class MetaDataFilter(django_filters.FilterSet):
     class Meta:
         model = SampleMetaData
         fields = ['id_uvigo', 'fecha_entrada']
+
+class RegionFilter(django_filters.FilterSet):
+    id_region = django_filters.NumberFilter(field_name = 'id_region', lookup_expr='icontains')
+    localizacion = django_filters.CharFilter(field_name = 'localizacion', lookup_expr='icontains')
+    cp = django_filters.CharFilter(field_name = 'cp', lookup_expr='icontains')
+    pais = django_filters.CharFilter(field_name = 'pais', lookup_expr='icontains')
+    region = django_filters.CharFilter(field_name = 'region', lookup_expr='icontains')
+    class Meta:
+        model = Region
+        fields = ['id_region','localizacion','cp']
 
 # class CompletedTestsFilter(django_filters.FilterSet):
 #     id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo', lookup_expr='icontains')

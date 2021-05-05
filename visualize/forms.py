@@ -38,11 +38,15 @@ class SampleMetaDataForm(ModelForm):
         fields = '__all__'
         exclude = ['data_path']
 
-class RegionForm(ModelForm):
-    id_region = forms.ModelChoiceField(queryset=Region.objects.all() , required=False, disabled=True)
-    class Meta:
-        model = Region
-        fields = '__all__'
+class RegionForm(forms.Form):
+    id_region = forms.CharField(required=False, disabled=True)
+    localizacion = forms.CharField(required=False, disabled=True)
+    cp = forms.DecimalField(required=False, disabled=True)
+    latitud = forms.DecimalField(required=False)
+    longitud = forms.DecimalField(required=False)
+    pais = forms.CharField(required=False)
+    region = forms.CharField(required=False)
+
 
 ## Test forms
 class SingleCheckForm(ModelForm):

@@ -16,6 +16,8 @@ from tests.models import LineagesTest, PicardTest, NextcladeTest, NGSstatsTest
 from .models import *
 from .forms import *
 
+
+# In[0]
 @login_required(login_url="/accounts/login") 
 def get_graphs(request):
     url_origen = ''
@@ -99,11 +101,11 @@ def edit_form(request, id_uvigo, tipo):
                 'model':SampleMetaData,
                 'tittle':'Edición de metadatos extra'
             },
-            'Region':{
-                'form_model':RegionForm,
-                'model':Region,
-                'tittle':'Edición de regiones'
-            },
+            # 'Region':{
+            #     'form_model':RegionForm,
+            #     'model':Region,
+            #     'tittle':'Edición de regiones'
+            # },
             ## Tests
             'SingleCheckTest':{
                 'form_model':SingleCheckForm,
@@ -152,6 +154,8 @@ def edit_form(request, id_uvigo, tipo):
 
                     )
             ## ARREGLAR EDICIÖN DE PANGOLIN
+            # elif tipo == 'LineagesTest':
+            #     pass
             else:
                 datos['id_uvigo']=Sample.objects.get(id_uvigo=id_uvigo)
                 _, created = model.objects.update_or_create(
@@ -204,6 +208,10 @@ def get_completed_tests(search=None):
         lista2.append(i)
     return lista2
 
+
+
+# In[1]
+# Perfiles
 @login_required(login_url="/accounts/login")
 def specific_sample(request, id_uvigo): 
     # Datos generales
@@ -259,6 +267,40 @@ def specific_sample(request, id_uvigo):
         }
     return render(request, 'visualize/sample_profile.html', context)
 
+@login_required(login_url="/accounts/login")
+def specific_region(request, id_region):
+    obj = Region.objects.get(id_region=id_region)
+    
+    if request.method=='POST':
+        form = RegionForm(request.POST)
+        if form.is_valid():
+            datos = form.cleaned_data
+            datos.pop('id_region',None)
+            datos.pop('localizacion',None)
+            datos.pop('cp',None)
+            defaults = {
+                'id_region':id_region,
+                'localizacion':obj.localizacion,
+                'cp':obj.cp,
+                **datos
+                }
+            print(defaults)
+            messages.success(request, 'Cambios guardados')
+            _, created = Region.objects.update_or_create(
+                    id_region = id_region,
+                    defaults = datos
+
+                ) 
+            return redirect(reverse('specific_region', args=(id_region,)))
+    else:
+        form = RegionForm(initial=model_to_dict(obj))
+
+    prev_url = request.META.get('HTTP_REFERER')
+    url_form = reverse('specific_region', args=(id_region,))
+    context = {'obj':obj, 'prev_url':prev_url, 'url_form':url_form, 'form':form}
+    return render(request, 'visualize/region_profile.html', context)
+
+# General
 @login_required(login_url="/accounts/login") 
 def general(request):
     if request.method=='POST':
@@ -273,13 +315,21 @@ def general(request):
 
     return render(request, 'visualize/general.html', {'table':table, 'filter':filter})
 
-# Para metadatos
+
+
+
+# In[2]
+# Para tablas de metadatos
 @login_required(login_url="/accounts/login")
 def regions(request):
-    table = RegionTable(Region.objects.all().order_by('localizacion'))
+    data = Region.objects.all().order_by('localizacion')
+    filter = RegionFilter(request.GET, queryset=data)
+    data = filter.qs
+    table = RegionTable(data)
     RequestConfig(request).configure(table)
-    table.paginate(page=request.GET.get("page", 1), per_page=50)    
-    return render(request, 'visualize/regions.html', {'table':table})   
+    table.paginate(page=request.GET.get("page", 1), per_page=50)   
+    context = {'table':table, 'filter':filter} 
+    return render(request, 'visualize/regions.html', context)   
     
 @login_required(login_url="/accounts/login")
 def samples(request):
@@ -306,7 +356,7 @@ def metadata(request):
     context = {'table':table, 'filter':filter}    
     return render(request, 'visualize/oursamplecharacteristics.html', context)
 
-# Para resultados
+# Para tablas de resultados
 @login_required(login_url="/accounts/login")
 def lineages(request):
     table = LineagesTable(LineagesTest.objects.all().order_by('id_uvigo'))
@@ -351,6 +401,7 @@ def variants(request):
 
 
 
+# In[3]
 ##############
 ## Gráficas ##
 from upload.models import SampleMetaData

@@ -7,9 +7,6 @@
   <h2 >Metadatos comunes</h2>
   Quisque venenatis eu arcu vel dignissim. Phasellus nec pharetra turpis, at tempus urna. Ut dapibus urna quis dui pellentesque, nec blandit lectus eleifend. Mauris convallis ornare libero, at porttitor tortor eleifend ut. Nunc nec magna in justo dapibus dapibus at at diam. Mauris gravida sapien vitae pulvinar ultricies
   </br>
-
-
-
   <div class="accordion pt-3" id="accordionExample">
     <div class="card">
       <div class="card-header" id="headingOne">
@@ -18,7 +15,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-search pr-2" viewBox="0 0 16 16">
               <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
             </svg>
-            Search
+            Buscar
           </button>
         </h2>
       </div>
@@ -28,8 +25,14 @@
             <div class="col">
               <div class="card card-body">
                 <form method="get" class="form-group">
-                  {{ filter.form.as_p }}
-                  <button class="btn btn-primary" type="submit">Search</button>
+                  <div class="table-responsive">
+                    <table class='table table-hover table-striped ' >
+                      {{ filter.form.as_table }}
+                    </table>          
+                  </div>
+                  <div class="row justify-content-center">
+                    <button class="btn btn-primary" type="submit">Buscar</button>
+                  </div>                  
                 </form>
               </div>
             </div>
