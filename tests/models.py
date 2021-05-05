@@ -121,8 +121,9 @@ class LineagesTest(models.Model): #.csv
     # id_process = models.CharField(max_length=40)
 
     lineage = models.CharField(max_length=10)
-    probability = models.DecimalField(max_digits=7, decimal_places=6) 
-    most_common_countries = models.ManyToManyField(Country)
+    probability = models.DecimalField(max_digits=7, decimal_places=6, blank=True, null=True) 
+    conflict = models.DecimalField(max_digits=7, decimal_places=6, blank=True, null=True) 
+    most_common_countries = models.ManyToManyField(Country, blank=True)
     pangolearn_version = models.CharField(max_length=15, blank=True, null=True)
     comments = models.TextField(max_length=50, default=None, blank=True, null=True)
 
@@ -132,27 +133,6 @@ class LineagesTest(models.Model): #.csv
         unique_together = ('id_uvigo','date')
     def __str__(self):
         return str(self.id_uvigo) + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
-
-
-
-
-# class LineagesMostCommonCountries(models.Model):
-#     # Esta tabla se hace porque el atributo 'most common countries' de pangolin es multivaluado 'Spain,Portugal'
-#     id = models.AutoField(primary_key=True)
-#     id_uvigo = models.ForeignKey(LineagesTest, on_delete=models.CASCADE)
-#     # id_process = models.CharField(max_length=40)
-#     date = models.DateTimeField(auto_now=True)
-#     country = models.CharField(max_length=30, default=None, blank=True)
-
-#     class Meta:
-#         unique_together = ('id_uvigo','country')    
-#     def __str__(self):
-#         return str(self.id_uvigo) + ' - ' + str(self.date.strftime("%m/%d/%Y, %H:%M:%S")) + ' (UTC)'
-
-
-# class ModeloPrueba(models.Model):
-#     id_uvigo = models.IntegerField(primary_key=True)
-#     atr1 = models.CharField(max_length=10)
 
 
 
@@ -222,6 +202,7 @@ fields_correspondence = {
         'taxon':'id_uvigo',
         'lineage':'lineage',
         'probability':'probability',
+        'conflict':'conflict',
         'most common countries':'most_common_countries',
         # Extras de versión de herramienta local:
         'pangolearn_version':'pangolearn_version',
@@ -477,6 +458,8 @@ def upload_lineages(reader):
         # id_process = 'U-XXX'
         lineage = line.get('lineage')
         probability = line.get('probability')
+        conflict = line.get('conflict')
+        comments = line.get('comments')
         countries = line.get('most_common_countries','').split(',')
         pangolearn_version = line.get('pangolearn_version')
 
@@ -486,10 +469,10 @@ def upload_lineages(reader):
                 id_uvigo=sample_reference,
                 defaults={
                     'id_uvigo' : sample_reference,
-                    # 'id_process' : id_process,
                     'lineage' : lineage,
                     'probability' : probability,
-                    'comments' : '',
+                    'conflict':conflict,
+                    'comments' : comments,
                     'pangolearn_version':pangolearn_version             
                 }
             )
