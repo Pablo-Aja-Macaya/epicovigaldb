@@ -23,35 +23,12 @@
       </div>
       {% endfor %}
   {% endif %}
-  <!-- {% if message %}
-    <div class="alert alert-success" role="alert">
-      {{ message }}. Compruébalo desde la <a href="{% url 'samples' %}">página de visualización</a>.
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-  {% endif %}
-  {% if warning %}
-    <div class="alert alert-warning" role="alert">
-      <div class="row">
-        <div class="col-11">
-          {{ warning | safe }}
-        </div>
-        <div class="col-1">
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  {% endif %} -->
-
-
-  <div class="container-lg pb-2 pt-2">
+  <h3 class='pb-3'><strong>Actualizaciones</strong></h3>
+  <div class="container-lg pb-1 pt-1">
     <div class="card mb-3" style="max-width: 100%;" >
-      <div class="row no-gutters pt-3 pb-3">
+      <div class="row no-gutters pt-1 pb-1">
         <div class="col-md-2 d-flex my-auto justify-content-center" >
-          <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+          <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
             <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
           </svg>
         </div>
@@ -73,9 +50,35 @@
       </div>
     </div>
   </div>  
-
+  <div class="container-lg pb-1 pt-1">
+    <div class="card mb-3" style="max-width: 100%;" >
+      <div class="row no-gutters pt-1 pb-1">
+        <div class="col-md-2 d-flex my-auto justify-content-center" >
+          <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+          </svg>
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h4 class="card-title"><strong>Actualizar coordenadas</strong></h4>
+            <p class="card-text">Se intentarán encontrar las coordenadas de las regiones que no tengan.</p>
+          </div>
+        </div>
+        <div class="col-md-2 text-center my-auto">
+          <div class="btn-group">
+            <a href="{% url 'update_coords' %}">
+              <button type="button" class="boton_carga" onclick="this.classList.toggle('boton_carga--loading')">
+                <span class="boton_carga__text">Actualizar </span>
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>  
   </br>
   <!-- Subida de datos -->
+  <h3 class='pb-3'><strong>Subida de archivos</strong></h3>
   <div class='container-lg'>
     <form id="upload_csv" method="POST" enctype="multipart/form-data" action="{% url 'upload' %}">
       {% csrf_token %}

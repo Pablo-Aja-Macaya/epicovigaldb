@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from re import X
 from epicovigal.celery import app
 from upload.models import Region, Sample
 from upload.models import SampleMetaData 
@@ -25,9 +26,13 @@ def coords(place):
     except:
         return None,None
 
-@app.task
+# @app.task
 def find_coords():
     data = Region.objects.filter(longitud=None) |  Region.objects.filter(longitud='NULL') | Region.objects.filter(longitud='0')
+    sin_coords = len(data)
+    print('Lugares sin coordenadas:',sin_coords)
+    errores = 0
+    actualizados = 0
     for obj in data:
         lat = obj.latitud
         long = obj.longitud
@@ -41,14 +46,22 @@ def find_coords():
             obj.latitud = lat
             obj.longitud = long
             obj.save()
-            print(f'Updated {cp}, {loc}, {lat}, {long}')   
+            if lat is None:
+                print(f'Could not update: {cp}, {loc}')
+                errores += 1   
+            else:
+                print(f'Updated: {cp}, {loc}, {lat}, {long}')
+                actualizados += 1
         else:
             obj.latitud = None
             obj.longitud = None
-            print(obj)
-            obj.save()                
+            obj.save()
+            print(f'No cumple condición: {cp}, {loc}')
+            errores += 1                 
  
     print('Finished updating coordinates')
+    sin_coords -= actualizados
+    return errores, actualizados, sin_coords
 
 
 @app.task

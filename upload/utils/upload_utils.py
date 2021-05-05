@@ -5,6 +5,7 @@ from ..models import Region, Sample
 from ..models import SampleMetaData
 import re
 import traceback
+from geopy import Nominatim
 
 # In[0]
 ## FUNCIONES AYUDANTES
@@ -52,6 +53,52 @@ def time_transform(date):
     except:
         transformed = None
     return transformed
+
+
+def coords(place):
+    geolocator = Nominatim(user_agent='test')
+    try:
+        location = geolocator.geocode(place)
+        return location.latitude,location.longitude
+    except:
+        return None,None
+
+def find_coords():
+    data = Region.objects.filter(longitud=None) |  Region.objects.filter(longitud='NULL') | Region.objects.filter(longitud='0')
+    sin_coords = len(data)
+    print('Lugares sin coordenadas:',sin_coords)
+    errores = 0
+    actualizados = 0
+    for obj in data:
+        lat = obj.latitud
+        long = obj.longitud
+
+        country = obj.pais
+        loc = obj.localizacion
+        cp = obj.cp
+
+        if len(loc)>2:
+            lat, long = coords(str(cp)+' '+ loc + ' ' + country)
+            obj.latitud = lat
+            obj.longitud = long
+            obj.save()
+            if lat is None:
+                print(f'Could not update: {cp}, {loc}')
+                errores += 1   
+            else:
+                print(f'Updated: {cp}, {loc}, {lat}, {long}')
+                actualizados += 1
+        else:
+            obj.latitud = None
+            obj.longitud = None
+            obj.save()
+            print(f'No cumple condición: {cp}, {loc}')
+            errores += 1                 
+ 
+    print('Finished updating coordinates')
+    sin_coords -= actualizados
+    return errores, actualizados, sin_coords
+
 
 # In[1]
 ## FUNCIONES PRINCIPALES

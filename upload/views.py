@@ -130,8 +130,14 @@ def upload(request):
         messages.warning(request, message)
         return redirect('csv')   
         # return render(request, 'upload/csv.html',{'message':'Algo ha ido mal (2).'})
-    
 
+@login_required(login_url="/accounts/login") 
+def update_coords(request):
+    errores, actualizados, sin_coords = find_coords()
+    u = 'https://epicovigaldb.com/visualize/regions?sort=latitud'
+    message = f'Coordenadas actualizadas: {errores} errores, {actualizados} actualizados. Quedan {sin_coords} <a href={u}>regiones sin coordenadas</a>.'
+    messages.success(request, message)
+    return redirect('csv') 
 
 # Subida de metadatos directamente desde el GoogleSheet
 @login_required(login_url="/accounts/login")
