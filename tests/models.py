@@ -477,6 +477,8 @@ def upload_lineages(reader):
                 }
             )
             lineage_reference = LineagesTest.objects.get(id_uvigo=id_uvigo)
+            lineage_reference.most_common_countries.clear() # esto quita los paises que ya tuviesen relación con esta muestra en caso de que sea una actualización
+            lineage_reference.save()
             for country in countries:
                 c = Country(name=country.strip())
                 c.save()
