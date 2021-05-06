@@ -21,7 +21,7 @@ from tasks import views
 from django.views.static import serve
 from django.conf.urls import url
 urlpatterns = [
-    path('administrador/epicovigal/', admin.site.urls),
+    path('administrador/epicovigal/', admin.site.urls, name='admin'),
     path('', views.home, name="home"),
     path('consorcio', views.consorcio, name="consorcio"),
     #url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT, }),
