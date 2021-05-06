@@ -456,7 +456,7 @@ def get_graph_json_link(request, graph_base_url, fecha_inicial, fecha_final, cat
 def linajes_porcentaje_total(request, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None, umbral=None):
     try:
         print(umbral, filtro)
-        if not umbral:
+        if umbral is None:
             thresh = 4 # para eliminar variantes
         else:
             thresh = umbral
@@ -575,7 +575,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final, categoria='ale
 
         value_list = linajes_count.order_by('lineagestest__lineage__count').values_list('lineagestest__lineage__count',flat=True).reverse()
         
-        if not umbral:
+        if umbral is None:
             thresh = int(percentile(value_list,percentil))
         else:
             thresh = umbral
