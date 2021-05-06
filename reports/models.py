@@ -46,21 +46,66 @@ class Report(models.Model):
     def get_month(self):
         m = datetime.datetime.strptime(str(self.fecha_inicial), "%Y-%m-%d").strftime("%B")
         meses = {
-        'January':'Enero',
-        'February':'Febrero',
-        'March':'Marzo',
-        'April':'Abril',
-        'May':'Mayo',
-        'June':'Junio',
-        'July':'Julio',
-        'August':'Agosto',
-        'September':'Septiembre',
-        'October':'Octubre',
-        'November':'Noviembre',
-        'December':'Diciembre', 
+            'January':'Enero',
+            'February':'Febrero',
+            'March':'Marzo',
+            'April':'Abril',
+            'May':'Mayo',
+            'June':'Junio',
+            'July':'Julio',
+            'August':'Agosto',
+            'September':'Septiembre',
+            'October':'Octubre',
+            'November':'Noviembre',
+            'December':'Diciembre', 
         }
         m = meses[m]
         return m
+    def get_date_español(self):
+        m1 = datetime.datetime.strptime(str(self.fecha_inicial), "%Y-%m-%d").strftime("%B")
+        m2 = datetime.datetime.strptime(str(self.fecha_final), "%Y-%m-%d").strftime("%B")
+
+        d1 = datetime.datetime.strptime(str(self.fecha_inicial), "%Y-%m-%d").strftime("%A")
+        d2 = datetime.datetime.strptime(str(self.fecha_final), "%Y-%m-%d").strftime("%A")
+        d1_n = datetime.datetime.strptime(str(self.fecha_inicial), "%Y-%m-%d").strftime("%d")
+        d2_n = datetime.datetime.strptime(str(self.fecha_final), "%Y-%m-%d").strftime("%d")
+        y1 = datetime.datetime.strptime(str(self.fecha_inicial), "%Y-%m-%d").year
+        y2 = datetime.datetime.strptime(str(self.fecha_final), "%Y-%m-%d").year
+        meses = {
+            'January':'Enero',
+            'February':'Febrero',
+            'March':'Marzo',
+            'April':'Abril',
+            'May':'Mayo',
+            'June':'Junio',
+            'July':'Julio',
+            'August':'Agosto',
+            'September':'Septiembre',
+            'October':'Octubre',
+            'November':'Noviembre',
+            'December':'Diciembre', 
+        }
+        dias = {
+            'Monday':'Lunes',
+            'Tuesday':'Martes',
+            'Wednesday':'Miércoles',
+            'Thursday':'Jueves',
+            'Friday':'Viernes',
+            'Saturday':'Sábado',
+            'Sunday':'Domingo'
+        }
+        m1 = meses[m1]
+        m2 = meses[m2]
+        d1 = dias[d1]
+        d2 = dias[d2]
+
+        fecha_i = f'{d1}, {d1_n} de {m1}, {y1}'
+        fecha_f = f'{d2}, {d2_n} de {m2}, {y2}'
+
+        fecha = fecha_i + ' - ' + fecha_f
+
+        return fecha
+
     def get_year(self):
         y = datetime.datetime.strptime(str(self.fecha_inicial), "%Y-%m-%d").year
         return y

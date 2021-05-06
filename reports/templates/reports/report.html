@@ -9,8 +9,8 @@
       <div class="row">
         <div class="container-lg">
           <div class="card-body">
-              <h5 class="card-title" style="color: white;"><strong>{{ report.titulo }}</strong></h5>
-              <h6 class="card-subtitle mb-2" style="color: white;">{{ report.fecha_inicial|date:'d-m-Y'  }} - {{ report.fecha_final|date:'d-m-Y' }}</h6>
+              <h5 class="card-title" style="color: white;"><strong>{{ report.titulo }} </strong></h5>
+              <h6 class="card-subtitle mb-2" style="color: white;">{{ report.get_date_español }}</h6>
           </div>
         </div>
       </div>
