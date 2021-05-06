@@ -15,9 +15,22 @@
 
   <div class="container-lg">
     <h2 class='pb-2'><strong>Ficheros con errores</strong></h2>
-        {% for e in errors %}
-            <p><strong>Archivo:</strong> {{ e.archivo }} - <strong>Error:</strong> {{ e.error }}</p>
-        {% endfor %}
+    <div class="container-fluid pb-3">
+        <div class="card">
+          <div class="card-body">
+            <ul class="list-unstyled">
+              <li><strong>Nota:</strong></li>
+                <ul>
+                    <li>Se ignoran archivos que tengan "_filtered.tsv" o "SingleCheck" en su nombre o que no contengan alguna de las siguientes estructuras: "EPI.X.N", "SERGAS.X.N" o "VAL.X.N". ¡</li>
+                    <li>Los que se muestran a continuación cumplen estas condiciones pero ha ocurrido algún error en la subida.</li>
+                </ul>
+            </ul>
+          </div>
+        </div>      
+    </div>
+    {% for e in errors %}
+        <p><strong>Archivo:</strong> {{ e.archivo }} - <strong>Error:</strong> {{ e.error }}</p>
+    {% endfor %}
   </div>
 </div>
 
