@@ -40,8 +40,8 @@ class SampleMetaDataForm(ModelForm):
 
 class RegionForm(forms.Form):
     id_region = forms.CharField(required=False, disabled=True)
-    localizacion = forms.CharField(required=False, disabled=True)
-    cp = forms.DecimalField(required=False, disabled=True)
+    localizacion = forms.CharField(required=False)
+    cp = forms.DecimalField(required=False)
     latitud = forms.DecimalField(required=False)
     longitud = forms.DecimalField(required=False)
     pais = forms.CharField(required=False)

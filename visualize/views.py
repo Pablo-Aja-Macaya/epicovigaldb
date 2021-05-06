@@ -276,21 +276,24 @@ def specific_region(request, id_region):
         if form.is_valid():
             datos = form.cleaned_data
             datos.pop('id_region',None)
-            datos.pop('localizacion',None)
-            datos.pop('cp',None)
+            # datos.pop('localizacion',None)
+            # datos.pop('cp',None)
             defaults = {
                 'id_region':id_region,
-                'localizacion':obj.localizacion,
-                'cp':obj.cp,
+                # 'localizacion':obj.localizacion,
+                # 'cp':obj.cp,
                 **datos
                 }
             print(defaults)
-            messages.success(request, 'Cambios guardados')
-            _, created = Region.objects.update_or_create(
-                    id_region = id_region,
-                    defaults = datos
-
-                ) 
+            
+            try:
+                _, created = Region.objects.update_or_create(
+                        id_region = id_region,
+                        defaults = datos
+                    ) 
+                messages.success(request, 'Cambios guardados')
+            except Exception as e:
+                messages.warning(request, f'Error: {e}')
             return redirect(reverse('specific_region', args=(id_region,)))
     else:
         form = RegionForm(initial=model_to_dict(obj))
