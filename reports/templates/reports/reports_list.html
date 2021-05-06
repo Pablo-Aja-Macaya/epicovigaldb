@@ -17,7 +17,7 @@
     {% endfor %}
   </div>
 
-  <h3 class='pb-2 pt-2 text-dark' ><strong>Informes mensuales</strong> </h3>
+  <h3 class='pb-2 pt-4 text-dark' ><strong>Informes mensuales</strong> </h3>
   <div class="list-group">
     {% for report in mensuales.all %}
     <a href="{% url 'report' id=report.id %}" class="list-group-item list-group-item-action">
@@ -30,9 +30,9 @@
     </a>
     {% endfor %}
   </div>
-
+  
   {% if privados.all %}
-  <h3 class='pb-2 pt-2 text-dark' ><strong>Informes privados </strong> </h3>
+  <h3 class='pb-2 pt-4 text-dark' ><strong>Informes privados </strong> </h3>
   <div class="list-group">
     {% for report in privados.all %}
     <a href="{% url 'report' id=report.id %}" class="list-group-item list-group-item-action">
