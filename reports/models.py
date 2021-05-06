@@ -4,12 +4,24 @@ import datetime
 # Create your models here.
 
 class Report(models.Model):
+    OPCIONES_TIPO = (
+        ('privado','privado'),
+        ('mensual','mensual'),
+        ('general','general')
+    )
+    OPCIONES_CATEGORIA = (
+        ('vigilancia','vigilancia'),
+        ('aleatoria','aleatoria'),
+        ('no aleatoria','no aleatoria'),
+    )
+
     id = models.AutoField(primary_key=True)
     titulo = models.CharField(max_length=20, default=None, blank=True)
     subtitulo = models.TextField(max_length=50, default=None)
 
-    tipo = models.CharField(max_length=10, default='mensual')
-    objetivo = models.CharField(max_length=10, default='vigilancia')
+    tipo = models.CharField(max_length=10, default='mensual', choices=OPCIONES_TIPO)
+    categoria = models.CharField(max_length=20, default='vigilancia', choices=OPCIONES_CATEGORIA)
+    umbral = models.IntegerField(default=None, blank=True, null=True)
     
     fecha_inicial = models.DateField(default='2020-01-01')
     fecha_final = models.DateField(default='2020-01-30')
@@ -53,4 +65,4 @@ class Report(models.Model):
         y = datetime.datetime.strptime(str(self.fecha_inicial), "%Y-%m-%d").year
         return y
     def __str__(self):
-        return f'{str(self.id)}'
+        return f'{str(self.id)} - {str(self.titulo)} - {str(self.categoria)}'

@@ -10,7 +10,7 @@
         <div class="container-lg">
           <div class="card-body">
               <h5 class="card-title" style="color: white;"><strong>{{ report.titulo }}</strong></h5>
-              <h6 class="card-subtitle mb-2" style="color: white;">{{ report.fecha_inicial  }} - {{ report.fecha_final }}</h6>
+              <h6 class="card-subtitle mb-2" style="color: white;">{{ report.fecha_inicial|date:'d-m-Y'  }} - {{ report.fecha_final|date:'d-m-Y' }}</h6>
           </div>
         </div>
       </div>
@@ -41,7 +41,7 @@
           </div>
         </div>
         <div class="col-lg-6 justify-content-center my-auto">
-          <div id="hospital_graph" data-url="{% url 'hospital_graph' fecha_inicial=report.fecha_inicial|date:'Y-m-d' fecha_final=report.fecha_final|date:'Y-m-d' %}"></div>
+          <div id="hospital_graph" data-url={{url_origen}}></div>
         </div>
       </div>
     </div>
@@ -53,12 +53,12 @@
         <div class="col-lg-5 d-flex justify-content-center my-auto">
           <div class="card-body" >
               <h5 class="card-title" ><strong>Variantes por hospital</strong></h5>
-              <h6 class="card-subtitle mb-2 text-muted" >Muestras aleatorias ({{ report.fecha_inicial|date:'d-m-Y' }} | {{ report.fecha_final|date:'d-m-Y' }})</h6>
+              <h6 class="card-subtitle mb-2 text-muted" >Categoría: {{ report.categoria }} - ({{ report.fecha_inicial|date:'d-m-Y' }} | {{ report.fecha_final|date:'d-m-Y' }})</h6>
               <p class="card-text" >{{ report.texto_variantes_hospitales }}</p>
           </div>
         </div>
         <div class="col-lg-7 justify-content-center my-auto" >
-          <div id="linajes_hospitales_graph" data-url="{% url 'linajes_hospitales_graph' fecha_inicial=report.fecha_inicial|date:'Y-m-d' fecha_final=report.fecha_final|date:'Y-m-d' %}"></div>
+          <div id="linajes_hospitales_graph" data-url={{url_linajes_hospital}}></div>
         </div>
       </div>
     </div>
@@ -70,12 +70,12 @@
         <div class="col-lg-5 d-flex justify-content-center my-auto">
           <div class="card-body">
               <h5 class="card-title"><strong>Variantes en Galicia </strong></h5>
-              <h6 class="card-subtitle mb-2 text-muted">Muestras aleatorias ({{ report.fecha_inicial|date:'d-m-Y' }} | {{ report.fecha_final|date:'d-m-Y' }})</h6>
+              <h6 class="card-subtitle mb-2 text-muted">Categoría: {{ report.categoria }} - ({{ report.fecha_inicial|date:'d-m-Y' }} | {{ report.fecha_final|date:'d-m-Y' }})</h6>
               <p class="card-text">{{ report.texto_variantes_galicia }}</p>
           </div>
         </div>
         <div class="col-lg-7 justify-content-center my-auto" >
-          <div id="linajes_porcentaje_total" data-url="{% url 'linajes_porcentaje_total' fecha_inicial=report.fecha_inicial|date:'Y-m-d' fecha_final=report.fecha_final|date:'Y-m-d' %}"></div>
+          <div id="linajes_porcentaje_total" data-url={{url_linajes}}></div>
         </div>
       </div>
     </div>
@@ -87,12 +87,13 @@
         <div class="col-lg-6 justify-content-center my-auto">
           <div class="card-body">
               <h5 class="card-title"><strong>Geolocalización de muestras</strong></h5>
-              <h6 class="card-subtitle mb-2 text-muted">Mapa: Instituto Geográfico Nacional de España</h6>
+              <h6 class="card-subtitle mb-2 text-muted">Categoría: {{ report.categoria }} - ({{ report.fecha_inicial|date:'d-m-Y' }} | {{ report.fecha_final|date:'d-m-Y' }})</h6>
+              <h6 class="card-subtitle mb-2 text-muted">Mapa: Instituto Geográfico Nacional de España</h6>              
               <p class="card-text">{{ report.texto_geolocalizacion_concellos }}</p>
           </div>
         </div>
         <div class="col-lg-6 justify-content-center my-auto">
-          <div id="concellos_gal_graph" data-url="{% url 'concellos_gal_graph' fecha_inicial=report.fecha_inicial|date:'Y-m-d' fecha_final=report.fecha_final|date:'Y-m-d' %}" style="height: 700px;"></div>
+          <div id="concellos_gal_graph" data-url={{url_concellos}} style="height: 700px;"></div>
         </div>
       </div>
     </div>
@@ -166,7 +167,7 @@
       }
     });
   </script>
-  <script>
+  <!-- <script>
     $.ajax({
       url: $("#variants_line_graph").attr("data-url"),
       dataType: 'json',
@@ -190,5 +191,5 @@
         Highcharts.chart("variants_column_graph", data);
       }
     });
-  </script>
+  </script> -->
 {% endblock %}
