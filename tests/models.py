@@ -591,8 +591,12 @@ def update():
             for f in files:
                 fname = pathlib.Path(f)
                 
-                if '_filtered.tsv' in str(fname):
-                    # El programa se salta estos archivos porque dan error seguro
+                # El programa se salta estos archivos porque dan error seguro
+                if not find_sample_name(str(fname)):
+                    continue
+                elif '_filtered.tsv' in str(fname):
+                    continue
+                elif 'SingleCheck' in str(fname):
                     continue
 
                 mtime = fname.stat().st_mtime # Time of most recent content modification expressed in seconds.
@@ -638,6 +642,15 @@ def update():
             for f in files:
                 fname = pathlib.Path(f)
                 mtime = fname.stat().st_mtime # Time of most recent content modification expressed in seconds.
+                
+                # El programa se salta estos archivos porque dan error seguro
+                if not find_sample_name(str(fname)):
+                    continue
+                elif '_filtered.tsv' in str(fname):
+                    continue
+                elif 'SingleCheck' in str(fname):
+                    continue
+
                 try:
                     with open(fname, 'rt') as fichero:
                         update_database(fichero, fname)
