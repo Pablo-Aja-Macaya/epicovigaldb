@@ -12,7 +12,6 @@ from .forms import SelectTestForm
 def test_errors(request):
     error_log_file = './test_update_error_log.txt'
     errors = read_log(error_log_file)
-    print(errors)
     context = {'errors':errors}
     return render(request, 'tests/test_errors.html', context)
 
