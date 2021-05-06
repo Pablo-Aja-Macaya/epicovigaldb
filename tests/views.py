@@ -5,10 +5,16 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.urls import reverse
 
-from .models import send_results_processing, update
+from .models import send_results_processing, update, read_log
 from .forms import SelectTestForm
 
-
+@login_required(login_url="/accounts/login")
+def test_errors(request):
+    error_log_file = './test_update_error_log.txt'
+    errors = read_log(error_log_file)
+    print(errors)
+    context = {'errors':errors}
+    return render(request, 'tests/test_errors.html', context)
 
 @login_required(login_url="/accounts/login")
 def tests(request):
