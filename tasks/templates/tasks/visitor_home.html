@@ -128,7 +128,7 @@
 
 
 
-
+  {% for report in data.all %}
   <div class="container-lg pt-2 pb-2">
     <h3 class='pb-2 pt-2 text-dark' ><strong>{{ report.titulo }} </strong> </h3>
     <h6 class="card-subtitle mb-2 text-muted">{{ report.get_date_español }}</h6>
@@ -216,7 +216,7 @@
       </div>
     </div>
   </div>  
-
+  {% endfor %}
   
 </main>
 

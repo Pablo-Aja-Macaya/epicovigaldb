@@ -19,10 +19,14 @@ def home(request):
     else:
         tasks = Task.objects.filter(show_to='all')
         url = 'tasks/visitor_home.html'
-
-        data = Report.objects.filter(titulo='Informe 2020-2021')
-        report = data[0]
-        urls_dicc = get_report_urls(report)
+        try:
+            data = Report.objects.filter(titulo='Informe 2020-2021')
+            report = data[0]
+            urls_dicc = get_report_urls(report)
+        except:
+            # la entrada no existe en la base de datos
+            report = None
+            urls_dicc = None
 
     context = {
         'tasks':tasks, 
@@ -31,7 +35,7 @@ def home(request):
         'lineage_count':lineage_count
         }
     if report:
-        context['report'] = report
+        context['data'] = data
     if urls_dicc:
         context = {**context, **urls_dicc}
 
