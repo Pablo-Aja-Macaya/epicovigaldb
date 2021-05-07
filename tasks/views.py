@@ -13,6 +13,8 @@ def home(request):
     sample_count = Sample.objects.filter(id_uvigo__contains='EPI').exclude(id_uvigo__contains='ICVS').count()
     sequenced_count = SampleMetaData.objects.exclude(fecha_entrada_fastq__isnull=True).exclude(id_hospital='ICVS').exclude(id_uvigo_id__id_uvigo__contains='SERGAS').count()
     lineage_count = LineagesTest.objects.exclude(id_uvigo_id__id_uvigo__contains='SERGAS').exclude(id_uvigo_id__id_uvigo__contains='ICVS').values('lineage').distinct().count()
+    report = None
+    urls_dicc = None
     if request.user.is_authenticated:
         tasks = Task.objects
         url = 'tasks/home.html'
