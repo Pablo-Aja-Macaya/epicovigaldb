@@ -130,104 +130,94 @@
 
 
   <div class="container-lg pt-2 pb-2">
-    <h3 class='pb-2 pt-2 text-dark' ><strong>Informe general (2020-2021) </strong> </h3>
+    <h3 class='pb-2 pt-2 text-dark' ><strong>{{ report.titulo }} </strong> </h3>
+    <h6 class="card-subtitle mb-2 text-muted">{{ report.get_date_español }}</h6>
+    
   </div>
+  <!-- Resumen -->
+  <div class="container-lg pt-2 pb-2">
+    <div class="card" style="width: 100%;">
+      <div class="row">
+        <div class="container-lg">
+          <div class="card-body">
+            <h5 class="card-title"><strong>Resumen</strong></h5>
+            <p class="card-text">{{ report.texto_informacion }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> 
+  <!-- Procedencia -->
   <div class="container-lg pt-2 pb-4">
     <div class="card" style="width: 100%;border-style: none;">
       <div class="row">
         <div class="col-lg-6 d-flex justify-content-center my-auto">
           <div class="card-body">
               <h5 class="card-title"><strong>Procedencia de muestras</strong></h5>
-              <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
+              <h6 class="card-subtitle mb-2 text-muted">Subtítulo</h6>
+              <p class="card-text">{{ report.texto_procedencia }} </p>
           </div>
         </div>
         <div class="col-lg-6 justify-content-center my-auto">
-          <div id="hospital_graph" data-url="{% url 'hospital_graph' fecha_inicial='2020-01-01' fecha_final=current_date %}"></div>
+          <div id="hospital_graph" data-url={{url_origen}}></div>
         </div>
-
       </div>
     </div>
-  </div>
+  </div>  
+  <!-- Variantes por hospital -->
   <div class="container-lg pt-2 pb-4">
     <div class="card" style="width: 100%;border-style: none;">
       <div class="row">
         <div class="col-lg-5 d-flex justify-content-center my-auto">
           <div class="card-body" >
               <h5 class="card-title" ><strong>Variantes por hospital</strong></h5>
-              <h6 class="card-subtitle mb-2 text-muted" >Muestras aleatorias</h6>
-              <p class="card-text" >Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
+              <h6 class="card-subtitle mb-2 text-muted" >Categoría: {{ report.categoria }} - ({{ report.fecha_inicial|date:'d-m-Y' }} | {{ report.fecha_final|date:'d-m-Y' }})</h6>
+              <p class="card-text" >{{ report.texto_variantes_hospitales }}</p>
           </div>
         </div>
         <div class="col-lg-7 justify-content-center my-auto" >
-          <div id="linajes_hospitales_graph" data-url="{% url 'linajes_hospitales_graph' fecha_inicial='2020-01-01' fecha_final=current_date %}"></div>
+          <div id="linajes_hospitales_graph" data-url={{url_linajes_hospital}}></div>
         </div>
       </div>
     </div>
   </div> 
+  <!-- Variantes en galicia -->
   <div class="container-lg pt-2 pb-4">
     <div class="card" style="width: 100%;border-style: none;">
       <div class="row">
         <div class="col-lg-5 d-flex justify-content-center my-auto">
           <div class="card-body">
-              <h5 class="card-title"><strong>Variantes en Galicia</strong></h5>
-              <h6 class="card-subtitle mb-2 text-muted">Muestras aleatorias</h6>
-              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
+              <h5 class="card-title"><strong>Variantes en Galicia </strong></h5>
+              <h6 class="card-subtitle mb-2 text-muted">Categoría: {{ report.categoria }} - ({{ report.fecha_inicial|date:'d-m-Y' }} | {{ report.fecha_final|date:'d-m-Y' }})</h6>
+              <p class="card-text">{{ report.texto_variantes_galicia }}</p>
           </div>
         </div>
         <div class="col-lg-7 justify-content-center my-auto" >
-          <div id="linajes_porcentaje_total" data-url="{% url 'linajes_porcentaje_total' fecha_inicial='2020-01-01' fecha_final=current_date %}"></div>
+          <div id="linajes_porcentaje_total" data-url={{url_linajes}}></div>
         </div>
       </div>
     </div>
   </div>  
+  <!-- Mapa -->
   <div class="container-lg pt-2 pb-4">
     <div class="card" style="width: 100%; border-style: none;">
       <div class="row">
         <div class="col-lg-6 justify-content-center my-auto">
           <div class="card-body">
               <h5 class="card-title"><strong>Geolocalización de muestras</strong></h5>
-              <h6 class="card-subtitle mb-2 text-muted">Mapa: Instituto Geográfico Nacional de España</h6>
-              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
+              <h6 class="card-subtitle mb-2 text-muted">Categoría: {{ report.categoria }} - ({{ report.fecha_inicial|date:'d-m-Y' }} | {{ report.fecha_final|date:'d-m-Y' }})</h6>
+              <h6 class="card-subtitle mb-2 text-muted">Mapa: Instituto Geográfico Nacional de España</h6>              
+              <p class="card-text">{{ report.texto_geolocalizacion_concellos }}</p>
           </div>
         </div>
         <div class="col-lg-6 justify-content-center my-auto">
-          <div id="concellos_gal_graph" data-url="{% url 'concellos_gal_graph' fecha_inicial='2020-01-01' fecha_final=current_date %}" style="height: 700px;"></div>
-        </div>
-
-      </div>
-    </div>
-  </div>  
-  <!-- <div class="container-lg pt-2 pb-3">
-    <div class="card" style="width: 100%;border-style: none;">
-      <div class="row">
-        <div class="container-lg">
-          <div class="card-body">
-              <h5 class="card-title"><strong>Variantes (DATOS NO REALES)</strong></h5>
-              <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
-          </div>
-          <div id="variants_line_graph" data-url="{% url 'variants_line_graph' variant='S:E484' fecha_inicial='2020-01-01' fecha_final='2030-1-1' %}"></div>
-          <div id="variants_line_graph2" data-url="{% url 'variants_line_graph' variant='S:N501' fecha_inicial='2020-01-01' fecha_final='2030-1-1'%}"></div>
+          <div id="concellos_gal_graph" data-url={{url_concellos}} style="height: 700px;"></div>
         </div>
       </div>
     </div>
   </div>  
 
-  <div class="container-lg pt-1 pb-4">
-    <div class="card" style="width: 100%;border-style: none;">
-      <div class="row">
-        <div class="container-lg">
-          <div class="card-body">
-              <h5 class="card-title"><strong>Origins (DATOS NO REALES)</strong></h5>
-              <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus ex vel nisl venenatis, non malesuada augue porttitor. Praesent pellentesque nec lectus sit amet tincidunt. Morbi finibus lobortis vulputate. Sed scelerisque, nisi vel mollis ultrices, ante libero iaculis massa, a bibendum lacus enim eget sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eget tellus sagittis, maximus lectus at, eleifend turpis. Cras volutpat lorem in augue ullamcorper, vitae condimentum tortor pulvinar. Donec eget magna odio. Donec no </p>
-          </div>
-          <div id="variants_column_graph" data-url="{% url 'variants_column_graph' variant='20E (EU1)' fecha_inicial='2020-01-01' fecha_final='2030-1-1' %}"></div>
-        </div>
-      </div>
-    </div>
-  </div>  -->
+  
 </main>
 
 <script>
@@ -267,31 +257,6 @@
     dataType: 'json',
     success: function (data) {
       Highcharts.chart("hospital_graph", data);
-    }
-  });
-</script>
-<script>
-  $.ajax({
-    url: $("#variants_line_graph").attr("data-url"),
-    dataType: 'json',
-    success: function (data) {
-      Highcharts.chart("variants_line_graph", data);
-    }
-  });
-  $.ajax({
-    url: $("#variants_line_graph2").attr("data-url"),
-    dataType: 'json',
-    success: function (data) {
-      Highcharts.chart("variants_line_graph2", data);
-    }
-  });
-</script>
-<script>
-  $.ajax({
-    url: $("#variants_column_graph").attr("data-url"),
-    dataType: 'json',
-    success: function (data) {
-      Highcharts.chart("variants_column_graph", data);
     }
   });
 </script>

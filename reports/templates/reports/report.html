@@ -98,38 +98,8 @@
       </div>
     </div>
   </div>  
-  <!-- Variantes (lineas) -->
-  <!-- <div class="container-lg pt-2 pb-3">
-    <div class="card" style="width: 100%;border-style: none;">
-      <div class="row">
-        <div class="container-lg">
-          <div class="card-body">
-              <h5 class="card-title"><strong>Variantes (DATOS NO REALES)</strong></h5>
-              <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-              <p class="card-text">{{ report.texto_variantes_lineas }}</p>
-          </div>
-          <div id="variants_line_graph" data-url="{% url 'variants_line_graph' variant='S:E484' fecha_inicial=report.fecha_inicial|date:'Y-m-d' fecha_final=report.fecha_final|date:'Y-m-d' %}"></div>
-          <div id="variants_line_graph2" data-url="{% url 'variants_line_graph' variant='S:N501' fecha_inicial=report.fecha_inicial|date:'Y-m-d' fecha_final=report.fecha_final|date:'Y-m-d' %}"></div>
-        </div>
-      </div>
-    </div>
-  </div>    -->
 
-  <!-- Variantes (columnas) -->
-  <!-- <div class="container-lg pt-1 pb-4">
-    <div class="card" style="width: 100%;border-style: none;">
-      <div class="row">
-        <div class="container-lg">
-          <div class="card-body">
-              <h5 class="card-title"><strong>Origins (DATOS NO REALES)</strong></h5>
-              <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-              <p class="card-text">{{ report.texto_variantes_columnas }}</p>
-          </div>
-          <div id="variants_column_graph" data-url="{% url 'variants_column_graph' variant='20E (EU1)' fecha_inicial=report.fecha_inicial fecha_final=report.fecha_final%}"></div>
-        </div>
-      </div>
-    </div>
-  </div>   -->
+
   {% endfor %}
   <script>
     $.ajax({
@@ -167,29 +137,5 @@
       }
     });
   </script>
-  <!-- <script>
-    $.ajax({
-      url: $("#variants_line_graph").attr("data-url"),
-      dataType: 'json',
-      success: function (data) {
-        Highcharts.chart("variants_line_graph", data);
-      }
-    });
-    $.ajax({
-      url: $("#variants_line_graph2").attr("data-url"),
-      dataType: 'json',
-      success: function (data) {
-        Highcharts.chart("variants_line_graph2", data);
-      }
-    });
-  </script>
-  <script>
-    $.ajax({
-      url: $("#variants_column_graph").attr("data-url"),
-      dataType: 'json',
-      success: function (data) {
-        Highcharts.chart("variants_column_graph", data);
-      }
-    });
-  </script> -->
+
 {% endblock %}
