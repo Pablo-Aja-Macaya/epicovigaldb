@@ -130,11 +130,12 @@ class RegionFilter(django_filters.FilterSet):
     id_region = django_filters.NumberFilter(field_name = 'id_region', lookup_expr='icontains')
     localizacion = django_filters.CharFilter(field_name = 'localizacion', lookup_expr='icontains')
     cp = django_filters.CharFilter(field_name = 'cp', lookup_expr='icontains')
+    division = django_filters.CharFilter(field_name = 'division', lookup_expr='icontains')
     pais = django_filters.CharFilter(field_name = 'pais', lookup_expr='icontains')
     region = django_filters.CharFilter(field_name = 'region', lookup_expr='icontains')
     class Meta:
         model = Region
-        fields = ['id_region','localizacion','cp']
+        fields = ['id_region','localizacion','cp','division']
 
 # class CompletedTestsFilter(django_filters.FilterSet):
 #     id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo', lookup_expr='icontains')

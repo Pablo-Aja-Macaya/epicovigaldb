@@ -44,6 +44,7 @@ class RegionForm(forms.Form):
     cp = forms.DecimalField(required=False)
     latitud = forms.DecimalField(required=False)
     longitud = forms.DecimalField(required=False)
+    division = forms.CharField(required=False)
     pais = forms.CharField(required=False)
     region = forms.CharField(required=False)
 
