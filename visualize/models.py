@@ -137,6 +137,7 @@ class RegionFilter(django_filters.FilterSet):
         model = Region
         fields = ['id_region','localizacion','cp','division']
 
+#
 # class CompletedTestsFilter(django_filters.FilterSet):
 #     id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo', lookup_expr='icontains')
 #     class Meta:
