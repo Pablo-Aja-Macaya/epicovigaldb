@@ -36,17 +36,27 @@
       </div>
       {% endfor %}
   {% endif %}
-  <h2>Resumen</h2>
-  <div class="row justify-content-center">
-    <div class="btn-group">
-      <a href="{% url 'get_graphs' %}"><button type="button"  class="btn btn-primary" > Visualizar gráficas</button></a>
-    </div>    
+  <h2><strong>Resumen</strong></h2>
+  <div class="container-lg pb-2 pt-3">
+    <div class="card mb-3"  >
+      <div class="row no-gutters justify-content-start pt-3 pb-3">
+        <div class="col-3 d-flex justify-content-center my-auto" >
+          <img src="/media/images/Epicovigal.icon_-1.png"  alt="..." style="height: 9vh; width: 9vh;">
+        </div>
+        <div class="col-9 my-auto">
+          <div class="card-body">
+            <h4 class="card-title"><strong><a href="{% url 'get_graphs' %}">Visualizar gráficas</a></strong></h4>
+            <p class="card-text">Visualiza las gráficas parametrizadas.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <hr>
 
-
-  <h2>Tabla de tests realizados</h2>
+  <h2><strong>Tabla de tests realizados</strong></h2>
   <p>Esta tabla indica, para cada muestra, qué tests se han realizado.</p>
 
   <div class="container-fluid pb-4 pt-3 justify-content-center">
