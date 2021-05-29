@@ -63,6 +63,21 @@ def coords(place):
     except:
         return None,None
 
+# def coords(place, extra=None):
+#     geolocator = Nominatim(user_agent='test')
+#     location = geolocator.geocode(place, addressdetails=True)
+#     if extra:
+#         try:
+#             raw_loc = location.raw['address']
+#             return location.latitude, location.longitude, raw_loc['state'], raw_loc['country']
+#         except: 
+#             return None, None, None , None
+#     else:
+#         try:
+#             return location.latitude, location.longitude
+#         except:
+#             return None, None
+
 def find_coords():
     data = Region.objects.filter(longitud=None) |  Region.objects.filter(longitud='NULL') | Region.objects.filter(longitud='0')
     sin_coords = len(data)
@@ -115,7 +130,10 @@ def upload_sample_hospital(stream):
         'Sexo paciente (H/M)':'sexo', 
         'Edad paciente (años)':'edad', 
         'Ciudad residencia paciente':'localizacion', 
-        'Código postal residencia paciente':'cp', 
+        'Código postal residencia paciente':'cp',
+        'Calidad secuenciación':'calidad_secuenciacion',
+        'Vacunación (tipo)':'vacunacion_tipo',
+        'Vacunación (dosis)':'vacunacion_dosis',
         'Ct ORF1ab':'ct_orf1ab', 
         'Ct gen E':'ct_gen_e', 
         'Ct gen N':'ct_gen_n', 
@@ -150,10 +168,6 @@ def upload_sample_hospital(stream):
     reader = csv.DictReader(io_string, fieldnames=fieldnames, dialect=dialect) 
     
     lista_fallos = []
-    entradas_sample_para_actualizar = []
-    entradas_samplemetadata_para_actualizar = []
-    entradas_sample_para_crear = []
-    entradas_samplemetadata_para_crear = []
     for line in reader:
         try:
             id_uvigo = line.get('id_uvigo')
@@ -164,6 +178,9 @@ def upload_sample_hospital(stream):
             id_muestra = line.get('id_muestra')
             hospitalizacion = line.get('hospitalizacion')[:1] # Para que si hay un 'Si' pille sólo la S
             uci = line.get('uci')
+            vacunacion_tipo = line.get('vacunacion_tipo')
+            vacunacion_dosis = line.get('vacunacion_dosis')
+            calidad_secuenciacion = line.get('calidad_secuenciacion')
             categoria_muestra = line.get('categoria_muestra')
             nodo_secuenciacion = line.get('nodo_secuenciacion')
             observaciones = line.get('observaciones')
@@ -188,6 +205,11 @@ def upload_sample_hospital(stream):
             try: 
                 int(cp)
             except: cp = 0
+
+            try:
+                int(vacunacion_dosis)
+            except:
+                vacunacion_dosis=None
                 
             try:
                 int(edad)
@@ -245,11 +267,14 @@ def upload_sample_hospital(stream):
                             'id_muestra' : id_muestra,
                             'hospitalizacion' : hospitalizacion[:1], 
                             'uci' : uci[:1],
+                            'vacunacion_tipo':vacunacion_tipo,
+                            'vacunacion_dosis':vacunacion_dosis,
                             'ct_orf1ab' : orf1ab,
                             'ct_gen_e' : gen_e,
                             'ct_gen_n' : gen_n,
                             'ct_rdrp' : rdrp,
                             'ct_s' : ct_s,
+                            'calidad_secuenciacion':calidad_secuenciacion,
                             'fecha_sintomas' : f_sintomas,
                             'fecha_diagnostico' : f_diagnostico,
                             'fecha_entrada' : f_entrada_uv,

@@ -2,13 +2,13 @@ from django.db import models
 
 class Region(models.Model):
     id_region = models.AutoField(primary_key=True)
-    cp = models.IntegerField(null=True)
-    localizacion = models.CharField(max_length=50, null=True) 
-    division = models.CharField(max_length=50, default=None, null=True) 
-    pais = models.CharField(max_length=50, default='SPAIN') 
-    region = models.CharField(max_length=50, default='EUROPE') 
-    latitud = models.TextField(max_length=50, default=None, null=True)
-    longitud = models.TextField(max_length=50, default=None, null=True)
+    cp = models.IntegerField(default=None, blank=True, null=True)
+    localizacion = models.CharField(max_length=50, default=None, blank=True, null=True) 
+    division = models.CharField(max_length=50, default=None, blank=True, null=True) 
+    pais = models.CharField(max_length=50, default=None, blank=True, null=True) 
+    region = models.CharField(max_length=50, default=None, blank=True, null=True) 
+    latitud = models.TextField(max_length=50, default=None, blank=True, null=True)
+    longitud = models.TextField(max_length=50, default=None, blank=True, null=True)
    
     class Meta:
         unique_together = ('cp','localizacion')
@@ -45,12 +45,17 @@ class SampleMetaData(models.Model):
     
     hospitalizacion = models.CharField(max_length=1, default=None, null=True, blank=True)
     uci = models.CharField(max_length=1, default=None, null=True, blank=True)
-    
+
+    vacunacion_tipo = models.CharField(max_length=20, default=None, blank=True, null=True)
+    vacunacion_dosis = models.IntegerField(default=None, blank=True, null=True)
+
     ct_orf1ab = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True, blank=True)
     ct_gen_e = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True, blank=True)
     ct_gen_n = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True, blank=True)
     ct_rdrp = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True, blank=True)
     ct_s = models.DecimalField(max_digits=5, decimal_places=2, default=None, null=True, blank=True)
+
+    calidad_secuenciacion = models.CharField(max_length=20, default=None, blank=True, null=True)
 
     fecha_envio_cdna = models.DateField(blank=True, null=True)
     fecha_run_ngs = models.DateField(blank=True, null=True)
@@ -59,6 +64,7 @@ class SampleMetaData(models.Model):
     fecha_diagnostico = models.DateField(blank=True, null=True)
     fecha_entrada = models.DateField(blank=True, null=True)
 
+    
     def __str__(self):
         return str(self.id_uvigo)
 
