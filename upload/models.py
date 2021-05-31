@@ -22,6 +22,7 @@ class Sample(models.Model):
     original_name = models.CharField(max_length=50, default=None, blank=True, null=True)
     id_region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True)
     categoria_muestra = models.CharField(max_length=20, default=None, blank=True, null=True)
+    vigilancia = models.CharField(max_length=20, default=None, blank=True, null=True)
     edad = models.IntegerField(default=0, blank=True, null=True)
     sexo = models.CharField(max_length=1, default=None, blank=True, null=True)
     patient_status = models.CharField(max_length=20, default=None, blank=True, null=True)
@@ -64,6 +65,7 @@ class SampleMetaData(models.Model):
     fecha_sintomas = models.DateField(blank=True, null=True)
     fecha_diagnostico = models.DateField(blank=True, null=True)
     fecha_entrada = models.DateField(blank=True, null=True)
+    fecha_vacunacion_ultima_dosis = models.DateField(default=None, blank=True, null=True)
 
     
     def __str__(self):
