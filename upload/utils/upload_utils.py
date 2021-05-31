@@ -63,20 +63,16 @@ def coords(place):
     except:
         return None,None
 
-# def coords(place, extra=None):
-#     geolocator = Nominatim(user_agent='test')
-#     location = geolocator.geocode(place, addressdetails=True)
-#     if extra:
-#         try:
-#             raw_loc = location.raw['address']
-#             return location.latitude, location.longitude, raw_loc['state'], raw_loc['country']
-#         except: 
-#             return None, None, None , None
-#     else:
-#         try:
-#             return location.latitude, location.longitude
-#         except:
-#             return None, None
+def full_place_info(place):
+    geolocator = Nominatim(user_agent='test')
+    location = geolocator.geocode(place, addressdetails=True)
+    try:
+        raw_loc = location.raw['address']
+        return location.latitude, location.longitude, raw_loc['state'], raw_loc['country']
+    except: 
+        return None, None, None, None
+
+
 
 def find_coords():
     data = Region.objects.filter(longitud=None) |  Region.objects.filter(longitud='NULL') | Region.objects.filter(longitud='0')
@@ -185,7 +181,7 @@ def upload_sample_hospital(stream):
             nodo_secuenciacion = line.get('nodo_secuenciacion')
             observaciones = line.get('observaciones')
             cp = line.get('cp')
-            loc = line.get('localizacion')
+            loc_org = line.get('localizacion')
             sexo = line.get('sexo','')[:1].upper()
             edad = line.get('edad')
             
@@ -224,66 +220,78 @@ def upload_sample_hospital(stream):
             f_run_ngs = time_transform(line.get('fecha_run_ngs'))
             f_entrada_fastq = time_transform(line.get('fecha_entrada_fastq'))
 
-            loc = clean_location(loc)
+            loc = clean_location(loc_org)
+            # latitud, longitud, division, pais = full_place_info(f'{cp} {loc_org}')
+
+            if id_hospital=='ICVS':
+                pais = 'Portugal'
+                division = 'Portugal'
+            else:
+                pais = 'España'
+                division = 'Galicia'
 
             # Insertado en la base de datos
-            if not Region.objects.filter(cp=cp, localizacion=loc).exists():
-                _, created = Region.objects.update_or_create(
-                        cp = int(cp),
-                        localizacion = loc,
-                        pais = 'SPAIN',
-                        region = 'EUROPE',
-                        # latitud = 0,
-                        # longitud = 0
-                    )
-            region_reference = Region.objects.get(cp=cp, localizacion=loc)
-            if id_uvigo:
-                _, created = Sample.objects.update_or_create(
-                        id_uvigo = id_uvigo,
-                        defaults = {
-                            'id_uvigo' : id_uvigo,
-                            'id_accession' : None,
-                            'id_region' : region_reference,
-                            'original_name' : None,
-                            'categoria_muestra':categoria_muestra,
-                            'edad' : edad,
-                            'sexo' : sexo[:1].upper(),
-                            'patient_status' : hospitalizacion,
-                            'nodo_secuenciacion' : nodo_secuenciacion,
-                            'fecha_muestra' : f_muestra,
-                            'observaciones' : observaciones                        
-                        }
+            # if not Region.objects.filter(cp=cp, localizacion=loc).exists():
+            _, created = Region.objects.update_or_create(
+                    cp = int(cp),
+                    localizacion = loc,
+                    defaults={
+                        'cp' : int(cp),
+                        'localizacion' : loc,
+                        'localizacion_org' : loc_org,
+                        'division' : division,
+                        'pais' : pais,
+                        'region' : 'Europa'
+                    }
+                )
+            # region_reference = Region.objects.get(cp=cp, localizacion=loc)
+            # if id_uvigo:
+            #     _, created = Sample.objects.update_or_create(
+            #             id_uvigo = id_uvigo,
+            #             defaults = {
+            #                 'id_uvigo' : id_uvigo,
+            #                 'id_accession' : None,
+            #                 'id_region' : region_reference,
+            #                 'original_name' : None,
+            #                 'categoria_muestra':categoria_muestra,
+            #                 'edad' : edad,
+            #                 'sexo' : sexo[:1].upper(),
+            #                 'patient_status' : hospitalizacion,
+            #                 'nodo_secuenciacion' : nodo_secuenciacion,
+            #                 'fecha_muestra' : f_muestra,
+            #                 'observaciones' : observaciones                        
+            #             }
 
-                    )
-                sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
-                _, created = SampleMetaData.objects.update_or_create(
-                        id_uvigo = sample_reference,
-                        defaults = {
-                            'id_uvigo' : sample_reference,
-                            'id_paciente' : id_paciente,
-                            'id_hospital' : id_hospital,
-                            'numero_envio' : numero_envio,
-                            'id_tubo' : id_tubo,
-                            'id_muestra' : id_muestra,
-                            'hospitalizacion' : hospitalizacion[:1], 
-                            'uci' : uci[:1],
-                            'vacunacion_tipo':vacunacion_tipo,
-                            'vacunacion_dosis':vacunacion_dosis,
-                            'ct_orf1ab' : orf1ab,
-                            'ct_gen_e' : gen_e,
-                            'ct_gen_n' : gen_n,
-                            'ct_rdrp' : rdrp,
-                            'ct_s' : ct_s,
-                            'calidad_secuenciacion':calidad_secuenciacion,
-                            'fecha_sintomas' : f_sintomas,
-                            'fecha_diagnostico' : f_diagnostico,
-                            'fecha_entrada' : f_entrada_uv,
-                            'fecha_envio_cdna' : f_envio_cdna,
-                            'fecha_run_ngs' : f_run_ngs,
-                            'fecha_entrada_fastq' : f_entrada_fastq                        
-                        }
+            #         )
+            #     sample_reference = Sample.objects.get(id_uvigo=id_uvigo)
+            #     _, created = SampleMetaData.objects.update_or_create(
+            #             id_uvigo = sample_reference,
+            #             defaults = {
+            #                 'id_uvigo' : sample_reference,
+            #                 'id_paciente' : id_paciente,
+            #                 'id_hospital' : id_hospital,
+            #                 'numero_envio' : numero_envio,
+            #                 'id_tubo' : id_tubo,
+            #                 'id_muestra' : id_muestra,
+            #                 'hospitalizacion' : hospitalizacion[:1], 
+            #                 'uci' : uci[:1],
+            #                 'vacunacion_tipo':vacunacion_tipo,
+            #                 'vacunacion_dosis':vacunacion_dosis,
+            #                 'ct_orf1ab' : orf1ab,
+            #                 'ct_gen_e' : gen_e,
+            #                 'ct_gen_n' : gen_n,
+            #                 'ct_rdrp' : rdrp,
+            #                 'ct_s' : ct_s,
+            #                 'calidad_secuenciacion':calidad_secuenciacion,
+            #                 'fecha_sintomas' : f_sintomas,
+            #                 'fecha_diagnostico' : f_diagnostico,
+            #                 'fecha_entrada' : f_entrada_uv,
+            #                 'fecha_envio_cdna' : f_envio_cdna,
+            #                 'fecha_run_ngs' : f_run_ngs,
+            #                 'fecha_entrada_fastq' : f_entrada_fastq                        
+            #             }
 
-                    ) 
+            #         ) 
         except Exception as e:
             print(e)
             print(traceback.format_exc())

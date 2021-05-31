@@ -4,6 +4,7 @@ class Region(models.Model):
     id_region = models.AutoField(primary_key=True)
     cp = models.IntegerField(default=None, blank=True, null=True)
     localizacion = models.CharField(max_length=50, default=None, blank=True, null=True) 
+    localizacion_org = models.CharField(max_length=50, default=None, blank=True, null=True) 
     division = models.CharField(max_length=50, default=None, blank=True, null=True) 
     pais = models.CharField(max_length=50, default=None, blank=True, null=True) 
     region = models.CharField(max_length=50, default=None, blank=True, null=True) 

@@ -158,18 +158,19 @@ def update_from_google(request):
             columnas_inesperadas_totales += columnas_inesperadas
             #find_coords.delay() # esto se hace por detrás con celery        
 
-    if fallos_totales and columnas_inesperadas_totales:
+    print(columnas_inesperadas_totales)
+    if columnas_inesperadas_totales and fallos_totales :
         warning = f'<strong>Columnas inesperadas</strong>: {columnas_inesperadas_totales}. <strong>Error en muestras:</strong> {fallos_totales}, puede que tengan fechas incorrectas o algún fallo de formato.'
+        messages.warning(request, warning)
+        return redirect('csv')
+    elif columnas_inesperadas_totales:
+        warning = f'<strong>Columnas inesperadas</strong>: {columnas_inesperadas_totales}. El resto de información se ha subido sin problema.'
         messages.warning(request, warning)
         return redirect('csv') 
     elif fallos_totales:
-        warning = f'<strong>Error en muestras:</strong> {fallos_totales}, puede que tengan fechas incorrectas o algún fallo de formato.'
+        warning = f'<strong>Error en muestras:</strong> {fallos_totales}, puede que tengan fechas incorrectas o algún fallo de formato. El resto de información se ha subido sin problema.'
         messages.warning(request, warning)
-        return redirect('csv')         
-    elif fallos_totales:
-        warning = f'<strong>Columnas inesperadas</strong>: {columnas_inesperadas_totales}'
-        messages.warning(request, warning)
-        return redirect('csv')    
+        return redirect('csv')           
     else:
         message = 'Se ha completado la actualización desde GoogleSheets'
         messages.success(request, message)
