@@ -461,10 +461,19 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final, categoria='ale
         else:
             thresh = umbral
 
-        if filtro:
-            linajes = Sample.objects.filter(id_uvigo__contains=filtro).filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
+        if categoria == 'vigilancia':
+            linajes = Sample.objects.filter(vigilancia='si').filter(id_uvigo__contains='EPI', fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
         else:
-            linajes = Sample.objects.filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
+            linajes = Sample.objects.filter(vigilancia='no').filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
+
+        if filtro:
+            linajes = linajes.filter(id_uvigo__contains=filtro)
+
+
+        # if filtro:
+        #     linajes = Sample.objects.filter(id_uvigo__contains=filtro).filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
+        # else:
+        #     linajes = Sample.objects.filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
 
         linajes_count = linajes\
             .values('lineagestest__lineage','samplemetadata__id_hospital')\
@@ -553,10 +562,13 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final, categoria='ale
 def linajes_hospitales_graph(request, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None, umbral=None):
     try:
         percentil = 85
-        if filtro:
-            linajes = Sample.objects.filter(id_uvigo__contains=filtro).filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
+        if categoria == 'vigilancia':
+            linajes = Sample.objects.filter(vigilancia='si').filter(id_uvigo__contains='EPI', fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
         else:
-            linajes = Sample.objects.filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
+            linajes = Sample.objects.filter(vigilancia='no').filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
+
+        if filtro:
+            linajes = linajes.filter(id_uvigo__contains=filtro)
 
         linajes_count_with_hosp = linajes\
             .values('lineagestest__lineage','samplemetadata__id_hospital')\
@@ -812,18 +824,34 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final, categoria='aleatori
     
     try:
         # Datos: [{'NomeMAY':'A CORUÑA', 'value':10}, {'NomeMAY':'SANTIAGO', 'value':15}...]
-        if filtro:
-            data = list(Sample.objects.filter(id_uvigo__contains=filtro).filter(id_uvigo__contains='EPI', categoria_muestra=categoria).exclude(id_uvigo__contains='ICVS')\
-                    .values('id_region__localizacion')\
-                    .filter(id_region__localizacion__gte=2)\
-                    .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
-                    .order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
+        if categoria == 'vigilancia':
+            data = Sample.objects.filter(vigilancia='si').filter(id_uvigo__contains='EPI', fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
         else:
-            data = list(Sample.objects.filter(id_uvigo__contains='EPI', categoria_muestra=categoria).exclude(id_uvigo__contains='ICVS')\
-                    .values('id_region__localizacion')\
-                    .filter(id_region__localizacion__gte=2)\
-                    .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
-                    .order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
+            data = Sample.objects.filter(vigilancia='no').filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
+
+        if filtro:
+            data = data.filter(id_uvigo__contains=filtro)
+
+        data = list(data.filter(id_uvigo__contains='EPI').exclude(id_uvigo__contains='ICVS')\
+                .values('id_region__localizacion')\
+                .filter(id_region__localizacion__gte=2)\
+                .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
+                .order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
+
+        
+        # if filtro:
+        #     data = list(Sample.objects.filter(id_uvigo__contains=filtro).filter(id_uvigo__contains='EPI', categoria_muestra=categoria).exclude(id_uvigo__contains='ICVS')\
+        #             .values('id_region__localizacion')\
+        #             .filter(id_region__localizacion__gte=2)\
+        #             .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
+        #             .order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
+        # else:
+        #     data = list(Sample.objects.filter(id_uvigo__contains='EPI', categoria_muestra=categoria).exclude(id_uvigo__contains='ICVS')\
+        #             .values('id_region__localizacion')\
+        #             .filter(id_region__localizacion__gte=2)\
+        #             .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
+        #             .order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
+
         json_link = get_graph_json_link(request,'concellos_gal_graph', fecha_inicial, fecha_final, categoria, filtro)
         chart = {
             'chart':{
@@ -885,8 +913,14 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final, categoria='aleatori
 
 def hospital_graph(request, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None):
     try:
-        hospitales = SampleMetaData.objects.filter(id_uvigo_id__categoria_muestra=categoria, id_uvigo__fecha_muestra__range=[fecha_inicial,fecha_final])\
-                    .exclude(id_hospital='ICVS').exclude(id_uvigo_id__id_uvigo__contains='SERGAS')
+        if categoria == 'vigilancia':
+            hospitales = SampleMetaData.objects.filter(id_uvigo_id__vigilancia='si').filter(id_uvigo_id__id_uvigo__contains='EPI', id_uvigo__fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo_id__id_uvigo__contains='ICVS')
+        else:
+            hospitales = SampleMetaData.objects.filter(id_uvigo_id__vigilancia='no').filter(id_uvigo_id__id_uvigo__contains='EPI', id_uvigo_id__categoria_muestra=categoria, id_uvigo__fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo_id__id_uvigo__contains='ICVS')
+
+
+        # hospitales = SampleMetaData.objects.filter(id_uvigo_id__categoria_muestra=categoria, id_uvigo__fecha_muestra__range=[fecha_inicial,fecha_final])\
+        #             .exclude(id_hospital='ICVS').exclude(id_uvigo_id__id_uvigo__contains='SERGAS')
 
         if filtro:
             hospitales = hospitales.filter(id_uvigo_id__id_uvigo__contains=filtro).values('id_hospital')
