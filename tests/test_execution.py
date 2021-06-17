@@ -12,7 +12,7 @@ def find_target_names(folder, suffix):
 
 def available_ids(target_folder, target_suffix):
     f = f'{TESTS_FOLDER_BASE}{target_folder}'
-    files = find_target_names(f,target_suffix)
+    files = sorted(find_target_names(f,target_suffix))
     return files
 
 # Ejecución de tests
