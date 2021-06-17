@@ -85,14 +85,17 @@ class VariantsTest(models.Model): #.tsv
     # id_process = models.CharField(max_length=41)
     row = models.IntegerField()
 
-    pos = models.IntegerField()
-    ref = models.CharField(max_length=100)
-    alt = models.CharField(max_length=100)
+    pos = models.IntegerField(default=None, null=True, blank=True)
+    ref = models.CharField(max_length=100, default=None, blank=True)
+    alt = models.CharField(max_length=100, default=None, blank=True)
+    ref_dp = models.IntegerField(default=None, null=True, blank=True)
+    alt_dp = models.IntegerField(default=None, null=True, blank=True)
     alt_freq = models.DecimalField(max_digits=7, decimal_places=6) 
-    ref_codon = models.CharField(max_length=100)
-    ref_aa = models.CharField(max_length=100)
-    alt_codon = models.CharField(max_length=100)
-    alt_aa = models.CharField(max_length=100)
+    total_dp = models.IntegerField(default=None, null=True, blank=True)
+    ref_codon = models.CharField(max_length=100, default=None, blank=True)
+    ref_aa = models.CharField(max_length=100, default=None, blank=True)
+    alt_codon = models.CharField(max_length=100, default=None, blank=True)
+    alt_aa = models.CharField(max_length=100, default=None, blank=True)
 
     date = models.DateTimeField(auto_now=True)
 
@@ -189,7 +192,10 @@ fields_correspondence = {
         'pos':'pos',
         'ref':'ref',
         'alt':'alt',
+        'ref_dp':'ref_dp',
+        'alt_dp':'alt_dp',
         'alt_freq':'alt_freq', 
+        'total_dp':'total_dp',
         'ref_codon':'ref_codon',
         'ref_aa':'ref_aa',
         'alt_codon':'alt_codon',
@@ -395,6 +401,7 @@ def upload_variants(reader, sample_name):
     id_uvigo = find_sample_name(sample_name)
     # id_process = 'U-XXX'
     row = 0
+    print('aqui')
     if id_uvigo:
         #### METODO 1 - MAS RAPIDO QUE EL update_or_create, se reduce el tiempo al 30% en principio
         lista_objs_update = []
@@ -403,7 +410,10 @@ def upload_variants(reader, sample_name):
             pos = line.get('pos')
             ref = line.get('ref')
             alt = line.get('alt')
+            ref_dp = line.get('ref_dp')
+            alt_dp = line.get('alt_dp')
             alt_freq = line.get('alt_freq')
+            total_dp = line.get('total_dp')
             ref_codon = line.get('ref_codon')
             ref_aa = line.get('ref_aa')
             alt_codon = line.get('alt_codon')
@@ -419,7 +429,10 @@ def upload_variants(reader, sample_name):
                 obj.pos = pos
                 obj.ref = ref
                 obj.alt = alt
+                obj.ref_dp = ref_dp
+                obj.alt_dp = alt_dp
                 obj.alt_freq = alt_freq
+                obj.total_dp = total_dp
                 obj.ref_codon = ref_codon
                 obj.ref_aa = ref_aa
                 obj.alt_codon = alt_codon
@@ -434,7 +447,10 @@ def upload_variants(reader, sample_name):
                     pos = pos,
                     ref = ref,
                     alt = alt,
+                    ref_dp = ref_dp,
+                    alt_dp = alt_dp,
                     alt_freq = alt_freq,
+                    total_dp = total_dp,
                     ref_codon = ref_codon,
                     ref_aa = ref_aa,
                     alt_codon = alt_codon,
@@ -445,7 +461,7 @@ def upload_variants(reader, sample_name):
             row += 1
 
         # BULK UPDATE
-        update_fields = ['id_uvigo','pos','ref','alt','alt_freq','ref_codon','ref_aa','alt_codon','alt_aa']
+        update_fields = ['id_uvigo','pos','ref','alt','ref_dp','alt_dp','alt_freq','total_dp','ref_codon','ref_aa','alt_codon','alt_aa']
         VariantsTest.objects.bulk_update(lista_objs_update, update_fields, batch_size=100)
         
         # BULK CREATE
