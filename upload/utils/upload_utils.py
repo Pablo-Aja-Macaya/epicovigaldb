@@ -35,7 +35,7 @@ def find_sample_name(string):
     accept = False
     # Probar las posibilidades, si encaja alguna se devuelve el nombre obtenido
     for i in formats:
-        sample_name = re.search(i,string+'.')
+        sample_name = re.search(i, string.replace('_','.')+'.')
         if sample_name:
             return sample_name.group()[:-1]
     # Si ninguna encaja se devuelve None
