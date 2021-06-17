@@ -690,27 +690,3 @@ def update():
 
 
 
-######################
-# Ejecución de tests #
-
-# from epicovigal.local_settings import TESTS_FOLDER_BASE
-# import glob
-
-# def find_target_names(folder, suffix):
-#     files = glob.glob(f'{folder}/*{suffix}')
-#     return files
-
-# def available_ids(target_folder, target_suffix):
-#     f = f'{TESTS_FOLDER_BASE}{target_folder}'
-#     files = find_target_names(f,target_suffix)
-#     print(files)
-
-# target_folder = 'ngs'
-# target_suffix = 'sorted.bam'
-# available_ids(target_folder, target_suffix)
-
-# taxon,lineage,conflict,pangolin_version,pangoLEARN_version,pango_version,status,note
-# Consensus_SERGAS.CHUAC.5111.consensus_threshold_0.5_quality_20,B.1.1.7,0,2.4.2,2021-04-28,1.1.23,passed_qc,17/17 B.1.1.7 SNPs (0 ref and 0 other)
-
-# taxon,lineage,conflict,pangolin_version,pangoLEARN_version,pango_version,status,note
-# Consensus_SERGAS.CHUAC.5045.consensus_threshold_0.5_quality_20,B.1.351,0,2.4.2,2021-04-28,1.1.23,passed_qc,9/9 B.1.351 SNPs (0 ref and 0 other)

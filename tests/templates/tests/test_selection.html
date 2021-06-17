@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-lg">
+  
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link active" href="{% url 'test_selection' %}"><strong>Ejecutar tests</strong></a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'upload_test_results' %}"><strong>Subir resultados</strong></a>
+    </li>
+  </ul>
+  <p></p>
+
+  <!-- <div class="alert alert-warning" role="alert">
+    Funcionalidad no implementada todavía.
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div> -->
+  {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message|safe }}
+      </div>
+      {% endfor %}
+  {% endif %}
+
+  <div class="container-lg pb-4">
+    <h2><strong>Ejecución de tests</strong></h2>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">1: Selección de test</li>
+      </ol>
+    </nav>
+    <form action={{url_form}} method="POST">
+      {% csrf_token %}
+      <div class="table-responsive">
+        <table class='table table-hover table-striped ' >
+        {{ form.as_table }} 
+        </table>          
+      </div>
+      <div class="row justify-content-center">
+        <button type="submit" value="Submit" class="btn btn-primary" >Siguiente</button>
+      </div>
+    </form>  
+  </div>
+</div>
+
+
+
+
+{% endblock %}

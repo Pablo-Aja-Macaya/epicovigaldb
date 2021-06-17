@@ -4,10 +4,10 @@
 <div class="container-lg">
   <ul class="nav nav-tabs">
     <li class="nav-item">
-      <a class="nav-link" href="selection"><strong>Ejecutar tests</strong></a>
+      <a class="nav-link" href="{% url 'test_selection' %}"><strong>Ejecutar tests</strong></a>
     </li>
     <li class="nav-item">
-      <a class="nav-link active" href="#"><strong>Subir resultados</strong></a>
+      <a class="nav-link active" href="{% url 'upload_test_results' %}"><strong>Subir resultados</strong></a>
     </li>
   </ul>
   <p></p>

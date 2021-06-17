@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.urls import reverse
 
 from .models import send_results_processing, update, read_log
-from .forms import SelectTestForm
+from .forms import SelectTestForm, SelectInputForm
 
 @login_required(login_url="/accounts/login")
 def test_errors(request):
@@ -16,46 +16,40 @@ def test_errors(request):
     return render(request, 'tests/test_errors.html', context)
 
 @login_required(login_url="/accounts/login")
-def tests(request):
+def test_selection(request):
     if request.method=='POST':
         form = SelectTestForm(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
             datos = form.cleaned_data
-            messages.success(request, 'Cambios guardados')
-            return redirect(reverse('selection'))
+            return redirect(reverse('input_selection', args=[datos['test']]))
     else:
         form = SelectTestForm()
 
     context = {
         'form':form,
-        'url_form':reverse('selection'),
+        'url_form':reverse('test_selection'),
     }
-    return render(request, 'tests/selection.html', context)
+    return render(request, 'tests/test_selection.html', context)
+
+@login_required(login_url="/accounts/login")
+def input_selection(request, test):
+    import tests.test_execution
+    form = ''
+    if request.method=='POST':
+        files = request.POST.getlist('files')
+
+    else:
+        form = SelectInputForm() 
+        form.fields['files'].choices = ( (i,i) for i in tests.test_execution.find_test_data(test))
+    context = {
+        'form':form,
+        'url_form':reverse('input_selection', args=[test]),
+    }
+    return render(request, 'tests/input_selection.html', context)
 
 @login_required(login_url="/accounts/login")
 def upload_test_results(request):
     return render(request, 'tests/upload_test_results.html')
-
-@login_required(login_url="/accounts/login")
-def send_selection(request):
-    
-    if request.method == 'POST':
-        test_list = ['Picard','SingleCheck', 'NGSStats', 'NextClade', 'iVar', 'Lineages']
-        selected_tests = {}
-        print(request.POST)
-        for i in test_list:
-            if request.POST.get(i):
-                selected_tests[i.lower()] = 1
-            else:
-                selected_tests[i.lower()] = 0
-        print(selected_tests)
-        # prueba() # celery
-
-        if 1 in selected_tests.values():
-          return render(request, 'tests/selection.html', {'message':'Tests corriendo!'})
-        else:
-          return render(request, 'tests/selection.html', {'warning':'Ningún test seleccionado.'})
 
 
 @login_required(login_url="/accounts/login")
