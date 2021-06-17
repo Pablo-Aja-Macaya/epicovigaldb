@@ -403,6 +403,9 @@ def upload_variants(reader, sample_name):
     row = 0
     print('aqui')
     if id_uvigo:
+        # Se borra el registro anterior en caso de que tengan un número de filas diferente
+        VariantsTest.objects.filter(id_uvigo=id_uvigo).delete()
+
         #### METODO 1 - MAS RAPIDO QUE EL update_or_create, se reduce el tiempo al 30% en principio
         lista_objs_update = []
         lista_objs_create = []
