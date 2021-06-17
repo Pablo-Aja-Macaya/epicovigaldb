@@ -31,11 +31,11 @@ def check_numbers(number):
 def find_sample_name(string):
     # Encontrar si una cadena contiene alguna de las siguientes cosas:
         # Posibilidades:  EPI.X.N , SERGAS.X.N y VAL.X.N
-    formats = [r'EPI\..+\.\d+.\.', r'SERGAS\..+\.\d+.\.', r'VAL\..+\.\d+.\.']
+    formats = [r'EPI\.\D+\.\d+.\.', r'SERGAS\.\D+\.\d+.\.', r'VAL\.\D+\.\d+.\.']
     accept = False
     # Probar las posibilidades, si encaja alguna se devuelve el nombre obtenido
     for i in formats:
-        sample_name = re.search(i, string.replace('_','.')+'.')
+        sample_name = re.search(i,string.replace('_','.')+'.')
         if sample_name:
             return sample_name.group()[:-1]
     # Si ninguna encaja se devuelve None

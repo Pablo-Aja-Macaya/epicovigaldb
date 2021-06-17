@@ -247,7 +247,7 @@ def detect_file(header):
 def find_sample_name(string):
     # Encontrar si una cadena contiene alguna de las siguientes cosas:
         # Posibilidades:  EPI.X.N , SERGAS.X.N y VAL.X.N
-    formats = [r'EPI\..+\.\d+.\.', r'SERGAS\..+\.\d+.\.', r'VAL\..+\.\d+.\.']
+    formats = [r'EPI\.\D+\.\d+.\.', r'SERGAS\.\D+\.\d+.\.', r'VAL\.\D+\.\d+.\.']
     accept = False
     # Probar las posibilidades, si encaja alguna se devuelve el nombre obtenido
     for i in formats:
@@ -401,7 +401,6 @@ def upload_variants(reader, sample_name):
     id_uvigo = find_sample_name(sample_name)
     # id_process = 'U-XXX'
     row = 0
-    print('aqui')
     if id_uvigo:
         # Se borra el registro anterior en caso de que tengan un número de filas diferente
         VariantsTest.objects.filter(id_uvigo=id_uvigo).delete()
