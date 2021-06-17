@@ -38,7 +38,7 @@ def find_test_data(test):
         target_suffix = 'consensus.fa'
     elif test == 'Picard':
         target_folder = 'ngs'
-        target_suffix = 'sorted.bam'
+        target_suffix = 'trimmed.sorted.bam'
     return available_ids(target_folder, target_suffix)
 
 # target_folder = 'ngs'
