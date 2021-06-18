@@ -37,13 +37,15 @@ def input_selection(request, test):
     form = ''
     if request.method=='POST':
         files = request.POST.getlist('files')
-
     else:
         form = SelectInputForm() 
-        form.fields['files'].choices = ( (i,i) for i in tests.test_execution.find_test_data(test))
+        choices, cmd = tests.test_execution.find_test_data(test)
+        form.fields['files'].choices = ( (i,i) for i in choices)
+
     context = {
         'form':form,
         'url_form':reverse('input_selection', args=[test]),
+        'command':cmd
     }
     return render(request, 'tests/input_selection.html', context)
 
