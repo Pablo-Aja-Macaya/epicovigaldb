@@ -35,8 +35,11 @@ def test_selection(request):
 def input_selection(request, test):
     import tests.test_execution
     form = ''
+    cmd = ''
     if request.method=='POST':
         files = request.POST.getlist('files')
+        messages.success(request, 'Test estaría siendo ejecutado')
+        return redirect(reverse('test_selection'))
     else:
         form = SelectInputForm() 
         choices, cmd = tests.test_execution.find_test_data(test)
