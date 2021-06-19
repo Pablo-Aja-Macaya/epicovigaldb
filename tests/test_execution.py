@@ -40,7 +40,7 @@ def clean_spaces(cmd):
     return cmd
 
 def get_command_nextclade(fasta_file, output_folder=NEXTCLADE_OUTPUT_FOLDER, nextclade_executable=NEXTCLADE_EXECUTABLE, root_seq=NEXTCLADE_ROOT_SEQ, input_tree=NEXTCLADE_INPUT_TREE, qc_config=NEXTCLADE_QC_CONFIG, gene_map=NEXTCLADE_GENE_MAP):
-    output_csv = f'../output/{fasta_file}.csv'
+    output_csv = f'{TESTS_OUTPUT}/prueba.csv'
 
     # Comando    
     cmd = f'{nextclade_executable} --input-fasta {fasta_file} \
