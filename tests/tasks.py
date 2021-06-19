@@ -13,7 +13,7 @@ def execute_command(files, cmd_function, execute_from_here=TESTS_OUTPUT_TMP):
     for i in files:
         # Ejecución de test
         cmd = cmd_function(i)
-        p = subprocess.call(cmd, i, cwd=execute_from_here, shell=True)
+        p = subprocess.call(cmd, cwd=execute_from_here, shell=True)
         # Comando para limpiar archivos temporales
         p = subprocess.call('rm ./*', cwd=execute_from_here, shell=True)
 
