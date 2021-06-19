@@ -6,7 +6,8 @@ from django.contrib import messages
 from django.urls import reverse
 
 from .models import send_results_processing, update, read_log
-from .forms import SelectTestForm, SelectInputForm
+from .forms import *
+from .test_execution import *
 
 @login_required(login_url="/accounts/login")
 def test_errors(request):
@@ -33,16 +34,17 @@ def test_selection(request):
 
 @login_required(login_url="/accounts/login")
 def input_selection(request, test):
-    import tests.test_execution
     form = ''
     cmd = ''
     if request.method=='POST':
         files = request.POST.getlist('files')
+        _, cmd = find_test_data(test)
+        execute_command('ls ../', TESTS_OUTPUT_TMP)
         messages.success(request, 'Test estaría siendo ejecutado')
         return redirect(reverse('test_selection'))
     else:
         form = SelectInputForm() 
-        choices, cmd = tests.test_execution.find_test_data(test)
+        choices, cmd = find_test_data(test)
         form.fields['files'].choices = ( (i,i) for i in choices)
 
     context = {
