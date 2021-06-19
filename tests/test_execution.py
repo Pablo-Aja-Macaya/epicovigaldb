@@ -21,8 +21,9 @@ NEXTCLADE_QC_CONFIG = f'{NEXTCLADE_FOLDER}/qc.json'
 NEXTCLADE_GENE_MAP = f'{NEXTCLADE_FOLDER}/genemap.gff'
 
 # Paths picard
-
-
+PICARD_EXECUTABLE = '../tools/picard.jar'
+PICARD_REF_FASTA = '/mnt/epicovigal/references/nCoV-2019.reference.fasta'
+PICARD_LIST_AMPLICONS="/mnt/epicovigal/references/list_amplicons.interval_list"
 
 # Nombres de archivos
 def find_target_names(folder, suffix):
@@ -55,12 +56,11 @@ def get_command_nextclade(fasta_file, output_folder=NEXTCLADE_OUTPUT_FOLDER, nex
 
     return cmd
 
-def get_command_picard(archivo, ):
-    output_picard="output_pcr_.txt"
-    input_bam=f"{archivo}.trimmed.sorted.bam"
-    picard_path = 'path/to/picard'
-    ref_fasta = 'path/ref_fasta'
-    list_amplicons = 'path/list_amplicons'
+def get_command_picard(archivo, picard_path=PICARD_EXECUTABLE, ref_fasta=PICARD_REF_FASTA, list_amplicons=PICARD_LIST_AMPLICONS):
+    name = find_sample_name(archivo)
+
+    input_bam=f"{archivo}"
+    output_picard=f"{TESTS_OUTPUT}/output_pcr_{name}.txt"
 
     cmd = f'java -jar {picard_path} CollectTargetedPcrMetrics I={input_bam} O={output_picard}\
          R={ref_fasta} AMPLICON_INTERVALS={list_amplicons} TARGET_INTERVALS={list_amplicons} COVERAGE_CAP=23000'
