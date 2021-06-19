@@ -2,6 +2,8 @@
 # Ejecución de tests #
 
 from epicovigal.local_settings import TESTS_FOLDER_BASE
+from tests.models import find_sample_name
+
 import glob
 import subprocess
 
@@ -40,7 +42,8 @@ def clean_spaces(cmd):
     return cmd
 
 def get_command_nextclade(fasta_file, output_folder=NEXTCLADE_OUTPUT_FOLDER, nextclade_executable=NEXTCLADE_EXECUTABLE, root_seq=NEXTCLADE_ROOT_SEQ, input_tree=NEXTCLADE_INPUT_TREE, qc_config=NEXTCLADE_QC_CONFIG, gene_map=NEXTCLADE_GENE_MAP):
-    output_csv = f'{TESTS_OUTPUT}/prueba.csv'
+    name = find_sample_name(fasta_file)
+    output_csv = f'{TESTS_OUTPUT}/{name}.csv'
 
     # Comando    
     cmd = f'{nextclade_executable} --input-fasta {fasta_file} \
@@ -83,7 +86,7 @@ def execute_command(cmd, execute_from_here=TESTS_OUTPUT_TMP):
     # Ejecución de test
     p = subprocess.call(cmd, cwd=execute_from_here, shell=True)
     # Comando para limpiar archivos temporales
-    # p = subprocess.call('rm ./*', cwd=execute_from_here, shell=True)
+    p = subprocess.call('rm ./*', cwd=execute_from_here, shell=True)
 
 # return cmd
 
