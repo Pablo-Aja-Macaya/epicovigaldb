@@ -13,10 +13,10 @@ TESTS_OUTPUT = '../tests_output'
 NEXTCLADE_FOLDER = '../tools/nextclade/data/sars-cov-2'
 NEXTCLADE_OUTPUT_FOLDER = '../output'
 NEXTCLADE_EXECUTABLE = '../tools/nextclade_exe'
-NEXTCLADE_ROOT_SEQ = f'{NEXTCLADE_FOLDER}/root_seq'
-NEXTCLADE_INPUT_TREE = f'{NEXTCLADE_FOLDER}/input_tree'
-NEXTCLADE_QC_CONFIG = f'{NEXTCLADE_FOLDER}/qc_config'
-NEXTCLADE_GENE_MAP = f'{NEXTCLADE_FOLDER}/gene_map'
+NEXTCLADE_ROOT_SEQ = f'{NEXTCLADE_FOLDER}/reference.fasta'
+NEXTCLADE_INPUT_TREE = f'{NEXTCLADE_FOLDER}/tree.json'
+NEXTCLADE_QC_CONFIG = f'{NEXTCLADE_FOLDER}/qc.json'
+NEXTCLADE_GENE_MAP = f'{NEXTCLADE_FOLDER}/genemap.gff'
 
 # Paths picard
 
