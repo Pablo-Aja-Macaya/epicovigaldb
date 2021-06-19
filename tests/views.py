@@ -38,13 +38,16 @@ def input_selection(request, test):
     cmd = ''
     if request.method=='POST':
         files = request.POST.getlist('files')
-        _, cmd = find_test_data(test)
-        execute_command(cmd, TESTS_OUTPUT_TMP)
+        _, cmd_function = find_test_data(test)
+        for i in files:
+            cmd = cmd_function(i)
+            execute_command(cmd, TESTS_OUTPUT_TMP)
         messages.success(request, 'Test estaría siendo ejecutado')
         return redirect(reverse('test_selection'))
     else:
         form = SelectInputForm() 
-        choices, cmd = find_test_data(test)
+        choices, cmd_function = find_test_data(test)
+        cmd = cmd_function('archivo')
         form.fields['files'].choices = ( (i,i) for i in choices)
 
     context = {

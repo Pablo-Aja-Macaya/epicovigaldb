@@ -71,12 +71,12 @@ def find_test_data(test):
     if test == 'Nextclade':
         target_folder = 'consensus'
         target_suffix = 'consensus.fa'
-        cmd = get_command_nextclade('archivo_elegido')
+        cmd_function = get_command_nextclade
     elif test == 'Picard':
         target_folder = 'ngs'
         target_suffix = 'trimmed.sorted.bam'
-        cmd = get_command_picard('archivo')
-    return available_ids(target_folder, target_suffix), cmd
+        cmd_function = get_command_picard
+    return available_ids(target_folder, target_suffix), cmd_function
 
 
 def execute_command(cmd, execute_from_here=TESTS_OUTPUT_TMP):
