@@ -87,22 +87,3 @@ def execute_command(cmd, execute_from_here=TESTS_OUTPUT_TMP):
     p = subprocess.call(cmd, cwd=execute_from_here, shell=True)
     # Comando para limpiar archivos temporales
     p = subprocess.call('rm ./*', cwd=execute_from_here, shell=True)
-
-# return cmd
-
-# target_folder = 'ngs'
-# target_suffix = 'sorted.bam'
-# available_ids(target_folder, target_suffix)
-
-# target_folder = 'consensus'
-# target_suffix = 'consensus.fa'
-# target_files = available_ids(target_folder, target_suffix)
-
-# execute_nextclade('fasta.consensus.fa')
-
-### Form 1 ###
-# Presentar posibles tests --> Eligen uno
-### Form 2 ###
-# Presentar posibles muestras --> Eligen una lista
-# Presentar variables elegidas
-

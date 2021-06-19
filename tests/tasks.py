@@ -3,9 +3,17 @@
 from epicovigal.celery import app
 import glob
 
+######################
+# Ejecución de tests #
+from .test_execution import *
+
 @app.task
-def check_status():
-    print('CHECKING STATUS...')
-    print(len(glob.glob("/home/pabs/GitRepos/EPICOVIGAL/BD_input_files/*_lineages.csv")))
-    # name = 'EPI.CHOP.201_lineages.csv'.split('_lineages.csv')
+def execute_command(cmd, execute_from_here=TESTS_OUTPUT_TMP):
+    # Ejecución de test
+    p = subprocess.call(cmd, cwd=execute_from_here, shell=True)
+    # Comando para limpiar archivos temporales
+    p = subprocess.call('rm ./*', cwd=execute_from_here, shell=True)
+
+
+
 

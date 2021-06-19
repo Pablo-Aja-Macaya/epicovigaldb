@@ -7,7 +7,7 @@ from django.urls import reverse
 
 from .models import send_results_processing, update, read_log
 from .forms import *
-from .test_execution import *
+from .tasks import *
 
 @login_required(login_url="/accounts/login")
 def test_errors(request):
@@ -41,8 +41,8 @@ def input_selection(request, test):
         _, cmd_function = find_test_data(test)
         for i in files:
             cmd = cmd_function(i)
-            execute_command(cmd, TESTS_OUTPUT_TMP)
-        messages.success(request, 'Test estaría siendo ejecutado')
+            execute_command.delay('ls', TESTS_OUTPUT_TMP)
+        messages.success(request, 'Test se ha ejecutado')
         return redirect(reverse('test_selection'))
     else:
         form = SelectInputForm() 
