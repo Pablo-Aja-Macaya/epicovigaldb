@@ -39,7 +39,7 @@ def input_selection(request, test):
     if request.method=='POST':
         files = request.POST.getlist('files')
         _, cmd = find_test_data(test)
-        execute_command('ls ../', TESTS_OUTPUT_TMP)
+        execute_command(cmd, TESTS_OUTPUT_TMP)
         messages.success(request, 'Test estaría siendo ejecutado')
         return redirect(reverse('test_selection'))
     else:

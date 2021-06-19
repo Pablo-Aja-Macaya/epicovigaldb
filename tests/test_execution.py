@@ -7,7 +7,7 @@ import subprocess
 
 # Paths generales
 TESTS_OUTPUT_TMP = '../tests_output_tmp'
-TESTS_OUTPUT = 'tests_output'
+TESTS_OUTPUT = '../tests_output'
 
 # Paths nextclade
 NEXTCLADE_FOLDER = '../tools/nextclade/data/sars-cov-2'
@@ -83,7 +83,7 @@ def execute_command(cmd, execute_from_here=TESTS_OUTPUT_TMP):
     # Ejecución de test
     p = subprocess.call(cmd, cwd=execute_from_here, shell=True)
     # Comando para limpiar archivos temporales
-    p = subprocess.call('rm ./*', cwd=execute_from_here, shell=True)
+    # p = subprocess.call('rm ./*', cwd=execute_from_here, shell=True)
 
 # return cmd
 
