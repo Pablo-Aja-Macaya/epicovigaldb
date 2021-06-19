@@ -3,7 +3,7 @@ from re import X
 from epicovigal.celery import app
 from upload.models import Region, Sample
 from upload.models import SampleMetaData 
-from jobstatus.models import Status
+# from jobstatus.models import Status
 import io, csv
 from datetime import datetime
 

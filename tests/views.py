@@ -41,7 +41,7 @@ def input_selection(request, test):
         files = request.POST.getlist('files')
         _, cmd_function = find_test_data(test)
         execute_command.delay(files, cmd_function, TESTS_OUTPUT_TMP)
-        messages.success(request, 'Test se ha ejecutado')
+        messages.success(request, 'Tests se están ejecutando!')
         return redirect(reverse('test_selection'))
     else:
         form = SelectInputForm() 
