@@ -36,17 +36,17 @@ def test_selection(request):
 def input_selection(request, test):
     form = ''
     cmd = ''
+    cmd_function_dicc = CMD_FUNCTION_DICT
     if request.method=='POST':
         files = request.POST.getlist('files')
         _, cmd_function = find_test_data(test)
-        for i in files:
-            cmd = cmd_function(i)
-            execute_command.delay('ls', TESTS_OUTPUT_TMP)
+        execute_command.delay(files, cmd_function, TESTS_OUTPUT_TMP)
         messages.success(request, 'Test se ha ejecutado')
         return redirect(reverse('test_selection'))
     else:
         form = SelectInputForm() 
         choices, cmd_function = find_test_data(test)
+        cmd_function = cmd_function_dicc[cmd_function]
         cmd = cmd_function('archivo')
         form.fields['files'].choices = ( (i,i) for i in choices)
 
