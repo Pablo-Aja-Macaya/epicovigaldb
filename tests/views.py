@@ -1,13 +1,16 @@
-import re
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.urls import reverse
+from django.urls.base import reverse_lazy
 
-from .models import send_results_processing, update, read_log
+from .subida_tests import send_results_processing, update, read_log
 from .forms import *
 from .test_execution import *
+
+STATUS_URL = reverse_lazy('check_status')
+
 
 @login_required(login_url="/accounts/login")
 def test_errors(request):
@@ -41,7 +44,7 @@ def input_selection(request, test):
         files = request.POST.getlist('files')
         _, cmd_function = find_test_data(test)
         execute_command.delay(files, cmd_function, TESTS_OUTPUT_TMP)
-        messages.success(request, 'Tests se están ejecutando!')
+        messages.success(request, f'Tests se están ejecutando. <a href={STATUS_URL}>Comprueba el status de la tarea.</a>')
         return redirect(reverse('test_selection'))
     else:
         form = SelectInputForm() 
@@ -90,10 +93,8 @@ def send_results(request):
 
 @login_required(login_url="/accounts/login")
 def update_from_folder(request):
-    unchanged, updated, new, errors = update()
-    messages.success(request, f'Actualización completa (Sin cambios: {unchanged}, Actualizados: {updated}, Nuevos: {new}, Errores: {errors})')
+    # unchanged, updated, new, errors = update()
+    update.delay()
+    messages.success(request, f'Actualizando')
     return redirect('upload_test_results')
 
-    # context = {'message':f'Actualización completa (Sin cambios: {unchanged}, Actualizados: {updated}, Nuevos: {new}, Errores: {errors})'}
-    # request.session['context'] = context
-    # return render(request, 'tests/upload_test_results.html', context)

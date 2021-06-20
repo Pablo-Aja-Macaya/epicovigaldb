@@ -3,7 +3,7 @@
 from epicovigal.celery import app
 
 from epicovigal.local_settings import TESTS_FOLDER_BASE
-from tests.models import find_sample_name
+from tests.subida_tests import find_sample_name
 
 import glob
 import subprocess
@@ -11,8 +11,6 @@ from datetime import datetime
 
 ## FUNCIONES DE STATUS
 from jobstatus.models import start_process, finish_process, failed_process
-from jobstatus.models import Status
-
 
 # Paths generales
 TESTS_OUTPUT_TMP = '../tests_output_tmp'
@@ -95,7 +93,6 @@ CMD_FUNCTION_DICT = {'Nextclade':get_command_nextclade, 'Picard':get_command_pic
 
 @app.task(bind=True)
 def execute_command(self, files, cmd_function, execute_from_here=TESTS_OUTPUT_TMP):
-
     start = datetime.now()
     id = self.request.id
     command = 'Ejecucion_Test'
