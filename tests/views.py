@@ -95,6 +95,6 @@ def send_results(request):
 def update_from_folder(request):
     # unchanged, updated, new, errors = update()
     update.delay()
-    messages.success(request, f'Actualizando')
+    messages.success(request, f'Actualizando. <a href={STATUS_URL}>Comprueba el status de la tarea.</a>')
     return redirect('upload_test_results')
 
