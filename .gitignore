@@ -10,3 +10,4 @@ local_settings.py
 
 tests/migrations/0070_country_lineagestest.py
 test_update_error_log.txt
+dump.rdb
