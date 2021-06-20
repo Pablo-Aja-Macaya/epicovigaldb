@@ -1,12 +1,17 @@
 ######################
 # Ejecución de tests #
+from epicovigal.celery import app
 
 from epicovigal.local_settings import TESTS_FOLDER_BASE
 from tests.models import find_sample_name
 
 import glob
 import subprocess
+from datetime import datetime
 
+## FUNCIONES DE STATUS
+from jobstatus.models import start_process, finish_process, failed_process
+from jobstatus.models import Status
 
 
 # Paths generales
@@ -86,3 +91,31 @@ def find_test_data(test):
 
 # Variables
 CMD_FUNCTION_DICT = {'Nextclade':get_command_nextclade, 'Picard':get_command_picard}
+
+
+@app.task(bind=True)
+def execute_command(self, files, cmd_function, execute_from_here=TESTS_OUTPUT_TMP):
+
+    start = datetime.now()
+    id = self.request.id
+    command = 'Ejecucion_Test'
+    start_process(id, command, start.strftime('%Y-%m-%d %H:%M:%S'))
+    print(f'Starting tests... (Task ID: {id})')
+
+    try:
+        cmd_function = CMD_FUNCTION_DICT[cmd_function]
+        for i in files:
+            # Ejecución de test
+            cmd = cmd_function(i)
+            p = subprocess.call(cmd, cwd=execute_from_here, shell=True)
+            # Comando para limpiar archivos temporales
+            p = subprocess.call('rm ./*', cwd=execute_from_here, shell=True)
+        finish = datetime.now()
+        elapsed_time = finish - start
+        finish_process(id, elapsed_time.seconds, 'Ejecución sin errores terminales')
+    except:
+        finish = datetime.now()
+        elapsed_time = finish - start
+        failed_process(id, elapsed_time.seconds, 'Error')
+
+

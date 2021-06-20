@@ -7,7 +7,6 @@ import traceback
 from geopy import Nominatim
 
 from epicovigal.celery import app
-from jobstatus.models import Status
 from datetime import datetime
 import urllib.request
 
@@ -15,6 +14,7 @@ import urllib.request
 # In[0]
 ## FUNCIONES DE STATUS
 from jobstatus.models import start_process, finish_process, failed_process
+from jobstatus.models import Status
 
 
 # In[1]

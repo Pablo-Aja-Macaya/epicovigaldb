@@ -7,7 +7,7 @@ from django.urls import reverse
 
 from .models import send_results_processing, update, read_log
 from .forms import *
-from .tasks import *
+from .test_execution import *
 
 @login_required(login_url="/accounts/login")
 def test_errors(request):
