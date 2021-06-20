@@ -24,9 +24,8 @@ def test_errors(request):
 
 @login_required(login_url="/accounts/login")
 def executed_tests_results(request, file=None):
-    # file = 'nextclade-7.csv'
     if file:
-        with open(f'{TESTS_OUTPUT}/{file}') as archivo:
+        with open(f'{TESTS_OUTPUT}/{file}','rt') as archivo:
             lines = archivo.readlines()
             lines= [l.replace('\t', ';') for l in lines]
             lines= [l.replace(';', ' ; ') for l in lines]
@@ -40,7 +39,6 @@ def executed_tests_results(request, file=None):
         files = [os.path.basename(f) for f in files]
         mtimes = [datetime.fromtimestamp(t).strftime('%Y-%m-%d-%H:%M') for t in mtimes]
 
-        print()
         context = {'files':list(zip(files, mtimes))}
 
     return render(request, 'tests/test_results.html', context)
