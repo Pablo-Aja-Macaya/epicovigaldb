@@ -39,7 +39,9 @@ def executed_tests_results(request, file=None):
         files = [os.path.basename(f) for f in files]
         mtimes = [datetime.fromtimestamp(t).strftime('%Y-%m-%d-%H:%M') for t in mtimes]
 
-        context = {'files':list(zip(files, mtimes))}
+        info = list(zip(files, mtimes))
+        info = sorted(info, key=lambda x: x[1], reverse=True) 
+        context = {'files':info}
 
     return render(request, 'tests/test_results.html', context)
 
