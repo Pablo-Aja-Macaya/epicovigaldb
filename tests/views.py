@@ -8,6 +8,9 @@ from django.urls.base import reverse_lazy
 from .subida_tests import send_results_processing, update, read_log
 from .forms import *
 from .test_execution import *
+import os
+import pathlib
+
 
 STATUS_URL = reverse_lazy('check_status')
 
@@ -18,6 +21,29 @@ def test_errors(request):
     errors = read_log(error_log_file)
     context = {'errors':errors}
     return render(request, 'tests/test_errors.html', context)
+
+@login_required(login_url="/accounts/login")
+def executed_tests_results(request, file=None):
+    # file = 'nextclade-7.csv'
+    if file:
+        with open(f'{TESTS_OUTPUT}/{file}') as archivo:
+            lines = archivo.readlines()
+            lines= [l.replace('\t', ';') for l in lines]
+            lines= [l.replace(';', ' ; ') for l in lines]
+        context = {'lines':lines}
+    else:
+        # Archivos y fechas de modificación
+        files = glob.glob(f'{TESTS_OUTPUT}/*')
+        mtimes = [pathlib.Path(f).stat().st_mtime for f in files]
+        
+        # Obtener únicamente nombre de archivo y fecha formateada
+        files = [os.path.basename(f) for f in files]
+        mtimes = [datetime.fromtimestamp(t).strftime('%Y-%m-%d-%H:%M') for t in mtimes]
+
+        print()
+        context = {'files':list(zip(files, mtimes))}
+
+    return render(request, 'tests/test_results.html', context)
 
 @login_required(login_url="/accounts/login")
 def test_selection(request):

@@ -9,4 +9,6 @@ urlpatterns = [
     path('update', views.update_from_folder, name='update'),
     path('send_results', views.send_results, name='send_results'),
     path('test_errors', views.test_errors, name='test_errors'),
+    path('executed_tests_results', views.executed_tests_results, name='executed_tests_results'),
+    path('executed_tests_results/<str:file>', views.executed_tests_results, name='executed_tests_results'),
 ]

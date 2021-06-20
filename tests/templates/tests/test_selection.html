@@ -13,12 +13,6 @@
   </ul>
   <p></p>
 
-  <!-- <div class="alert alert-warning" role="alert">
-    Funcionalidad no implementada todavía.
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div> -->
   {% if messages %}
       {% for message in messages %}
       <div class="alert alert-{{ message.tags }}" role="alert">
@@ -31,7 +25,7 @@
   {% endif %}
 
   <div class="container-lg pb-4">
-    <h2><strong>Ejecución de tests</strong></h2>
+    <h2 class='pb-2'><strong>Ejecución de tests</strong></h2>
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item active" aria-current="page">1: Selección de test</li>
@@ -48,6 +42,34 @@
         <button type="submit" value="Submit" class="btn btn-primary" >Siguiente</button>
       </div>
     </form>  
+  </div>
+  <hr></hr>
+  <div class="container-lg pt-2 pb-4">
+    <h2 class='pb-2'><strong>Resultados de tests</strong></h2>
+    <div class="card mb-3" style="max-width: 100%;" >
+      <div class="row no-gutters pt-1 pb-1">
+        <div class="col-md-2 d-flex my-auto justify-content-center" >
+          <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+          </svg>
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h4 class="card-title"><strong>Revisar resultados de ejecución</strong></h4>
+            <p class="card-text">Visualización de los datos obtenidos.</p>
+          </div>
+        </div>
+        <div class="col-md-2 text-center my-auto">
+            <div class="btn-group">
+                <a href="{% url 'executed_tests_results' %}" >
+                  <button type="button" class="boton_carga" onclick="this.classList.toggle('boton_carga--loading')">
+                    <span class="boton_carga__text">Revisar</span>
+                  </button>
+                </a>
+            </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 

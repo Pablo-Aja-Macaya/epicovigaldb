@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-lg">
+  
+  <div class="btn-group">
+    <a href="{% url 'test_selection' %}"><button type="button"  class="btn btn-outline-primary" >&lt Volver a ejecución de tests</button></a>
+  </div>
+
+  {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message|safe }}
+      </div>
+      {% endfor %}
+  {% endif %}
+
+  <div class="container-lg pt-3 pb-4">
+    <h2 class='pb-2'><strong>Resultados de tests ejecutados</strong></h2>
+    {% if files %}
+      {% for f in files %}
+        <p><a href="{% url 'executed_tests_results' file=f.0 %}">{{f.0}} - {{f.1}}</a></p>
+      {% endfor %}
+    {% endif %}
+
+    {% if lines %}
+      {% for l in lines %}
+        <p>{{l}}</p>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+</div>
+
+
+
+
+{% endblock %}
