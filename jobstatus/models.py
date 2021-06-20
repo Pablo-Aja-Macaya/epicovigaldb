@@ -29,3 +29,30 @@ class StatusTable(tables.Table):
     class Meta:
         model = Status
         template_name = "table_template.html"
+
+
+########
+# Funciones de actualizado de status
+def start_process(id, c, d):
+    _, created = Status.objects.update_or_create(
+        id_proceso = id,
+        tarea = c,
+        status = 'O',
+        comentario = '',
+        fecha = d,
+        tiempo = 0
+        )      
+
+def finish_process(id, time, comentario):
+    Status.objects.filter(id_proceso=id).update(
+        status = 'C',
+        tiempo = time,
+        comentario = comentario
+        )      
+
+def failed_process(id, time, comentario):
+    Status.objects.filter(id_proceso=id).update(
+        status = 'F',
+        tiempo = time+1,
+        comentario = comentario
+        )  

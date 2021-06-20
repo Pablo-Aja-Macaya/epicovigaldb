@@ -14,30 +14,7 @@ import urllib.request
 
 # In[0]
 ## FUNCIONES DE STATUS
-def start_process(id, c, d):
-    _, created = Status.objects.update_or_create(
-        id_proceso = id,
-        tarea = c,
-        status = 'O',
-        comentario = '',
-        fecha = d,
-        tiempo = 0
-        )      
-
-def finish_process(id, time, comentario):
-    Status.objects.filter(id_proceso=id).update(
-        status = 'C',
-        tiempo = time,
-        comentario = comentario
-        )      
-
-def failed_process(id, time, comentario):
-    Status.objects.filter(id_proceso=id).update(
-        status = 'F',
-        tiempo = time+1,
-        comentario = comentario
-        )  
-
+from jobstatus.models import start_process, finish_process, failed_process
 
 
 # In[1]
