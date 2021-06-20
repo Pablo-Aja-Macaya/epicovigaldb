@@ -3,16 +3,18 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.contrib import messages
 import io
-import re
-import urllib.request
+
+from django.urls.base import reverse_lazy
 
 from .utils import upload_utils
-from .tasks import find_coords
+from .utils.upload_utils import find_coords
 from .forms import FullSampleForm
 from django.urls import reverse
 from .models import *
 from .utils.upload_utils import clean_location, find_sample_name
 
+
+STATUS_URL = reverse_lazy('check_status')
 
 # Create your views here.
 @login_required(login_url="/accounts/login")
@@ -133,47 +135,16 @@ def upload(request):
 
 @login_required(login_url="/accounts/login") 
 def update_coords(request):
-    errores, actualizados, sin_coords = find_coords()
-    u = 'https://epicovigaldb.com/visualize/regions?sort=latitud'
-    message = f'Coordenadas actualizadas: {errores} errores, {actualizados} actualizados. Quedan {sin_coords} <a href={u}>regiones sin coordenadas</a>.'
-    messages.success(request, message)
+    find_coords.delay()
+    messages.success(request, f'Actualizando coordenadas. <a href={STATUS_URL}>Comprueba el status de la tarea.</a>')
     return redirect('csv') 
 
 # Subida de metadatos directamente desde el GoogleSheet
 @login_required(login_url="/accounts/login")
 def update_from_google(request):
-    from epicovigal.local_settings import GS_DATA_KEY as key
-    # from epicovigal.local_settings import GS_DATA_GID as gid
-    from epicovigal.local_settings import GS_DATA_GID_LIST as gid_list    
-    
-    fallos_totales = []
-    columnas_inesperadas_totales = []
-    for gid in gid_list:
-        enlace = f'https://docs.google.com/spreadsheets/d/{key}/export?format=tsv&gid={gid}'
-        with urllib.request.urlopen(enlace) as google_sheet:
-            data = google_sheet.read().decode('UTF-8')
-            io_string = io.StringIO(data)
-            fallos, columnas_inesperadas = upload_utils.upload_sample_hospital(io_string)
-            fallos_totales += fallos
-            columnas_inesperadas_totales += columnas_inesperadas
-            #find_coords.delay() # esto se hace por detrás con celery        
+    upload_utils.upload_sample_hospital.delay()
+    messages.success(request, f'Actualizando desde GoogleSheets por detrás. <a href={STATUS_URL}>Comprueba el status de la tarea.</a>')
+    return redirect('csv') 
 
-    print(columnas_inesperadas_totales)
-    if columnas_inesperadas_totales and fallos_totales :
-        warning = f'<strong>Columnas inesperadas</strong>: {columnas_inesperadas_totales}. <strong>Error en muestras:</strong> {fallos_totales}, puede que tengan fechas incorrectas o algún fallo de formato.'
-        messages.warning(request, warning)
-        return redirect('csv')
-    elif columnas_inesperadas_totales:
-        warning = f'<strong>Columnas inesperadas</strong>: {columnas_inesperadas_totales}. El resto de información se ha subido sin problema.'
-        messages.warning(request, warning)
-        return redirect('csv') 
-    elif fallos_totales:
-        warning = f'<strong>Error en muestras:</strong> {fallos_totales}, puede que tengan fechas incorrectas o algún fallo de formato. El resto de información se ha subido sin problema.'
-        messages.warning(request, warning)
-        return redirect('csv')           
-    else:
-        message = 'Se ha completado la actualización desde GoogleSheets'
-        messages.success(request, message)
-        return redirect('csv') 
 
 
