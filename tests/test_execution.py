@@ -95,7 +95,7 @@ CMD_FUNCTION_DICT = {'Nextclade':get_command_nextclade, 'Picard':get_command_pic
 def execute_command(self, files, cmd_function, execute_from_here=TESTS_OUTPUT_TMP):
     start = datetime.now()
     id = self.request.id
-    command = 'Ejecucion_Test'
+    command = f'Ejecucion_Test_{cmd_function}'
     start_process(id, command, start.strftime('%Y-%m-%d %H:%M:%S'))
     print(f'Starting tests... (Task ID: {id})')
 
