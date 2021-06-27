@@ -107,6 +107,7 @@ def get_graphs(request):
     url_linajes_hospital = ''
     url_linajes = ''
     url_concellos = ''
+    filter_collapse = ''
     if request.method=='POST':
         form = GraphsFormMultipleChoice(request.POST)
         if form.is_valid():
@@ -543,9 +544,8 @@ def linajes_porcentaje_total(request, encrypted_url_code):
 
         linajes = Sample.objects.filter(vigilancia__in=vigilancia)\
                 .filter(categoria_muestra__in=categoria)\
-                .filter(samplemetadata__calidad_secuenciacion__in=calidad_secuenciacion)\
                 .filter(id_uvigo__contains='EPI', fecha_muestra__range=[fecha_inicial, fecha_final])\
-                .exclude(id_uvigo__contains='ICVS')
+                .exclude(id_uvigo__contains='ICVS')# .filter(samplemetadata__calidad_secuenciacion__in=calidad_secuenciacion)\
 
         if filtro:
             linajes = linajes.filter(id_uvigo__contains=filtro)
@@ -649,9 +649,8 @@ def linajes_hospitales_graph(request, encrypted_url_code):
         
         linajes = Sample.objects.filter(vigilancia__in=vigilancia)\
                 .filter(categoria_muestra__in=categoria)\
-                .filter(samplemetadata__calidad_secuenciacion__in=calidad_secuenciacion)\
                 .filter(id_uvigo__contains='EPI', fecha_muestra__range=[fecha_inicial, fecha_final])\
-                .exclude(id_uvigo__contains='ICVS')
+                .exclude(id_uvigo__contains='ICVS') # .filter(samplemetadata__calidad_secuenciacion__in=calidad_secuenciacion)\
 
         if filtro:
             linajes = linajes.filter(id_uvigo__contains=filtro)
@@ -923,9 +922,8 @@ def concellos_gal_graph(request, encrypted_url_code):
 
         data = Sample.objects.filter(vigilancia__in=vigilancia)\
                 .filter(categoria_muestra__in=categoria)\
-                .filter(samplemetadata__calidad_secuenciacion__in=calidad_secuenciacion)\
                 .filter(id_uvigo__contains='EPI', fecha_muestra__range=[fecha_inicial, fecha_final])\
-                .exclude(id_uvigo__contains='ICVS')
+                .exclude(id_uvigo__contains='ICVS') # .filter(samplemetadata__calidad_secuenciacion__in=calidad_secuenciacion)\
 
         if filtro:
             data = data.filter(id_uvigo__contains=filtro)
@@ -1009,10 +1007,9 @@ def hospital_graph(request, encrypted_url_code):
         calidad_secuenciacion = decrypted_dicc.get('calidad_secuenciacion')
         
         hospitales = SampleMetaData.objects.filter(id_uvigo_id__categoria_muestra__in=categoria)\
-                    .filter(calidad_secuenciacion__in=calidad_secuenciacion)\
                     .filter(id_uvigo_id__vigilancia__in=vigilancia)\
                     .filter(id_uvigo_id__id_uvigo__contains='EPI', id_uvigo__fecha_muestra__range=[fecha_inicial, fecha_final])\
-                    .exclude(id_uvigo_id__id_uvigo__contains='ICVS')
+                    .exclude(id_uvigo_id__id_uvigo__contains='ICVS') # .filter(samplemetadata__calidad_secuenciacion__in=calidad_secuenciacion)\
 
         if filtro:
             hospitales = hospitales.filter(id_uvigo_id__id_uvigo__contains=filtro).values('id_hospital')

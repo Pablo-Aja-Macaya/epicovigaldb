@@ -184,6 +184,7 @@ def upload_sample_hospital(self):
         'Observaciones':'observaciones',
     }
     lista_fallos = []
+    lista_columnas_inesperadas = []
     for gid in gid_list:
         enlace = f'https://docs.google.com/spreadsheets/d/{key}/export?format=tsv&gid={gid}'
         with urllib.request.urlopen(enlace) as google_sheet:
@@ -195,7 +196,6 @@ def upload_sample_hospital(self):
         fieldnames = io_string.readline().strip().split(str(dialect.delimiter))
 
         # Cambio de nombres de campos a los de la base de datos 
-        lista_columnas_inesperadas = []
         for i in range(len(fieldnames)):
             if fieldnames[i] != '':
                 try:
@@ -345,8 +345,12 @@ def upload_sample_hospital(self):
 
     finish = datetime.now()
     elapsed_time = finish - start
-    if lista_fallos:
+    if lista_fallos and lista_columnas_inesperadas:
+        mensaje = f'Problema: {lista_fallos}. Columnas inesperadas: {lista_columnas_inesperadas}'
+    elif lista_fallos:
         mensaje = f'Problema: {lista_fallos}'
+    elif lista_columnas_inesperadas:
+        mensaje = f'Columnas inesperadas: {lista_columnas_inesperadas}'
     else:
         mensaje = 'Actualizado desde google sheet'
     finish_process(id, elapsed_time.seconds, mensaje)

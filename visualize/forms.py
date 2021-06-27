@@ -19,13 +19,13 @@ class GraphsFormMultipleChoice(forms.Form):
     # Choices
     choices_categoria = [(i,i) for i in Sample.objects.values_list('categoria_muestra',flat=True).distinct().order_by('categoria_muestra')]
     choices_vigilancia = [(i,i) for i in Sample.objects.values_list('vigilancia',flat=True).distinct().order_by('vigilancia')]
-    choices_calidad = [(i,i) for i in Sample.objects.values_list('samplemetadata__calidad_secuenciacion',flat=True).distinct().order_by('samplemetadata__calidad_secuenciacion')]
+    # choices_calidad = [(i,i) for i in Sample.objects.values_list('samplemetadata__calidad_secuenciacion',flat=True).distinct().order_by('samplemetadata__calidad_secuenciacion')]
     # Campos
     fecha_inicial = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
     fecha_final = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
     categoria = forms.MultipleChoiceField(choices=choices_categoria,required=True, widget=forms.SelectMultiple(attrs={'size': 5}))
     vigilancia = forms.MultipleChoiceField(choices=choices_vigilancia, required=True, widget=forms.SelectMultiple(attrs={'size': 3}))
-    calidad_secuenciacion = forms.MultipleChoiceField(choices=choices_calidad, required=True, widget=forms.SelectMultiple(attrs={'size': 3}))
+    # calidad_secuenciacion = forms.MultipleChoiceField(choices=choices_calidad, required=True, widget=forms.SelectMultiple(attrs={'size': 3}))
     umbral = forms.IntegerField(required=False)
     filtro = forms.CharField(required=False)
 
