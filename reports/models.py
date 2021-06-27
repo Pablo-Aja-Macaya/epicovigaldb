@@ -21,8 +21,9 @@ class Report(models.Model):
 
     tipo = models.CharField(max_length=10, default='mensual', choices=OPCIONES_TIPO)
     categoria = models.CharField(max_length=20, default='vigilancia', choices=OPCIONES_CATEGORIA)
-    umbral = models.IntegerField(default=None, blank=True, null=True)
-    
+
+    encrypted_url_code = models.TextField(max_length=600, default='Obtener este código desde el apartado de gráficas', blank=False)
+
     fecha_inicial = models.DateField(default='2020-01-01')
     fecha_final = models.DateField(default='2020-01-30')
     fecha_publ = models.DateTimeField(auto_now=True)
