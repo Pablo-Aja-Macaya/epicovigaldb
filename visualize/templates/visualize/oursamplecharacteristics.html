@@ -25,10 +25,16 @@
         <div class="card-body">
           <div class="row">
             <div class="col">
-              <div class="card card-body">
-                <form method="get" class="form-group ">
-                  {{ filter.form.as_p }}
-                  <button class="btn btn-primary" type="submit">Search</button>
+              <div class="card card-body"  style="border-style: none;">
+                <form method="get" class="form-group">
+                  <div class="table-responsive">
+                    <table class='table ' >
+                      {{ filter.form.as_table }}
+                    </table>          
+                  </div>
+                  <div class="row justify-content-center">
+                    <button class="btn btn-primary" type="submit">Buscar</button>
+                  </div>                  
                 </form>
               </div>
             </div>
