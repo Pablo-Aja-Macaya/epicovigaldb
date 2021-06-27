@@ -64,6 +64,7 @@ class NextcladeTest(models.Model): #.csv
     qc_missing_data_status = models.CharField(max_length=30, default=None, blank=True)
     qc_snp_clusters_status = models.CharField(max_length=30, default=None, blank=True)
     qc_mixed_sites_status = models.CharField(max_length=30, default=None, blank=True)
+    qc_overall_status = models.CharField(max_length=30, default=None, blank=True)
 
     date = models.DateTimeField(auto_now=True)
 
