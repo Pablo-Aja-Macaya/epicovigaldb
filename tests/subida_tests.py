@@ -51,6 +51,7 @@ fields_correspondence = {
         'qc.missingdata.status':'qc_missing_data_status',
         'qc.snpclusters.status':'qc_snp_clusters_status',
         'qc.mixedsites.status':'qc_mixed_sites_status',   
+        'qc.overallStatus':'qc_overall_status'
     },
     # iVar #.tsv
     # Muestra a partir del nombre del archivo
@@ -244,6 +245,7 @@ def upload_nextclade(reader):
         qc_missing_data_status = line.get('qc_missing_data_status')
         qc_snp_clusters_status = line.get('qc_snp_clusters_status')
         qc_mixed_sites_status = line.get('qc_mixed_sites_status')
+        qc_overall_status = line.get('qc_overall_status')
 
         if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
@@ -258,7 +260,8 @@ def upload_nextclade(reader):
                     'qc_private_mutations_status' : qc_private_mutations_status,
                     'qc_missing_data_status' : qc_missing_data_status,
                     'qc_snp_clusters_status' : qc_snp_clusters_status,
-                    'qc_mixed_sites_status' : qc_mixed_sites_status,                    
+                    'qc_mixed_sites_status' : qc_mixed_sites_status,   
+                    'qc_overall_status':qc_overall_status                 
                 }
             )
 
