@@ -84,6 +84,13 @@ fields_correspondence = {
     },
 }
 
+def check_if_number(value):
+    try:
+        int(value)
+    except:
+        value = None
+    return value
+
 def detect_file(header):
     # Detección del tipo de archivo 
 
@@ -349,6 +356,10 @@ def upload_lineages(reader):
         comments = line.get('comments')
         countries = line.get('most_common_countries','').split(',')
         pangolearn_version = line.get('pangolearn_version')
+
+        # Puede haber valores tipo 'NA' que dan error porque no son números. Esto transforma a None si pasa
+        conflict = check_if_number(conflict)
+        probability = check_if_number(probability)
 
         if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
