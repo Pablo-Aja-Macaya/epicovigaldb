@@ -6,28 +6,57 @@
         <a href="{% url 'general' %}"><button type="button"  class="btn btn-outline-primary" >&lt Volver a tablas</button></a>
     </div>
     <h2 class='pb-3 pt-3'><strong>Gráficas</strong></h2>
-    <form action={{url_form}} method="POST">
-      {% csrf_token %}
-      <div class="table-responsive">
-        <table class='table table-hover table-striped ' >
-        {{ form.as_table }} 
-        </table>          
+    <div class="accordion" id="accordionExample">
+      <div class="card">
+        <div class="card-header" id="headingOne">
+          <h2 class="mb-0">
+            <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+              <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-search pr-2" viewBox="0 0 16 16">
+                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+              </svg>
+              Filtrar
+            </button>
+          </h2>
+        </div>
+        <div id="collapseOne" class="collapse {{filter_collapse}}" aria-labelledby="headingOne" data-parent="#accordionExample">
+          <div class="card-body" >
+            <div class="row">
+              <div class="col">
+                <div class="card card-body" style="border-style: none;">
+                  <p class="text-muted">En los atributos con un listado de elementos prueba a hacer click y arrastrar, o usa ctrl+click para seleccionar varios valores. Las posibles elecciones mostradas salen directamente de lo que hay en la base de datos.</p>
+                  <form action={{url_form}} method="POST">
+                    {% csrf_token %}
+                    <div class="table-responsive">
+                      <table class='table' >
+                      {{ form.as_table }} 
+                      </table>          
+                    </div>
+                    <div class="row justify-content-center">
+                      <button type="submit" value="Submit" class="btn btn-primary" >Actualizar</button>
+                    </div>
+                  </form> 
+                </div>
+              </div>
+            </div>          
+          </div>
+        </div>
       </div>
-      <div class="row justify-content-center">
-        <button type="submit" value="Submit" class="btn btn-primary" >Actualizar</button>
-      </div>
-    </form>  
+    </div> 
     <hr>
+    {% if encrypted_url_code %}
+    <div class="form-group">
+      <label for="encrypted_url">Código para URLs de gráficas (se usa para los informes):</label>
+      <textarea class="form-control" id="encrypted_url" rows="3">{{encrypted_url_code}}</textarea>
+    </div>
+    {% endif %}  
 </div>
+
 
 
 
 <div class='container-fluid'>
     <div class="row justify-content-center">
         <div class="col" >
-            <!-- <button class="btn btn-outline-info" > 
-                <h4 style="margin-bottom: 0%;"><i class="bi bi-link" ></i></h4>
-            </button> -->
             <div id="hospital_graph" data-url={{url_origen}}></div>
         </div>
         <div class="col">

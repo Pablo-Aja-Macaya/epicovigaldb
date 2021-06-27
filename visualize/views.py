@@ -148,7 +148,7 @@ def get_graphs(request):
         'url_linajes_hospital':url_linajes_hospital,
         'url_concellos':url_concellos
         }
-    return render(request, 'visualize/graphs_pruebas.html', context)
+    return render(request, 'visualize/graphs.html', context)
 
 @login_required(login_url="/accounts/login") 
 def drop_sample_cascade(request):
@@ -516,15 +516,10 @@ COLOR_LIST = [
     '#ffe4c4','#ffb6c1',
 ]
 
-def get_graph_json_link(request, graph_base_url, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None, umbral=None):
+def get_graph_json_link(request, graph_base_url, encrypted_url_code):
     # Devuelve un icono con el enlace de la gráfica si el usuario está loggeado
     if request.user.is_authenticated:
-        args = [fecha_inicial,fecha_final,categoria]
-        if umbral:
-            args.append(umbral)
-        if filtro:
-            args.append(filtro)
-        url = reverse(graph_base_url, args=args)
+        url = reverse(graph_base_url, args=[encrypted_url_code])
         json_link = f'<a href="{url}"><p style="color: rgb(61, 61, 255);">&#9741</p></a>'
         return json_link
     else:
@@ -552,19 +547,8 @@ def linajes_porcentaje_total(request, encrypted_url_code):
                 .filter(id_uvigo__contains='EPI', fecha_muestra__range=[fecha_inicial, fecha_final])\
                 .exclude(id_uvigo__contains='ICVS')
 
-        # if categoria == 'vigilancia':
-        #     linajes = Sample.objects.filter(vigilancia='si').filter(id_uvigo__contains='EPI', fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
-        # else:
-        #     linajes = Sample.objects.filter(vigilancia='no').filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
-
         if filtro:
             linajes = linajes.filter(id_uvigo__contains=filtro)
-
-
-        # if filtro:
-        #     linajes = Sample.objects.filter(id_uvigo__contains=filtro).filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
-        # else:
-        #     linajes = Sample.objects.filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
 
         linajes_count = linajes\
             .values('lineagestest__lineage','samplemetadata__id_hospital')\
@@ -586,7 +570,7 @@ def linajes_porcentaje_total(request, encrypted_url_code):
 
         # print(lista_linajes)
         # print(lista_valores)
-        # json_link = get_graph_json_link(request,'linajes_porcentaje_total', fecha_inicial, fecha_final, categoria, filtro, thresh)
+        json_link = get_graph_json_link(request,'linajes_porcentaje_total', encrypted_url_code)
 
         chart = {
             'chart': {
@@ -594,7 +578,7 @@ def linajes_porcentaje_total(request, encrypted_url_code):
                 'type': 'bar'
             },
             'title': {
-                'text': f'Variantes en Galicia ({fecha_inicial} | {fecha_final}) ' # {json_link} ({fecha_inicial} | {fecha_final})
+                'text': f'Variantes en Galicia ({fecha_inicial} | {fecha_final}) {json_link}' #  ({fecha_inicial} | {fecha_final})
             },
             'subtitle': {
                 'text': f'Categoría: {categoria}. Umbral: {thresh}'
@@ -816,7 +800,7 @@ def linajes_hospitales_graph(request, encrypted_url_code):
                     }
 
         drilldown_dicc = OrderedDict(sorted(drilldown_dicc.items()))
-        # json_link = get_graph_json_link(request,'linajes_hospitales_graph', fecha_inicial, fecha_final, categoria, filtro, thresh)
+        json_link = get_graph_json_link(request,'linajes_hospitales_graph', encrypted_url_code)
         chart_height = 700
         chart = {
             'chart': {
@@ -824,7 +808,7 @@ def linajes_hospitales_graph(request, encrypted_url_code):
                 'type': 'bar'
             },
             'title': {
-                'text': f'Variantes por hospital ({fecha_inicial} | {fecha_final}) ' #{json_link} ({fecha_inicial} | {fecha_final})
+                'text': f'Variantes por hospital ({fecha_inicial} | {fecha_final}) {json_link}' #({fecha_inicial} | {fecha_final})
             },
             'subtitle': {
                 'text': f'Pulsa sobre el nombre de un hospital para ver todos los linajes. Categoría: {categoria}. Umbral: {thresh}'
@@ -955,7 +939,7 @@ def concellos_gal_graph(request, encrypted_url_code):
 
         
 
-        # json_link = get_graph_json_link(request,'concellos_gal_graph', fecha_inicial, fecha_final, categoria, filtro)
+        json_link = get_graph_json_link(request,'concellos_gal_graph', encrypted_url_code)
         chart = {
             'chart':{
                 'map':geojson_data,
@@ -965,7 +949,7 @@ def concellos_gal_graph(request, encrypted_url_code):
                 'useGPUTranslations': True
             },
             'title': {
-                'text': f'Geolocalización ({fecha_inicial} | {fecha_final}) ' #{json_link} ({fecha_inicial} | {fecha_final})
+                'text': f'Geolocalización ({fecha_inicial} | {fecha_final}) {json_link}' # ({fecha_inicial} | {fecha_final})
             },
             'subtitle': {
                 'text': f'Muestras en cada concello. Categoría: {categoria}'
@@ -1043,12 +1027,12 @@ def hospital_graph(request, encrypted_url_code):
             c = hospitales.filter(id_hospital = h).count()
             answer.append({'name':h, 'y':int(c)})
 
-        # json_link = get_graph_json_link(request,'hospital_graph', fecha_inicial, fecha_final, categoria, filtro)
+        json_link = get_graph_json_link(request,'hospital_graph', encrypted_url_code)
         chart = {
             'chart': {
                 'type': 'pie',
             },
-            'title': {'text': f'Origen de muestras ({fecha_inicial} | {fecha_final}) '}, #{json_link}
+            'title': {'text': f'Origen de muestras ({fecha_inicial} | {fecha_final}) {json_link}'}, #
             'subtitle': {
                 'text': f'Origen de muestras recibidas (Incluyendo secuenciadas y no secuenciadas). Categoría: {categoria}.'
             },
