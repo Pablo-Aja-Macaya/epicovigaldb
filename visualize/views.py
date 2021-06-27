@@ -8,14 +8,22 @@ from django.contrib import messages
 from django.forms.models import model_to_dict
 from django.urls import reverse
 from collections import OrderedDict
+import base64
+import datetime
 
 from upload.models import Region, Sample
 from upload.models import SampleMetaData 
 
-from tests.models import LineagesTest, PicardTest, NextcladeTest, NGSstatsTest
-from .models import *
-from .forms import *
-
+from tests.models import VariantsTest, LineagesTest, PicardTest, NextcladeTest, NGSstatsTest, SingleCheckTest
+# Tablas
+from .models import SampleTable, RegionTable, SampleMetaDataTable, CompletedTestsTable
+from .models import LineagesTable, PicardTable, NextcladeTable, NGSTable, VariantsTable, SingleCheckTable
+# Filtros
+from .models import SampleFilter, MetaDataFilter, RegionFilter
+# Formularios
+from .forms import GraphsForm, GraphsFormMultipleChoice
+from .forms import SampleForm, SampleMetaDataForm, RegionForm
+from .forms import SingleCheckForm, PicardForm, NextcladeForm, LineagesForm, NGSStatssForm
 
 # In[0]
 @login_required(login_url="/accounts/login") 
@@ -62,6 +70,10 @@ def get_graphs(request):
         url_linajes = reverse('linajes_porcentaje_total',args=(fecha_inicial,fecha_final))
         url_concellos = reverse('concellos_gal_graph',args=(fecha_inicial,fecha_final))
 
+    form2 = GraphsFormMultipleChoice()
+    form2.fields['categoria'].choices = [(i,i) for i in Sample.objects.values_list('categoria_muestra',flat=True).distinct().order_by('categoria_muestra')]
+    form2.fields['vigilancia'].choices = [(i,i) for i in Sample.objects.values_list('vigilancia',flat=True).distinct().order_by('vigilancia')]
+    form2.fields['calidad_secuenciacion'].choices = [(i,i) for i in Sample.objects.values_list('samplemetadata__calidad_secuenciacion',flat=True).distinct().order_by('samplemetadata__calidad_secuenciacion')]
 
     context = {
         'url_form':reverse('get_graphs'),
@@ -72,6 +84,71 @@ def get_graphs(request):
         'form':form
         }
     return render(request, 'visualize/graphs.html', context)
+
+
+
+def simple_url_encrypt(message):
+    message_bytes = message.encode('ascii')
+    base64_bytes = base64.b64encode(message_bytes)
+    base64_message = base64_bytes.decode('ascii')
+    return(base64_message)
+
+def simple_url_decrypt(base64_message):
+    base64_bytes = base64_message.encode('ascii')
+    message_bytes = base64.b64decode(base64_bytes)
+    message = eval(message_bytes.decode('ascii'))
+    return message
+
+
+@login_required(login_url="/accounts/login") 
+def get_graphs(request):
+    encrypted_url_code = ''
+    url_origen = ''
+    url_linajes_hospital = ''
+    url_linajes = ''
+    url_concellos = ''
+    if request.method=='POST':
+        form = GraphsFormMultipleChoice(request.POST)
+        if form.is_valid():
+            f = form.cleaned_data
+            f['fecha_inicial'] = f['fecha_inicial'].strftime("%Y-%m-%d") 
+            f['fecha_final'] = f['fecha_final'].strftime("%Y-%m-%d") 
+            
+            # Encriptado
+            string = str(dict(f))
+            encrypted_url_code = simple_url_encrypt(string)
+
+            # URLs de gráficas
+            url_origen = reverse('hospital_graph',args=[encrypted_url_code])
+            url_linajes = reverse('linajes_porcentaje_total',args=[encrypted_url_code])
+            url_linajes_hospital = reverse('linajes_hospitales_graph',args=[encrypted_url_code])
+            url_concellos = reverse('concellos_gal_graph',args=[encrypted_url_code])
+
+            # Estado de filtro (colapsado/no colapsado)
+            filter_collapse = ''
+            
+
+    else:
+        fecha_inicial = '2020-01-01'
+        fecha_final = '2022-01-01'
+        categoria = 'aleatoria'
+        inicial = {'fecha_inicial':fecha_inicial, 'fecha_final':fecha_final, 'categoria':'aleatoria'}
+        
+        form = GraphsFormMultipleChoice(initial=inicial)
+        # Estado de filtro (colapsado/no colapsado)
+        filter_collapse = 'show'
+
+    context = {
+        'url_form':reverse('get_graphs'),
+        'form':form,
+        'filter_collapse':filter_collapse,
+        'encrypted_url_code':encrypted_url_code,
+        'url_origen':url_origen,
+        'url_linajes':url_linajes,
+        'url_linajes_hospital':url_linajes_hospital,
+        'url_concellos':url_concellos
+        }
+    return render(request, 'visualize/graphs_pruebas.html', context)
 
 @login_required(login_url="/accounts/login") 
 def drop_sample_cascade(request):
@@ -453,18 +530,32 @@ def get_graph_json_link(request, graph_base_url, fecha_inicial, fecha_final, cat
     else:
         return ''
 
-def linajes_porcentaje_total(request, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None, umbral=None):
+def linajes_porcentaje_total(request, encrypted_url_code):
     try:
-        print(umbral, filtro)
+        decrypted_dicc = simple_url_decrypt(encrypted_url_code)
+        fecha_inicial = decrypted_dicc.get('fecha_inicial')
+        fecha_final = decrypted_dicc.get('fecha_final')
+        categoria = decrypted_dicc.get('categoria')
+        vigilancia = decrypted_dicc.get('vigilancia')
+        calidad_secuenciacion = decrypted_dicc.get('calidad_secuenciacion')
+        filtro = decrypted_dicc.get('filtro')
+        umbral = decrypted_dicc.get('umbral')
+        
         if umbral is None:
             thresh = 4 # para eliminar variantes
         else:
             thresh = umbral
 
-        if categoria == 'vigilancia':
-            linajes = Sample.objects.filter(vigilancia='si').filter(id_uvigo__contains='EPI', fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
-        else:
-            linajes = Sample.objects.filter(vigilancia='no').filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
+        linajes = Sample.objects.filter(vigilancia__in=vigilancia)\
+                .filter(categoria_muestra__in=categoria)\
+                .filter(samplemetadata__calidad_secuenciacion__in=calidad_secuenciacion)\
+                .filter(id_uvigo__contains='EPI', fecha_muestra__range=[fecha_inicial, fecha_final])\
+                .exclude(id_uvigo__contains='ICVS')
+
+        # if categoria == 'vigilancia':
+        #     linajes = Sample.objects.filter(vigilancia='si').filter(id_uvigo__contains='EPI', fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
+        # else:
+        #     linajes = Sample.objects.filter(vigilancia='no').filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
 
         if filtro:
             linajes = linajes.filter(id_uvigo__contains=filtro)
@@ -495,7 +586,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final, categoria='ale
 
         # print(lista_linajes)
         # print(lista_valores)
-        json_link = get_graph_json_link(request,'linajes_porcentaje_total', fecha_inicial, fecha_final, categoria, filtro, thresh)
+        # json_link = get_graph_json_link(request,'linajes_porcentaje_total', fecha_inicial, fecha_final, categoria, filtro, thresh)
 
         chart = {
             'chart': {
@@ -503,7 +594,7 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final, categoria='ale
                 'type': 'bar'
             },
             'title': {
-                'text': f'Variantes en Galicia ({fecha_inicial} | {fecha_final}) {json_link}' # ({fecha_inicial} | {fecha_final})
+                'text': f'Variantes en Galicia ({fecha_inicial} | {fecha_final}) ' # {json_link} ({fecha_inicial} | {fecha_final})
             },
             'subtitle': {
                 'text': f'Categoría: {categoria}. Umbral: {thresh}'
@@ -554,18 +645,29 @@ def linajes_porcentaje_total(request, fecha_inicial, fecha_final, categoria='ale
             }
             ]
         }
-    except:
+    except Exception as e:
+        print(e)
         chart = {}
     return JsonResponse(chart)
 
-
-def linajes_hospitales_graph(request, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None, umbral=None):
+def linajes_hospitales_graph(request, encrypted_url_code):
     try:
+        decrypted_dicc = simple_url_decrypt(encrypted_url_code)
+        fecha_inicial = decrypted_dicc.get('fecha_inicial')
+        fecha_final = decrypted_dicc.get('fecha_final')
+        categoria = decrypted_dicc.get('categoria')
+        vigilancia = decrypted_dicc.get('vigilancia')
+        calidad_secuenciacion = decrypted_dicc.get('calidad_secuenciacion')
+        filtro = decrypted_dicc.get('filtro')
+        umbral = decrypted_dicc.get('umbral')
+
         percentil = 85
-        if categoria == 'vigilancia':
-            linajes = Sample.objects.filter(vigilancia='si').filter(id_uvigo__contains='EPI', fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
-        else:
-            linajes = Sample.objects.filter(vigilancia='no').filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
+        
+        linajes = Sample.objects.filter(vigilancia__in=vigilancia)\
+                .filter(categoria_muestra__in=categoria)\
+                .filter(samplemetadata__calidad_secuenciacion__in=calidad_secuenciacion)\
+                .filter(id_uvigo__contains='EPI', fecha_muestra__range=[fecha_inicial, fecha_final])\
+                .exclude(id_uvigo__contains='ICVS')
 
         if filtro:
             linajes = linajes.filter(id_uvigo__contains=filtro)
@@ -714,7 +816,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final, categoria='ale
                     }
 
         drilldown_dicc = OrderedDict(sorted(drilldown_dicc.items()))
-        json_link = get_graph_json_link(request,'linajes_hospitales_graph', fecha_inicial, fecha_final, categoria, filtro, thresh)
+        # json_link = get_graph_json_link(request,'linajes_hospitales_graph', fecha_inicial, fecha_final, categoria, filtro, thresh)
         chart_height = 700
         chart = {
             'chart': {
@@ -722,7 +824,7 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final, categoria='ale
                 'type': 'bar'
             },
             'title': {
-                'text': f'Variantes por hospital ({fecha_inicial} | {fecha_final}) {json_link}' # ({fecha_inicial} | {fecha_final})
+                'text': f'Variantes por hospital ({fecha_inicial} | {fecha_final}) ' #{json_link} ({fecha_inicial} | {fecha_final})
             },
             'subtitle': {
                 'text': f'Pulsa sobre el nombre de un hospital para ver todos los linajes. Categoría: {categoria}. Umbral: {thresh}'
@@ -810,28 +912,41 @@ def linajes_hospitales_graph(request, fecha_inicial, fecha_final, categoria='ale
             # },
             
         }
-    except:
+    except Exception as e:
+        print(e)
         chart = {}
     return JsonResponse(chart)
 
-def concellos_gal_graph(request, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None):
+def concellos_gal_graph(request, encrypted_url_code):
     map_file = './mapas_galicia/GaliciaConcellos_Simple.geojson'
     map_file = './mapas_galicia/GaliciaConcellos_reduccion.geojson'
+    
     
     # map_file = '/home/pabs/GaliciaComarcas.geojson'
     with open(map_file) as map:
         geojson_data = geojson.load(map) # mapa
     
     try:
-        # Datos: [{'NomeMAY':'A CORUÑA', 'value':10}, {'NomeMAY':'SANTIAGO', 'value':15}...]
-        if categoria == 'vigilancia':
-            data = Sample.objects.filter(vigilancia='si').filter(id_uvigo__contains='EPI', fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
-        else:
-            data = Sample.objects.filter(vigilancia='no').filter(id_uvigo__contains='EPI', categoria_muestra=categoria, fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo__contains='ICVS')
+        
+        decrypted_dicc = simple_url_decrypt(encrypted_url_code)
+        fecha_inicial = decrypted_dicc.get('fecha_inicial')
+        fecha_final = decrypted_dicc.get('fecha_final')
+        categoria = decrypted_dicc.get('categoria')
+        vigilancia = decrypted_dicc.get('vigilancia')
+        calidad_secuenciacion = decrypted_dicc.get('calidad_secuenciacion')
+        filtro = decrypted_dicc.get('filtro')
+        umbral = decrypted_dicc.get('umbral')
+
+        data = Sample.objects.filter(vigilancia__in=vigilancia)\
+                .filter(categoria_muestra__in=categoria)\
+                .filter(samplemetadata__calidad_secuenciacion__in=calidad_secuenciacion)\
+                .filter(id_uvigo__contains='EPI', fecha_muestra__range=[fecha_inicial, fecha_final])\
+                .exclude(id_uvigo__contains='ICVS')
 
         if filtro:
             data = data.filter(id_uvigo__contains=filtro)
 
+        # Datos: [{'NomeMAY':'A CORUÑA', 'value':10}, {'NomeMAY':'SANTIAGO', 'value':15}...]
         data = list(data.filter(id_uvigo__contains='EPI').exclude(id_uvigo__contains='ICVS')\
                 .values('id_region__localizacion')\
                 .filter(id_region__localizacion__gte=2)\
@@ -839,20 +954,8 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final, categoria='aleatori
                 .order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
 
         
-        # if filtro:
-        #     data = list(Sample.objects.filter(id_uvigo__contains=filtro).filter(id_uvigo__contains='EPI', categoria_muestra=categoria).exclude(id_uvigo__contains='ICVS')\
-        #             .values('id_region__localizacion')\
-        #             .filter(id_region__localizacion__gte=2)\
-        #             .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
-        #             .order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
-        # else:
-        #     data = list(Sample.objects.filter(id_uvigo__contains='EPI', categoria_muestra=categoria).exclude(id_uvigo__contains='ICVS')\
-        #             .values('id_region__localizacion')\
-        #             .filter(id_region__localizacion__gte=2)\
-        #             .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
-        #             .order_by().annotate(NomeMAY = F('id_region__localizacion') , value=Count('id_region__localizacion')))
 
-        json_link = get_graph_json_link(request,'concellos_gal_graph', fecha_inicial, fecha_final, categoria, filtro)
+        # json_link = get_graph_json_link(request,'concellos_gal_graph', fecha_inicial, fecha_final, categoria, filtro)
         chart = {
             'chart':{
                 'map':geojson_data,
@@ -862,7 +965,7 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final, categoria='aleatori
                 'useGPUTranslations': True
             },
             'title': {
-                'text': f'Geolocalización ({fecha_inicial} | {fecha_final}) {json_link}' # ({fecha_inicial} | {fecha_final})
+                'text': f'Geolocalización ({fecha_inicial} | {fecha_final}) ' #{json_link} ({fecha_inicial} | {fecha_final})
             },
             'subtitle': {
                 'text': f'Muestras en cada concello. Categoría: {categoria}'
@@ -911,16 +1014,21 @@ def concellos_gal_graph(request, fecha_inicial, fecha_final, categoria='aleatori
         chart = {}
     return JsonResponse(chart)
 
-def hospital_graph(request, fecha_inicial, fecha_final, categoria='aleatoria', filtro=None):
+def hospital_graph(request, encrypted_url_code):
     try:
-        if categoria == 'vigilancia':
-            hospitales = SampleMetaData.objects.filter(id_uvigo_id__vigilancia='si').filter(id_uvigo_id__id_uvigo__contains='EPI', id_uvigo__fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo_id__id_uvigo__contains='ICVS')
-        else:
-            hospitales = SampleMetaData.objects.filter(id_uvigo_id__vigilancia='no').filter(id_uvigo_id__id_uvigo__contains='EPI', id_uvigo_id__categoria_muestra=categoria, id_uvigo__fecha_muestra__range=[fecha_inicial, fecha_final]).exclude(id_uvigo_id__id_uvigo__contains='ICVS')
-
-
-        # hospitales = SampleMetaData.objects.filter(id_uvigo_id__categoria_muestra=categoria, id_uvigo__fecha_muestra__range=[fecha_inicial,fecha_final])\
-        #             .exclude(id_hospital='ICVS').exclude(id_uvigo_id__id_uvigo__contains='SERGAS')
+        decrypted_dicc = simple_url_decrypt(encrypted_url_code)
+        fecha_inicial = decrypted_dicc.get('fecha_inicial')
+        fecha_final = decrypted_dicc.get('fecha_final')
+        categoria = decrypted_dicc.get('categoria')
+        vigilancia = decrypted_dicc.get('vigilancia')
+        filtro = decrypted_dicc.get('filtro')
+        calidad_secuenciacion = decrypted_dicc.get('calidad_secuenciacion')
+        
+        hospitales = SampleMetaData.objects.filter(id_uvigo_id__categoria_muestra__in=categoria)\
+                    .filter(calidad_secuenciacion__in=calidad_secuenciacion)\
+                    .filter(id_uvigo_id__vigilancia__in=vigilancia)\
+                    .filter(id_uvigo_id__id_uvigo__contains='EPI', id_uvigo__fecha_muestra__range=[fecha_inicial, fecha_final])\
+                    .exclude(id_uvigo_id__id_uvigo__contains='ICVS')
 
         if filtro:
             hospitales = hospitales.filter(id_uvigo_id__id_uvigo__contains=filtro).values('id_hospital')
@@ -935,12 +1043,12 @@ def hospital_graph(request, fecha_inicial, fecha_final, categoria='aleatoria', f
             c = hospitales.filter(id_hospital = h).count()
             answer.append({'name':h, 'y':int(c)})
 
-        json_link = get_graph_json_link(request,'hospital_graph', fecha_inicial, fecha_final, categoria, filtro)
+        # json_link = get_graph_json_link(request,'hospital_graph', fecha_inicial, fecha_final, categoria, filtro)
         chart = {
             'chart': {
                 'type': 'pie',
             },
-            'title': {'text': f'Origen de muestras ({fecha_inicial} | {fecha_final}) {json_link}'},
+            'title': {'text': f'Origen de muestras ({fecha_inicial} | {fecha_final}) '}, #{json_link}
             'subtitle': {
                 'text': f'Origen de muestras recibidas (Incluyendo secuenciadas y no secuenciadas). Categoría: {categoria}.'
             },
@@ -971,7 +1079,8 @@ def hospital_graph(request, fecha_inicial, fecha_final, categoria='aleatoria', f
                 'data': answer # [{ name: 'CHHUVI', y: 1 }, { name: 'CHUAC', y: 1 }]
             }]
         }
-    except:
+    except Exception as e:
+        print(e)
         chart = {}
     return JsonResponse(chart)
 

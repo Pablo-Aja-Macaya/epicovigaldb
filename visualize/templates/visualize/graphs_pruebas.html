@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-lg pb-4">
+    <div class="btn-group">
+        <a href="{% url 'general' %}"><button type="button"  class="btn btn-outline-primary" >&lt Volver a tablas</button></a>
+    </div>
+    <h2 class='pb-3 pt-3'><strong>Gráficas</strong></h2>
+    <div class="accordion pt-3" id="accordionExample">
+      <div class="card">
+        <div class="card-header" id="headingOne">
+          <h2 class="mb-0">
+            <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+              <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-search pr-2" viewBox="0 0 16 16">
+                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+              </svg>
+              Filtrar
+            </button>
+          </h2>
+        </div>
+        <div id="collapseOne" class="collapse {{filter_collapse}}" aria-labelledby="headingOne" data-parent="#accordionExample">
+          <div class="card-body">
+            <div class="row">
+              <div class="col">
+                <div class="card card-body">
+                  <form action={{url_form}} method="POST">
+                    {% csrf_token %}
+                    <div class="table-responsive">
+                      <table class='table table-hover table-striped ' >
+                      {{ form.as_table }} 
+                      </table>          
+                    </div>
+                    <div class="row justify-content-center">
+                      <button type="submit" value="Submit" class="btn btn-primary" >Actualizar</button>
+                    </div>
+                  </form> 
+                </div>
+              </div>
+            </div>          
+          </div>
+        </div>
+      </div>
+    </div> 
+    <hr>
+    {% if encrypted_url_code %}
+    <div class="form-group">
+      <label for="encrypted_url">Código para URLs de gráficas (se usa para los informes):</label>
+      <textarea class="form-control" id="encrypted_url" rows="3">{{encrypted_url_code}}</textarea>
+    </div>
+    {% endif %}  
+</div>
+
+
+
+
+<div class='container-fluid'>
+    <div class="row justify-content-center">
+        <div class="col" >
+            <div id="hospital_graph" data-url={{url_origen}}></div>
+        </div>
+        <div class="col">
+            <div id="linajes_hospitales_graph" data-url={{url_linajes_hospital}}></div>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col">
+            <div id="linajes_porcentaje_total" data-url={{url_linajes}} ></div>
+        </div>
+        <div class="col">
+            <div id="concellos_gal_graph" data-url={{url_concellos}} style="height: 700px;"></div>
+        </div>
+    </div>
+</div> 
+
+
+
+
+  <script>
+    $.ajax({
+      url: $("#linajes_porcentaje_total").attr("data-url"),
+      dataType: 'json',
+      success: function (data) {
+        Highcharts.chart("linajes_porcentaje_total", data);
+      }
+    });
+  </script>
+  <script>
+    $.ajax({
+      url: $("#linajes_hospitales_graph").attr("data-url"),
+      dataType: 'json',
+      success: function (data) {
+        Highcharts.chart("linajes_hospitales_graph", data);
+      }
+    });
+  </script>
+  <script>
+    $.ajax({
+      url: $("#concellos_gal_graph").attr("data-url"),
+      dataType: 'json',
+      success: function (data) {
+        Highcharts.mapChart("concellos_gal_graph", data);
+      }
+    });
+  </script>
+  <script>
+    $.ajax({
+      url: $("#hospital_graph").attr("data-url"),
+      dataType: 'json',
+      success: function (data) {
+        Highcharts.chart("hospital_graph", data);
+      }
+    });
+  </script>
+  <script>
+    $.ajax({
+      url: $("#variants_line_graph").attr("data-url"),
+      dataType: 'json',
+      success: function (data) {
+        Highcharts.chart("variants_line_graph", data);
+      }
+    });
+    $.ajax({
+      url: $("#variants_line_graph2").attr("data-url"),
+      dataType: 'json',
+      success: function (data) {
+        Highcharts.chart("variants_line_graph2", data);
+      }
+    });
+  </script>
+  <script>
+    $.ajax({
+      url: $("#variants_column_graph").attr("data-url"),
+      dataType: 'json',
+      success: function (data) {
+        Highcharts.chart("variants_column_graph", data);
+      }
+    });
+  </script>
+
+{% endblock %}

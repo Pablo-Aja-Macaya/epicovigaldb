@@ -86,15 +86,6 @@ class SingleCheckTable(tables.Table):
 # In[3]: Tabla de tests completados
 class CompletedTestsTable(tables.Table):
     # Tabla donde se indicará para cada muestra qué tests tiene hechos
-    # 1 - Coger todos los nombres de Samples
-    # 2 - Buscar estos nombres en las tablas de resultados, si aparecen poner un {sample:1},
-    #     si no poner {sample:0}?
-    # 3 - Renderizarlo en la tabla según si han sido testeadas (1) o no (0)
-    # data = [
-    #     {'sample':'epiblabla', 'picard':1, 'nextclade':0, 'ngsstats':1},
-    #     {'sample':'epiblabla2', 'picard':1, 'nextclade':0, 'ngsstats':1},
-    # ]
-
     id_uvigo = tables.LinkColumn('specific_sample', args=[A('id_uvigo')])
     picardtest = tables.Column(verbose_name='Picard')
     nextcladetest = tables.Column(verbose_name='NextClade')
@@ -107,7 +98,6 @@ class CompletedTestsTable(tables.Table):
 
 
 # In[4]: Filtros
-
 class SampleFilter(django_filters.FilterSet):
     id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo', lookup_expr='icontains')
     categoria_muestra = django_filters.CharFilter(field_name = 'categoria_muestra', lookup_expr='icontains')

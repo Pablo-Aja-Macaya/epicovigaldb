@@ -77,7 +77,7 @@ def input_selection(request, test):
         choices, cmd_function = find_test_data(test)
         cmd_function = cmd_function_dicc[cmd_function]
         cmd = cmd_function('archivo')
-        form.fields['files'].choices = ( (i,i) for i in choices)
+        form.fields['files'].choices = ((i,i) for i in choices)
 
     context = {
         'form':form,
