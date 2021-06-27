@@ -51,7 +51,7 @@ fields_correspondence = {
         'qc.missingdata.status':'qc_missing_data_status',
         'qc.snpclusters.status':'qc_snp_clusters_status',
         'qc.mixedsites.status':'qc_mixed_sites_status',   
-        'qc.overallStatus':'qc_overall_status'
+        'qc.overallstatus':'qc_overall_status'
     },
     # iVar #.tsv
     # Muestra a partir del nombre del archivo
