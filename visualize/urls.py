@@ -22,16 +22,17 @@ urlpatterns = [
     path('lineages', views.lineages, name='lineages'),
     # Graficas
     path('graphs/', views.get_graphs, name="get_graphs"),
-        ## Proporción por hospital
+        # Proporción por hospital
         path('hospital_graph/<str:encrypted_url_code>', views.hospital_graph, name="hospital_graph"),
-        ## Muestras por concello
+        # Muestras por concello
         path('concellos_gal_graph/<str:encrypted_url_code>', views.concellos_gal_graph, name="concellos_gal_graph"),
-        ## Linajes por hospital
+        # Linajes por hospital
         path('linajes_hospitales_graph/<str:encrypted_url_code>', views.linajes_hospitales_graph, name="linajes_hospitales_graph"),
-        ## Cantidad total de cada linaje
+        # Cantidad total de cada linaje
         path('linajes_porcentaje_total/<str:encrypted_url_code>', views.linajes_porcentaje_total, name="linajes_porcentaje_total"),
+        # Proporción de variantes en cada época
+        path('variants_column_graph/<str:encrypted_url_code>', views.variants_column_graph, name="variants_column_graph"),
 
         # Sin usar
         path('variants_line_graph/<str:fecha_inicial>+<str:fecha_final>/<str:variant>', views.variants_line_graph, name="variants_line_graph"),
-        path('variants_column_graph/<str:fecha_inicial>+<str:fecha_final>/<str:variant>', views.variants_column_graph, name="variants_column_graph"),
 ]

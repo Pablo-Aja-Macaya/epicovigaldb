@@ -21,72 +21,11 @@ from .models import LineagesTable, PicardTable, NextcladeTable, NGSTable, Varian
 # Filtros
 from .models import SampleFilter, MetaDataFilter, RegionFilter
 # Formularios
-from .forms import GraphsForm, GraphsFormMultipleChoice
+from .forms import GraphsFormMultipleChoice
 from .forms import SampleForm, SampleMetaDataForm, RegionForm
 from .forms import SingleCheckForm, PicardForm, NextcladeForm, LineagesForm, NGSStatssForm
 
 # In[0]
-@login_required(login_url="/accounts/login") 
-def get_graphs(request):
-    url_origen = ''
-    url_linajes_hospital = ''
-    url_linajes = ''
-    url_concellos = ''
-    form = ''
-    if request.method=='POST':
-        form = GraphsForm(request.POST)
-        if form.is_valid():
-            f = form.cleaned_data
-            fecha_inicial = f['fecha_inicial'].strftime("%Y-%m-%d") 
-            fecha_final = f['fecha_final'].strftime("%Y-%m-%d") 
-            categoria = f['categoria']
-            filtro = f['filtro']
-            umbral = f['umbral']
-
-            args = [fecha_inicial,fecha_final,categoria]
-            args_sin_umbral = args.copy()
-            args_con_umbral = args.copy()
-
-            if umbral:
-                args_con_umbral.append(umbral)
-            if filtro:
-                args_sin_umbral.append(filtro)
-                args_con_umbral.append(filtro)
-
-            url_origen = reverse('hospital_graph',args=args_sin_umbral)
-            url_linajes_hospital = reverse('linajes_hospitales_graph',args=args_con_umbral)
-            url_linajes = reverse('linajes_porcentaje_total',args=args_con_umbral)
-            url_concellos = reverse('concellos_gal_graph',args=args_sin_umbral)            
-    else:
-        
-        fecha_inicial = '2020-01-01'
-        fecha_final = '2022-01-01'
-        categoria = 'aleatoria'
-        inicial = {'fecha_inicial':fecha_inicial, 'fecha_final':fecha_final, 'categoria':'aleatoria'}
-        form = GraphsForm(initial=inicial)
-
-        url_origen = reverse('hospital_graph',args=(fecha_inicial,fecha_final))
-        url_linajes_hospital = reverse('linajes_hospitales_graph',args=(fecha_inicial,fecha_final))
-        url_linajes = reverse('linajes_porcentaje_total',args=(fecha_inicial,fecha_final))
-        url_concellos = reverse('concellos_gal_graph',args=(fecha_inicial,fecha_final))
-
-    form2 = GraphsFormMultipleChoice()
-    form2.fields['categoria'].choices = [(i,i) for i in Sample.objects.values_list('categoria_muestra',flat=True).distinct().order_by('categoria_muestra')]
-    form2.fields['vigilancia'].choices = [(i,i) for i in Sample.objects.values_list('vigilancia',flat=True).distinct().order_by('vigilancia')]
-    form2.fields['calidad_secuenciacion'].choices = [(i,i) for i in Sample.objects.values_list('samplemetadata__calidad_secuenciacion',flat=True).distinct().order_by('samplemetadata__calidad_secuenciacion')]
-
-    context = {
-        'url_form':reverse('get_graphs'),
-        'url_origen' : url_origen,
-        'url_linajes_hospital' : url_linajes_hospital,
-        'url_linajes' : url_linajes,
-        'url_concellos' : url_concellos,
-        'form':form
-        }
-    return render(request, 'visualize/graphs.html', context)
-
-
-
 def simple_url_encrypt(message):
     message_bytes = message.encode('ascii')
     base64_bytes = base64.b64encode(message_bytes)
@@ -107,6 +46,7 @@ def get_graphs(request):
     url_linajes_hospital = ''
     url_linajes = ''
     url_concellos = ''
+    url_variants_column_graph = ''
     filter_collapse = ''
     if request.method=='POST':
         form = GraphsFormMultipleChoice(request.POST)
@@ -124,6 +64,7 @@ def get_graphs(request):
             url_linajes = reverse('linajes_porcentaje_total',args=[encrypted_url_code])
             url_linajes_hospital = reverse('linajes_hospitales_graph',args=[encrypted_url_code])
             url_concellos = reverse('concellos_gal_graph',args=[encrypted_url_code])
+            url_variants_column_graph = reverse('variants_column_graph',args=[encrypted_url_code])
 
             # Estado de filtro (colapsado/no colapsado)
             filter_collapse = ''
@@ -147,7 +88,8 @@ def get_graphs(request):
         'url_origen':url_origen,
         'url_linajes':url_linajes,
         'url_linajes_hospital':url_linajes_hospital,
-        'url_concellos':url_concellos
+        'url_concellos':url_concellos,
+        'url_variants_column_graph':url_variants_column_graph
         }
     return render(request, 'visualize/graphs.html', context)
 
@@ -1065,8 +1007,105 @@ def hospital_graph(request, encrypted_url_code):
         chart = {}
     return JsonResponse(chart)
 
+def variants_column_graph(request, encrypted_url_code):
+    decrypted_dicc = simple_url_decrypt(encrypted_url_code)
+    fecha_inicial = decrypted_dicc.get('fecha_inicial')
+    fecha_final = decrypted_dicc.get('fecha_final')
+    categoria = decrypted_dicc.get('categoria')
+    vigilancia = decrypted_dicc.get('vigilancia')
+    filtro = decrypted_dicc.get('filtro')
+    calidad_secuenciacion = decrypted_dicc.get('calidad_secuenciacion')
 
+    #######################
+    ### Esto es para generar datos de prueba
+    import random
+    length = 10
+    var = 10
+    variantes = []
+    for i in range(var):
+        x = 'lugar' + str(i)
+        variantes.append(x)
+    dicc = {}
+    for v in variantes:
+        dicc[v] = []
+        for l in range(length):
+            x = round(random.normalvariate(0.5,0.2),2)
+            dicc[v].append(x)
 
+    from datetime import timedelta, date
+
+    def daterange(date1, date2):
+        for n in range(int ((date2 - date1).days)+1):
+            yield date1 + timedelta(n)
+
+    start_dt = date(2021, 1, 1)
+    end_dt = date(2021, 1, 30)
+    dias = []
+    for dt in daterange(start_dt, end_dt):
+        dias.append(dt.strftime("%d/%m/%Y"))
+    #############################
+    chart = {
+        'chart': {
+            'type':'column'
+        },
+        'title': {
+            'text': f'Proporción de variantes (DATOS DE PRUEBA NO REALES) ({fecha_inicial}|{fecha_final})'
+        },
+        'subtitle': {
+            'text': 'Source: Denmark'
+        },
+        'tooltip': {
+            'shared': True,
+            'crosshairs': True
+        },
+        'xAxis': {
+            'categories': dias
+        },
+        'legend': {
+            'align': 'left',
+            'verticalAlign': 'top',
+            'borderWidth': 0
+        },
+        'tooltip': {
+            'headerFormat': '<b>{point.x}</b><br/>',
+            'pointFormat': '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+        },
+        'plotOptions': {
+            'column': {
+                'stacking': 'normal',
+                'dataLabels': {
+                    'enabled': True
+                }
+            },
+            'series': {
+                'animation': False
+            }
+        },
+        'credits':credits,
+        'series': [{
+            'name': f'Variante',
+            'data': [483, 420, 601, 724, 977, 1412, 2206, 2122, 2335, 2512, 2282, 2099, 1448, 918, 577, 123]
+        },{
+            'name': 'N439K',
+            'data': [217, 123, 157, 176, 244, 328, 530, 381, 435, 414, 377, 245, 114, 126, 75]
+        },{
+            'name': 'Resto',
+            'data': [1435, 1229, 1623, 1734, 1979, 2690, 3951, 3576, 3908, 4135, 3956, 3680, 2657, 2225, 1821, 527]
+        },
+
+        ]        
+    }
+    return JsonResponse(chart)
+
+# data = Sample.objects\
+#         .values('lineagestest__lineage','fecha_muestra')\
+#         .exclude(lineagestest__lineage__isnull=True)\
+#         .exclude(fecha_muestra__isnull=True)\
+#         .order_by('fecha_muestra', 'lineagestest__lineage')\
+#         .annotate(Count('lineagestest__lineage'))\
+#         .exclude(lineagestest__lineage='None')
+
+# data.values_list('fecha_muestra',flat=True).distinct()
 
 # No usadas
 def variants_line_graph(request, fecha_inicial, fecha_final, variant):
@@ -1153,86 +1192,5 @@ def variants_line_graph(request, fecha_inicial, fecha_final, variant):
     }
     return JsonResponse(chart)
 
-def variants_column_graph(request, fecha_inicial, fecha_final, variant):
-    #######################
-    ### Esto es para generar datos de prueba
-    import random
-    length = 10
-    var = 10
-    variantes = []
-    for i in range(var):
-        x = 'lugar' + str(i)
-        variantes.append(x)
-    dicc = {}
-    for v in variantes:
-        dicc[v] = []
-        for l in range(length):
-            x = round(random.normalvariate(0.5,0.2),2)
-            dicc[v].append(x)
-
-    from datetime import timedelta, date
-
-    def daterange(date1, date2):
-        for n in range(int ((date2 - date1).days)+1):
-            yield date1 + timedelta(n)
-
-    start_dt = date(2021, 1, 1)
-    end_dt = date(2021, 1, 30)
-    dias = []
-    for dt in daterange(start_dt, end_dt):
-        dias.append(dt.strftime("%d/%m/%Y"))
-    #############################
-    chart = {
-        'chart': {
-            'type':'column'
-        },
-        'title': {
-            'text': f'Proporción de variantes ({fecha_inicial}|{fecha_final})'
-        },
-        'subtitle': {
-            'text': 'Source: Denmark'
-        },
-        'tooltip': {
-            'shared': True,
-            'crosshairs': True
-        },
-        'xAxis': {
-            'categories': dias
-        },
-        'legend': {
-            'align': 'left',
-            'verticalAlign': 'top',
-            'borderWidth': 0
-        },
-        'tooltip': {
-            'headerFormat': '<b>{point.x}</b><br/>',
-            'pointFormat': '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
-        },
-        'plotOptions': {
-            'column': {
-                'stacking': 'normal',
-                'dataLabels': {
-                    'enabled': True
-                }
-            },
-            'series': {
-                'animation': False
-            }
-        },
-        'credits':credits,
-        'series': [{
-            'name': f'{variant}',
-            'data': [483, 420, 601, 724, 977, 1412, 2206, 2122, 2335, 2512, 2282, 2099, 1448, 918, 577, 123]
-        },{
-            'name': 'N439K',
-            'data': [217, 123, 157, 176, 244, 328, 530, 381, 435, 414, 377, 245, 114, 126, 75]
-        },{
-            'name': 'Resto',
-            'data': [1435, 1229, 1623, 1734, 1979, 2690, 3951, 3576, 3908, 4135, 3956, 3680, 2657, 2225, 1821, 527]
-        },
-
-        ]        
-    }
-    return JsonResponse(chart)
 
 

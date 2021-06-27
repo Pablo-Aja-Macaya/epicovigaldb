@@ -53,7 +53,6 @@
 
 
 
-
 <div class='container-fluid'>
     <div class="row justify-content-center">
         <div class="col" >
@@ -71,71 +70,87 @@
             <div id="concellos_gal_graph" data-url={{url_concellos}} style="height: 700px;"></div>
         </div>
     </div>
+    <div class="row justify-content-center">
+      <div class="col" >
+          <div id="variants_column_graph" data-url={{url_variants_column_graph}}></div>
+      </div>
+      <div class="col">
+      </div>
+  </div>
 </div> 
 
 
 
 
-  <script>
-    $.ajax({
-      url: $("#linajes_porcentaje_total").attr("data-url"),
-      dataType: 'json',
-      success: function (data) {
-        Highcharts.chart("linajes_porcentaje_total", data);
-      }
-    });
-  </script>
-  <script>
-    $.ajax({
-      url: $("#linajes_hospitales_graph").attr("data-url"),
-      dataType: 'json',
-      success: function (data) {
-        Highcharts.chart("linajes_hospitales_graph", data);
-      }
-    });
-  </script>
-  <script>
-    $.ajax({
-      url: $("#concellos_gal_graph").attr("data-url"),
-      dataType: 'json',
-      success: function (data) {
-        Highcharts.mapChart("concellos_gal_graph", data);
-      }
-    });
-  </script>
-  <script>
-    $.ajax({
-      url: $("#hospital_graph").attr("data-url"),
-      dataType: 'json',
-      success: function (data) {
-        Highcharts.chart("hospital_graph", data);
-      }
-    });
-  </script>
-  <script>
-    $.ajax({
-      url: $("#variants_line_graph").attr("data-url"),
-      dataType: 'json',
-      success: function (data) {
-        Highcharts.chart("variants_line_graph", data);
-      }
-    });
-    $.ajax({
-      url: $("#variants_line_graph2").attr("data-url"),
-      dataType: 'json',
-      success: function (data) {
-        Highcharts.chart("variants_line_graph2", data);
-      }
-    });
-  </script>
-  <script>
-    $.ajax({
-      url: $("#variants_column_graph").attr("data-url"),
-      dataType: 'json',
-      success: function (data) {
-        Highcharts.chart("variants_column_graph", data);
-      }
-    });
-  </script>
+<script>
+  $.ajax({
+    url: $("#variants_column_graph").attr("data-url"),
+    dataType: 'json',
+    success: function (data) {
+      Highcharts.chart("variants_column_graph", data);
+    }
+  });
+</script>
+<script>
+  $.ajax({
+    url: $("#linajes_porcentaje_total").attr("data-url"),
+    dataType: 'json',
+    success: function (data) {
+      Highcharts.chart("linajes_porcentaje_total", data);
+    }
+  });
+</script>
+<script>
+  $.ajax({
+    url: $("#linajes_hospitales_graph").attr("data-url"),
+    dataType: 'json',
+    success: function (data) {
+      Highcharts.chart("linajes_hospitales_graph", data);
+    }
+  });
+</script>
+<script>
+  $.ajax({
+    url: $("#concellos_gal_graph").attr("data-url"),
+    dataType: 'json',
+    success: function (data) {
+      Highcharts.mapChart("concellos_gal_graph", data);
+    }
+  });
+</script>
+<script>
+  $.ajax({
+    url: $("#hospital_graph").attr("data-url"),
+    dataType: 'json',
+    success: function (data) {
+      Highcharts.chart("hospital_graph", data);
+    }
+  });
+</script>
+<script>
+  $.ajax({
+    url: $("#variants_line_graph").attr("data-url"),
+    dataType: 'json',
+    success: function (data) {
+      Highcharts.chart("variants_line_graph", data);
+    }
+  });
+  $.ajax({
+    url: $("#variants_line_graph2").attr("data-url"),
+    dataType: 'json',
+    success: function (data) {
+      Highcharts.chart("variants_line_graph2", data);
+    }
+  });
+</script>
+<script>
+  $.ajax({
+    url: $("#variants_column_graph").attr("data-url"),
+    dataType: 'json',
+    success: function (data) {
+      Highcharts.chart("variants_column_graph", data);
+    }
+  });
+</script>
 
 {% endblock %}
