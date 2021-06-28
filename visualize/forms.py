@@ -23,9 +23,9 @@ class GraphsFormMultipleChoice(forms.Form):
     # Campos
     fecha_inicial = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
     fecha_final = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
-    categoria = forms.MultipleChoiceField(choices=choices_categoria,required=True, widget=forms.SelectMultiple(attrs={'size': 5}))
-    vigilancia = forms.MultipleChoiceField(choices=choices_vigilancia, required=True, widget=forms.SelectMultiple(attrs={'size': 3}))
-    # calidad_secuenciacion = forms.MultipleChoiceField(choices=choices_calidad, required=True, widget=forms.SelectMultiple(attrs={'size': 3}))
+    categoria = forms.MultipleChoiceField(choices=choices_categoria, required=True, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))#
+    vigilancia = forms.MultipleChoiceField(choices=choices_vigilancia, required=True, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))#,widget=forms.CheckboxSelectMultiple())
+    # calidad_secuenciacion = forms.MultipleChoiceField(choices=choices_calidad, required=True, widget=forms.SelectMultiple()
     umbral = forms.IntegerField(required=False)
     filtro = forms.CharField(required=False)
 

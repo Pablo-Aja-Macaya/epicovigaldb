@@ -54,7 +54,7 @@
         {% endif %}
     {% endblock pagination_top %}
     {% block table %}
-        <table {% render_attrs table.attrs %} class="table-sortable  mx-auto w-100">
+        <table {% render_attrs table.attrs %} class="table-sortable  mx-auto w-100" style="text-align: center;">
             {% block table.thead %}
             {% if table.show_header %}
                 <thead {{ table.attrs.thead.as_html }}>

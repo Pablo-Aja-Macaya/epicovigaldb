@@ -23,11 +23,11 @@
             <div class="row">
               <div class="col">
                 <div class="card card-body" style="border-style: none;">
-                  <p class="text-muted">En los atributos con un listado de elementos prueba a hacer click y arrastrar, o usa ctrl+click para seleccionar varios valores. Las posibles elecciones mostradas salen directamente de lo que hay en la base de datos.</p>
+                  <!-- <p class="text-muted">Selecciona las características de las muestras para crear las gráficas:</p> -->
                   <form action={{url_form}} method="POST">
                     {% csrf_token %}
-                    <div class="table-responsive">
-                      <table class='table' >
+                    <div class="table-responsive " >
+                      <table class='table'>
                       {{ form.as_table }} 
                       </table>          
                     </div>
@@ -52,11 +52,35 @@
 </div>
 
 
-
 <div class='container-fluid'>
+  <div class="row justify-content-center pb-3">
+    <div class="col col-lg-6 col-sm-12">
+      <div id="variants_column_graph" data-url={{url_variants_column_graph}} style="height: 600px;"></div>
+    </div>
+    <div class="col col-lg-6 col-sm-12">
+      <div id="linajes_hospitales_graph" data-url={{url_linajes_hospital}} style="height: 600px;"></div>
+    </div>    
+  </div>
+  <div class="row justify-content-center pb-3">
+    <div class="col col-lg-6 col-sm-12">
+      <div id="linajes_porcentaje_total" data-url={{url_linajes}} style="height: 600px;"></div>
+    </div>
+    <div class="col col-lg-6 col-sm-12">
+      <div id="concellos_gal_graph" data-url={{url_concellos}} style="height: 600px;"></div>
+    </div>
+  </div>
+  <div class="row justify-content-center pb-3">
+    <div class="col col-lg-6 col-sm-12">
+      <div id="hospital_graph" data-url={{url_origen}}></div>
+    </div>
+  </div>
+</div> 
+
+
+<!-- <div class='container-fluid'>
     <div class="row justify-content-center">
         <div class="col" >
-            <div id="hospital_graph" data-url={{url_origen}}></div>
+          <div id="variants_column_graph" data-url={{url_variants_column_graph}}></div>
         </div>
         <div class="col">
             <div id="linajes_hospitales_graph" data-url={{url_linajes_hospital}}></div>
@@ -72,12 +96,12 @@
     </div>
     <div class="row justify-content-center">
       <div class="col" >
-          <div id="variants_column_graph" data-url={{url_variants_column_graph}}></div>
+        <div id="hospital_graph" data-url={{url_origen}}></div>
       </div>
       <div class="col">
       </div>
   </div>
-</div> 
+</div>  -->
 
 
 
