@@ -516,7 +516,7 @@ def linajes_porcentaje_total(request, encrypted_url_code):
 
         chart = {
             'chart': {
-                'height': 400,
+                'height': 600,
                 'type': 'bar'
             },
             'title': {
@@ -883,6 +883,7 @@ def concellos_gal_graph(request, encrypted_url_code):
         chart = {
             'chart':{
                 'map':geojson_data,
+                'height': 700,
             },
             'boost': {
                 'seriesThreshold': 1,
@@ -1046,7 +1047,8 @@ def variants_column_graph(request, encrypted_url_code):
     #############################
     chart = {
         'chart': {
-            'type':'column'
+            'type':'column',
+            'height': 600,
         },
         'title': {
             'text': f'Proporción de variantes (DATOS DE PRUEBA NO REALES) ({fecha_inicial}|{fecha_final})'
