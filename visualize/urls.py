@@ -32,6 +32,8 @@ urlpatterns = [
         path('linajes_porcentaje_total/<str:encrypted_url_code>', views.linajes_porcentaje_total, name="linajes_porcentaje_total"),
         # Proporción de variantes en cada época
         path('variants_column_graph/<str:encrypted_url_code>', views.variants_column_graph, name="variants_column_graph"),
+        # Proporción de secuenciados
+        path('sequenced_proportion_graph/<str:encrypted_url_code>', views.sequenced_proportion_graph, name="sequenced_proportion_graph"),
 
         # Sin usar
         path('variants_line_graph/<str:fecha_inicial>+<str:fecha_final>/<str:variant>', views.variants_line_graph, name="variants_line_graph"),

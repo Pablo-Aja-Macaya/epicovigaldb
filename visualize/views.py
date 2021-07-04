@@ -47,6 +47,7 @@ def get_graphs(request):
     url_linajes = ''
     url_concellos = ''
     url_variants_column_graph = ''
+    url_sequenced_proportion_graph = ''
     filter_collapse = ''
     if request.method=='POST':
         form = GraphsFormMultipleChoice(request.POST)
@@ -65,7 +66,7 @@ def get_graphs(request):
             url_linajes_hospital = reverse('linajes_hospitales_graph',args=[encrypted_url_code])
             url_concellos = reverse('concellos_gal_graph',args=[encrypted_url_code])
             url_variants_column_graph = reverse('variants_column_graph',args=[encrypted_url_code])
-
+            url_sequenced_proportion_graph = reverse('sequenced_proportion_graph',args=[encrypted_url_code])
             # Estado de filtro (colapsado/no colapsado)
             filter_collapse = ''
             
@@ -89,7 +90,8 @@ def get_graphs(request):
         'url_linajes':url_linajes,
         'url_linajes_hospital':url_linajes_hospital,
         'url_concellos':url_concellos,
-        'url_variants_column_graph':url_variants_column_graph
+        'url_variants_column_graph':url_variants_column_graph,
+        'url_sequenced_proportion_graph':url_sequenced_proportion_graph
         }
     return render(request, 'visualize/graphs.html', context)
 
@@ -971,6 +973,7 @@ def hospital_graph(request, encrypted_url_code):
         chart = {
             'chart': {
                 'type': 'pie',
+                'height': 500,
             },
             'title': {'text': f'Origen de muestras ({fecha_inicial} | {fecha_final}) {json_link}'}, #
             'subtitle': {
@@ -1007,6 +1010,70 @@ def hospital_graph(request, encrypted_url_code):
         print(e)
         chart = {}
     return JsonResponse(chart)
+
+def sequenced_proportion_graph(request, encrypted_url_code):
+    try:
+        decrypted_dicc = simple_url_decrypt(encrypted_url_code)
+        fecha_inicial = decrypted_dicc.get('fecha_inicial')
+        fecha_final = decrypted_dicc.get('fecha_final')
+        categoria = decrypted_dicc.get('categoria')
+        vigilancia = decrypted_dicc.get('vigilancia')
+        filtro = decrypted_dicc.get('filtro')
+        calidad_secuenciacion = decrypted_dicc.get('calidad_secuenciacion')
+
+        selected = Sample.objects.filter(vigilancia__in=vigilancia)\
+                .filter(categoria_muestra__in=categoria)\
+                .filter(id_uvigo__contains='EPI', fecha_muestra__range=[fecha_inicial, fecha_final])\
+                .exclude(id_uvigo__contains='ICVS') # .filter(samplemetadata__calidad_secuenciacion__in=calidad_secuenciacion)\
+
+        if filtro:
+            selected = selected.filter(id_uvigo__contains=filtro)
+
+        sequenced = selected.filter(samplemetadata__fecha_entrada_fastq__isnull=False).count()
+        not_sequenced = selected.filter(samplemetadata__fecha_entrada_fastq__isnull=True).count()
+
+        json_link = get_graph_json_link(request,'hospital_graph', encrypted_url_code)
+        chart = {
+            'chart': {
+                'type': 'pie',
+                'height': 500,
+            },
+            'title': {'text': f'Proporción de secuenciados ({fecha_inicial} | {fecha_final}) {json_link}'}, #
+            'subtitle': {
+                'text': f'Proporción de muestras secuenciadas (fecha_muestra vs. fecha_entrada_fastq). Categoría: {categoria}.'
+            },
+            'tooltip': {
+                'pointFormat': '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            'accessibility': {
+                'point': {
+                    'valueSuffix': '%'
+                }
+            },
+            'plotOptions': {
+                'pie': {
+                    'allowPointSelect': True,
+                    'cursor': 'pointer',
+                    'dataLabels': {
+                        'enabled': True,
+                        'format': '<b>{point.name}</b>: {point.percentage:.1f} %'
+                    }
+                },
+                'series': {
+                    'animation': False
+                }
+            },
+            'credits': credits,
+            'series': [{
+                'name': 'Cantidad',
+                'data': [{ 'name': 'Secuenciados', 'y': sequenced }, { 'name': 'No secuenciados', 'y': not_sequenced }]
+            }]
+        }
+    except Exception as e:
+        print(e)
+        chart = {}
+    return JsonResponse(chart)
+
 
 def variants_column_graph(request, encrypted_url_code):
     decrypted_dicc = simple_url_decrypt(encrypted_url_code)
@@ -1107,7 +1174,28 @@ def variants_column_graph(request, encrypted_url_code):
 #         .annotate(Count('lineagestest__lineage'))\
 #         .exclude(lineagestest__lineage='None')
 
-# data.values_list('fecha_muestra',flat=True).distinct()
+# # data.values_list('fecha_muestra',flat=True).distinct()
+
+
+# from datetime import timedelta, date
+
+# def daterange(date1, date2):
+#     for n in range(int ((date2 - date1).days)+1):
+#         yield date1 + timedelta(n)
+
+# start_dt = date(2021, 1, 1)
+# end_dt = date(2021, 1, 30)
+# dias_dicc = {}
+# for dt in daterange(start_dt, end_dt):
+#     dias_dicc[dt.strftime("%d/%m/%Y")] = ''
+
+
+
+
+
+
+
+
 
 # No usadas
 def variants_line_graph(request, fecha_inicial, fecha_final, variant):

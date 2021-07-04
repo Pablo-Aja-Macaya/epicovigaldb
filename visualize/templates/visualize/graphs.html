@@ -52,14 +52,24 @@
 </div>
 
 
+
 <div class='container-fluid'>
   <div class="row justify-content-center pb-3">
     <div class="col col-lg-6 col-md-12 col-sm-12">
-      <div id="variants_column_graph" data-url={{url_variants_column_graph}} style="min-width: 50%;"></div>
+      <div id="sequenced_proportion_graph" data-url={{url_sequenced_proportion_graph}} style="min-width: 50%;"></div>
     </div>
     <div class="col col-lg-6 col-md-12 col-sm-12">
+      <div id="variants_column_graph" data-url={{url_variants_column_graph}} style="min-width: 50%;"></div>
+    </div>
+  
+  </div>
+  <div class="row justify-content-center pb-3">
+    <div class="col col-lg-6 col-md-12 col-sm-12">
       <div id="linajes_hospitales_graph" data-url={{url_linajes_hospital}} style="min-width: 50%;"></div>
-    </div>    
+    </div>   
+    <div class="col col-lg-6 col-md-12 col-sm-12">
+      <div id="hospital_graph" data-url={{url_origen}} style="min-width: 50%;"></div>
+    </div>   
   </div>
   <div class="row justify-content-center pb-3">
     <div class="col col-lg-6 col-md-12 col-sm-12">
@@ -70,9 +80,7 @@
     </div>
   </div>
   <div class="row justify-content-center pb-3">
-    <div class="col col-lg-6 col-md-12 col-sm-12">
-      <div id="hospital_graph" data-url={{url_origen}} style="min-width: 50%;"></div>
-    </div>
+
   </div>
 </div> 
 
@@ -121,6 +129,15 @@
     dataType: 'json',
     success: function (data) {
       Highcharts.chart("hospital_graph", data);
+    }
+  });
+</script>
+<script>
+  $.ajax({
+    url: $("#sequenced_proportion_graph").attr("data-url"),
+    dataType: 'json',
+    success: function (data) {
+      Highcharts.chart("sequenced_proportion_graph", data);
     }
   });
 </script>
