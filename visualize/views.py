@@ -1149,12 +1149,14 @@ def variants_column_graph(request, encrypted_url_code):
             'chart': {
                 'type':'column',
                 'height': 600,
+                'zoomType':'x',
+                'spacingRight':20
             },
             'title': {
                 'text': f'Proporción de variantes ({fecha_inicial}|{fecha_final})'
             },
             'subtitle': {
-                'text': f'Proporción de variantes por día. Categoría: {categoria}'
+                'text': f'Haz click y arrastra para hacer zoom sobre una zona. Categoría: {categoria}'
             },
             'tooltip': {
                 'shared': True,
