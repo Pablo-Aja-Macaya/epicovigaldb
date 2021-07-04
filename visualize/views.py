@@ -1023,7 +1023,8 @@ def sequenced_proportion_graph(request, encrypted_url_code):
 
         selected = Sample.objects.filter(vigilancia__in=vigilancia)\
                 .filter(categoria_muestra__in=categoria)\
-                .filter(id_uvigo__contains='EPI', fecha_muestra__range=[fecha_inicial, fecha_final])\
+                .filter(id_uvigo__contains='EPI')\
+                .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
                 .exclude(id_uvigo__contains='ICVS') # .filter(samplemetadata__calidad_secuenciacion__in=calidad_secuenciacion)\
 
         if filtro:
