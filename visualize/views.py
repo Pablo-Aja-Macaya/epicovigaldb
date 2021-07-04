@@ -434,6 +434,7 @@ from django.http import JsonResponse
 from django.db.models import F
 from django.db.models import Count
 from datetime import date, datetime
+from datetime import timedelta, date
 import geojson
 from random import randint
 from numpy import percentile
@@ -1076,125 +1077,132 @@ def sequenced_proportion_graph(request, encrypted_url_code):
     return JsonResponse(chart)
 
 
+
+
+
+
+# Opcion 2
+# categories = ['fecha1','fecha2','...']
+# series_dicc = {
+#     'Linaje1':{
+#         'name':'Linaje1',
+#         'data':[2,3]
+#     }
+# }
+
+
+
 def variants_column_graph(request, encrypted_url_code):
-    decrypted_dicc = simple_url_decrypt(encrypted_url_code)
-    fecha_inicial = decrypted_dicc.get('fecha_inicial')
-    fecha_final = decrypted_dicc.get('fecha_final')
-    categoria = decrypted_dicc.get('categoria')
-    vigilancia = decrypted_dicc.get('vigilancia')
-    filtro = decrypted_dicc.get('filtro')
-    calidad_secuenciacion = decrypted_dicc.get('calidad_secuenciacion')
+    try:
+        decrypted_dicc = simple_url_decrypt(encrypted_url_code)
+        fecha_inicial = decrypted_dicc.get('fecha_inicial')
+        fecha_final = decrypted_dicc.get('fecha_final')
+        categoria = decrypted_dicc.get('categoria')
+        vigilancia = decrypted_dicc.get('vigilancia')
+        filtro = decrypted_dicc.get('filtro')
+        calidad_secuenciacion = decrypted_dicc.get('calidad_secuenciacion')
 
-    #######################
-    ### Esto es para generar datos de prueba
-    import random
-    length = 10
-    var = 10
-    variantes = []
-    for i in range(var):
-        x = 'lugar' + str(i)
-        variantes.append(x)
-    dicc = {}
-    for v in variantes:
-        dicc[v] = []
-        for l in range(length):
-            x = round(random.normalvariate(0.5,0.2),2)
-            dicc[v].append(x)
+        selected = Sample.objects.filter(vigilancia__in=vigilancia)\
+                .filter(categoria_muestra__in=categoria)\
+                .filter(id_uvigo__contains='EPI')\
+                .filter(fecha_muestra__range=[fecha_inicial, fecha_final])\
+                .exclude(id_uvigo__contains='ICVS') # .filter(samplemetadata__calidad_secuenciacion__in=calidad_secuenciacion)\
 
-    from datetime import timedelta, date
+        if filtro:
+            selected = selected.filter(id_uvigo__contains=filtro)
 
-    def daterange(date1, date2):
-        for n in range(int ((date2 - date1).days)+1):
-            yield date1 + timedelta(n)
+        data = selected\
+                .values('lineagestest__lineage','fecha_muestra')\
+                .exclude(lineagestest__lineage__isnull=True)\
+                .exclude(fecha_muestra__isnull=True)\
+                .order_by('fecha_muestra', 'lineagestest__lineage')\
+                .annotate(Count('lineagestest__lineage'))\
+                .exclude(lineagestest__lineage='None')
 
-    start_dt = date(2021, 1, 1)
-    end_dt = date(2021, 1, 30)
-    dias = []
-    for dt in daterange(start_dt, end_dt):
-        dias.append(dt.strftime("%d/%m/%Y"))
-    #############################
-    chart = {
-        'chart': {
-            'type':'column',
-            'height': 600,
-        },
-        'title': {
-            'text': f'Proporción de variantes (DATOS DE PRUEBA NO REALES) ({fecha_inicial}|{fecha_final})'
-        },
-        'subtitle': {
-            'text': 'Source: Denmark'
-        },
-        'tooltip': {
-            'shared': True,
-            'crosshairs': True
-        },
-        'xAxis': {
-            'categories': dias
-        },
-        'legend': {
-            'align': 'left',
-            'verticalAlign': 'top',
-            'borderWidth': 0
-        },
-        'tooltip': {
-            'headerFormat': '<b>{point.x}</b><br/>',
-            'pointFormat': '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
-        },
-        'plotOptions': {
-            'column': {
-                'stacking': 'normal',
-                'dataLabels': {
-                    'enabled': True
+        # Crear lista con el rango de fechas
+        def daterange(date1, date2):
+            for n in range(int ((date2 - date1).days)+1):
+                yield date1 + timedelta(n)
+
+        start_dt = datetime.strptime(fecha_inicial, '%Y-%m-%d').date()
+        end_dt = datetime.strptime(fecha_final, '%Y-%m-%d').date()
+        dias_dicc = {}
+        for dt in daterange(start_dt, end_dt):
+            dias_dicc[dt.strftime("%d/%m/%Y")] = None
+
+        series_dicc = {}
+        for i in data:
+            linaje = i['lineagestest__lineage']
+            fecha = i['fecha_muestra'].strftime("%d/%m/%Y")
+            cuenta = i['lineagestest__lineage__count']
+            if linaje not in series_dicc.keys():
+                series_dicc[linaje] = {
+                    'name':linaje,
+                    'data':dias_dicc.copy()
+                }
+                series_dicc[linaje]['data'][fecha] = cuenta
+            else:
+                if series_dicc[linaje]['data'][fecha] is not None:
+                    series_dicc[linaje]['data'][fecha] += cuenta
+                else:
+                    series_dicc[linaje]['data'][fecha] = cuenta
+
+        series_dicc_final = {}
+        for k in series_dicc.keys():
+            series_dicc_final[k] = {
+                'name':series_dicc[k]['name'],
+                'data':list(series_dicc[k]['data'].values())
+            }
+
+        chart = {
+            'chart': {
+                'type':'column',
+                'height': 600,
+            },
+            'title': {
+                'text': f'Proporción de variantes ({fecha_inicial}|{fecha_final})'
+            },
+            'subtitle': {
+                'text': 'x'
+            },
+            'tooltip': {
+                'shared': True,
+                'crosshairs': True
+            },
+            'xAxis': {
+                'categories': list(dias_dicc.keys())
+            },
+            'legend': {
+                'align': 'left',
+                'verticalAlign': 'top',
+                'borderWidth': 0
+            },
+            'tooltip': {
+                'headerFormat': '<span style="font-size:10px"><strong>{point.key}</strong></span><table>',
+                'pointFormat': '<tr><td style="color:{series.color};padding:0;"><strong>{series.name}:</strong> </td>' +
+                    '<td style="padding:0"> <strong>&nbsp;{point.y}</strong> ({point.percentage:.0f}%) </td></tr>',
+                'footerFormat': '</table>',
+                'shared': True,
+                'backgroundColor':'#FFFFFF',
+                'useHTML': True            
+            },
+            'plotOptions': {
+                'column': {
+                    'stacking': 'normal',
+                    'dataLabels': {
+                        'enabled': True
+                    }
+                },
+                'series': {
+                    'animation': False
                 }
             },
-            'series': {
-                'animation': False
-            }
-        },
-        'credits':credits,
-        'series': [{
-            'name': f'Variante',
-            'data': [483, 420, 601, 724, 977, 1412, 2206, 2122, 2335, 2512, 2282, 2099, 1448, 918, 577, 123]
-        },{
-            'name': 'N439K',
-            'data': [217, 123, 157, 176, 244, 328, 530, 381, 435, 414, 377, 245, 114, 126, 75]
-        },{
-            'name': 'Resto',
-            'data': [1435, 1229, 1623, 1734, 1979, 2690, 3951, 3576, 3908, 4135, 3956, 3680, 2657, 2225, 1821, 527]
-        },
-
-        ]        
-    }
+            'credits':credits,
+            'series': list(series_dicc_final.values())    
+        }
+    except Exception as e:
+        print(e)
     return JsonResponse(chart)
-
-# data = Sample.objects\
-#         .values('lineagestest__lineage','fecha_muestra')\
-#         .exclude(lineagestest__lineage__isnull=True)\
-#         .exclude(fecha_muestra__isnull=True)\
-#         .order_by('fecha_muestra', 'lineagestest__lineage')\
-#         .annotate(Count('lineagestest__lineage'))\
-#         .exclude(lineagestest__lineage='None')
-
-# # data.values_list('fecha_muestra',flat=True).distinct()
-
-
-# from datetime import timedelta, date
-
-# def daterange(date1, date2):
-#     for n in range(int ((date2 - date1).days)+1):
-#         yield date1 + timedelta(n)
-
-# start_dt = date(2021, 1, 1)
-# end_dt = date(2021, 1, 30)
-# dias_dicc = {}
-# for dt in daterange(start_dt, end_dt):
-#     dias_dicc[dt.strftime("%d/%m/%Y")] = ''
-
-
-
-
-
-
 
 
 
