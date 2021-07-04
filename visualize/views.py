@@ -1075,22 +1075,6 @@ def sequenced_proportion_graph(request, encrypted_url_code):
         chart = {}
     return JsonResponse(chart)
 
-
-
-
-
-
-# Opcion 2
-# categories = ['fecha1','fecha2','...']
-# series_dicc = {
-#     'Linaje1':{
-#         'name':'Linaje1',
-#         'data':[2,3]
-#     }
-# }
-
-
-
 def variants_column_graph(request, encrypted_url_code):
     try:
         decrypted_dicc = simple_url_decrypt(encrypted_url_code)
@@ -1118,7 +1102,7 @@ def variants_column_graph(request, encrypted_url_code):
                 .annotate(Count('lineagestest__lineage'))\
                 .exclude(lineagestest__lineage='None')
 
-        # Crear lista con el rango de fechas
+        # --- Crear lista con el rango de fechas ----
         def daterange(date1, date2):
             for n in range(int ((date2 - date1).days)+1):
                 yield date1 + timedelta(n)
@@ -1129,6 +1113,14 @@ def variants_column_graph(request, encrypted_url_code):
         for dt in daterange(start_dt, end_dt):
             dias_dicc[dt.strftime("%d/%m/%Y")] = None
 
+        # ---- Obtener datos en el siguiente formato ----
+        # categories = ['fecha1','fecha2','...']
+        # series_dicc_final = {
+        #     'Linaje1':{
+        #         'name':'Linaje1',
+        #         'data':[2,3]
+        #     }
+        # }
         series_dicc = {}
         for i in data:
             linaje = i['lineagestest__lineage']
@@ -1162,7 +1154,7 @@ def variants_column_graph(request, encrypted_url_code):
                 'text': f'Proporción de variantes ({fecha_inicial}|{fecha_final})'
             },
             'subtitle': {
-                'text': 'x'
+                'text': f'Proporción de variantes por día. Categoría: {categoria}'
             },
             'tooltip': {
                 'shared': True,
