@@ -73,7 +73,7 @@ def get_graphs(request):
 
     else:
         fecha_inicial = '2020-01-01'
-        fecha_final = '2022-01-01'
+        fecha_final = date.today().strftime('%Y-%m-%d')
         categoria = 'aleatoria'
         inicial = {'fecha_inicial':fecha_inicial, 'fecha_final':fecha_final, 'categoria':'aleatoria'}
         
