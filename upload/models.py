@@ -41,7 +41,7 @@ class SampleMetaData(models.Model):
     id_uvigo = models.ForeignKey(Sample, on_delete=models.CASCADE)
     id_paciente = models.CharField(max_length=20, default=None, blank=True, null=True)
     id_hospital = models.CharField(max_length=20, default=None, blank=True, null=True)
-    numero_envio = models.IntegerField(default=0, blank=True, null=True)
+    numero_envio = models.CharField(max_length=20, default=None, blank=True, null=True)
     id_tubo = models.CharField(max_length=20, default=None, blank=True, null=True)
     id_muestra = models.CharField(max_length=20, default=None, blank=True, null=True)
     

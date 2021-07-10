@@ -1033,7 +1033,7 @@ def sequenced_proportion_graph(request, encrypted_url_code):
         sequenced = selected.filter(samplemetadata__fecha_entrada_fastq__isnull=False).count()
         not_sequenced = selected.filter(samplemetadata__fecha_entrada_fastq__isnull=True).count()
 
-        json_link = get_graph_json_link(request,'hospital_graph', encrypted_url_code)
+        json_link = get_graph_json_link(request,'sequenced_proportion_graph', encrypted_url_code)
         chart = {
             'chart': {
                 'type': 'pie',
