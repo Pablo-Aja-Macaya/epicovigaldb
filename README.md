@@ -30,7 +30,7 @@ Una vez MySQL esté instalado y configurado, se importa un dump de la base de da
 FALTA
 ```
 
-# Manejo de epicovigaldb
+# Manejo de epicovigaldb en local
 
 Cualquier cambio que se haga en código se debe probar primero en la instalación local, **nunca** en el servidor. A continuación se explicará el sistema de Django y ciertos elementos de la herramienta. Para "encenderla" en local se usa:
 ```
@@ -85,5 +85,21 @@ La gráficas vienen dadas por la aplicación `visualize` y se encuentran al fond
 - Tras esto, el views devuelve al usuario a la página, llevando en el contexto las URLs de las gráficas.
 - Una vez en el HTML (`visualize/templates/visualize/graphs.html`), existen apartados donde se pondrá cada gráfica.
 - El apartado con el URL {{url_linajes_hospital}} es llamado por una función de ajax (fondo de la página). Cada gráfica tiene su propio views y reciben el diccionario en base64 con los atributos seleccionados. Tras esto, filtra y devuelve el JSON, que la librería Highcharts se encarga de traducir a gráfica.
-- 
+
+
+# Manejo de epicovigaldb en servidor
+Una vez se han probado los cambios hechos en local, se hace un push a Git para subirlo a esta carpeta. El siguiente paso es conectarse al servidor y, una vez dentro, ir a la carpeta `epicovigal/epicovigaldb`. Desde aquí se hace un `git pull`. Si los cambios incluyen migraciones es necesario activar el entorno virtual de la aplicación y realizarlas:
+```
+source ../django/bin/activate
+python manage.py makemigrations
+python manage.py migrate
+```
+Para que los cambios tengan efecto, hay que reiniciar Gunicorn, Redis y Celery (Supervisor). Ejecutar lo siguiente 2 veces:
+```
+sudo systmctl restart gunicorn
+sudo systemctl restart redis
+sudo supervisorctl restart all
+```
+
+
 
