@@ -51,7 +51,11 @@ fields_correspondence = {
         'qc.missingdata.status':'qc_missing_data_status',
         'qc.snpclusters.status':'qc_snp_clusters_status',
         'qc.mixedsites.status':'qc_mixed_sites_status',   
-        'qc.overallstatus':'qc_overall_status'
+        'qc.overallstatus':'qc_overall_status',
+        'qc.frameshifts.status' : 'qc_frameshifts_status',
+        'qc.frameshifts.frameshifts' : 'qc_frameshifts_frameshifts',
+        'qc.stopcodons.status' : 'qc_stopcodons_status',
+        'qc.stopcodons.stopcodons' : 'qc_stopcodons_stopcodons'
     },
     # iVar #.tsv
     # Muestra a partir del nombre del archivo
@@ -253,7 +257,12 @@ def upload_nextclade(reader):
         qc_snp_clusters_status = line.get('qc_snp_clusters_status')
         qc_mixed_sites_status = line.get('qc_mixed_sites_status')
         qc_overall_status = line.get('qc_overall_status')
+        qc_frameshifts_status = line.get('qc_frameshifts_status')
+        qc_frameshifts_frameshifts = line.get('qc_frameshifts_frameshifts')
+        qc_stopcodons_status = line.get('qc_stopcodons_status')
+        qc_stopcodons_stopcodons = line.get('qc_stopcodons_stopcodons')
 
+        print(qc_stopcodons_stopcodons, qc_stopcodons_status)
         if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
 
@@ -268,7 +277,11 @@ def upload_nextclade(reader):
                     'qc_missing_data_status' : qc_missing_data_status,
                     'qc_snp_clusters_status' : qc_snp_clusters_status,
                     'qc_mixed_sites_status' : qc_mixed_sites_status,   
-                    'qc_overall_status':qc_overall_status                 
+                    'qc_overall_status':qc_overall_status, 
+                    'qc_frameshifts_status' : qc_frameshifts_status,
+                    'qc_frameshifts_frameshifts' : qc_frameshifts_frameshifts,
+                    'qc_stopcodons_status' : qc_stopcodons_status,
+                    'qc_stopcodons_stopcodons' : qc_stopcodons_stopcodons       
                 }
             )
 

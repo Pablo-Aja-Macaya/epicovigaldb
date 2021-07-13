@@ -59,12 +59,17 @@ class NextcladeTest(models.Model): #.csv
     # id_process = models.CharField(max_length=40)
 
     total_missing = models.IntegerField(default=None, null=True, blank=True)
+    missing_on_target = models.IntegerField(default=None, null=True, blank=True)
     clade = models.CharField(max_length=30, default=None, blank=True, null=True)
     qc_private_mutations_status = models.CharField(max_length=30, default=None, blank=True, null=True)
     qc_missing_data_status = models.CharField(max_length=30, default=None, blank=True, null=True)
     qc_snp_clusters_status = models.CharField(max_length=30, default=None, blank=True, null=True)
     qc_mixed_sites_status = models.CharField(max_length=30, default=None, blank=True, null=True)
     qc_overall_status = models.CharField(max_length=30, default=None, blank=True, null=True)
+    qc_frameshifts_status = models.CharField(max_length=30, default=None, blank=True, null=True)
+    qc_frameshifts_frameshifts = models.CharField(max_length=30, default=None, blank=True, null=True) 
+    qc_stopcodons_status = models.CharField(max_length=30, default=None, blank=True, null=True) 
+    qc_stopcodons_stopcodons = models.CharField(max_length=30, default=None, blank=True, null=True)
 
     date = models.DateTimeField(auto_now=True)
 
