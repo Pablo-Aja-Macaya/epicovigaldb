@@ -167,6 +167,8 @@ def upload_sample_hospital(self):
         'Vacunación tipo':'vacunacion_tipo',
         'Vacunación dosis':'vacunacion_dosis',
         'Vacunación fecha última dosis':'fecha_vacunacion_ultima_dosis',
+        'QC VAF':'qc_vaf',
+        'QC numero de mutaciones':'qc_numero_mutaciones',
         'Ct ORF1ab':'ct_orf1ab', 
         'Ct gen E':'ct_gen_e', 
         'Ct gen N':'ct_gen_n', 
@@ -216,6 +218,8 @@ def upload_sample_hospital(self):
                 id_muestra = line.get('id_muestra')
                 hospitalizacion = line.get('hospitalizacion')[:1] # Para que si hay un 'Si' pille sólo la S
                 uci = line.get('uci')
+                qc_vaf = line.get('qc_vaf')
+                qc_numero_mutaciones = line.get('qc_numero_mutaciones')
                 vacunacion_tipo = line.get('vacunacion_tipo')
                 vacunacion_dosis = line.get('vacunacion_dosis')
                 calidad_secuenciacion = line.get('calidad_secuenciacion')
@@ -320,6 +324,8 @@ def upload_sample_hospital(self):
                                 'id_muestra' : id_muestra,
                                 'hospitalizacion' : hospitalizacion[:1], 
                                 'uci' : uci[:1],
+                                'qc_vaf':qc_vaf,
+                                'qc_numero_mutaciones':qc_numero_mutaciones,
                                 'vacunacion_tipo':vacunacion_tipo,
                                 'vacunacion_dosis':vacunacion_dosis,
                                 'ct_orf1ab' : orf1ab,

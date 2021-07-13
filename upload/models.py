@@ -48,6 +48,9 @@ class SampleMetaData(models.Model):
     hospitalizacion = models.CharField(max_length=1, default=None, null=True, blank=True)
     uci = models.CharField(max_length=1, default=None, null=True, blank=True)
 
+    qc_vaf = models.CharField(max_length=30, default=None, blank=True, null=True)
+    qc_numero_mutaciones = models.CharField(max_length=30, default=None, blank=True, null=True)
+
     vacunacion_tipo = models.CharField(max_length=20, default=None, blank=True, null=True)
     vacunacion_dosis = models.IntegerField(default=None, blank=True, null=True)
 
