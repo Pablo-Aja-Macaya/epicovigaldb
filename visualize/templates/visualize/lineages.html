@@ -7,6 +7,40 @@
   <h2 ><strong>Pangolin</strong></h2>
   Tabla de resultados procedentes de Pangolin.
   </br>
+  <div class="accordion pt-3" id="accordionExample">
+    <div class="card">
+      <div class="card-header" id="headingOne">
+        <h2 class="mb-0">
+          <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-search pr-2" viewBox="0 0 16 16">
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+            </svg>
+            Buscar
+          </button>
+        </h2>
+      </div>
+      <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+        <div class="card-body">
+          <div class="row">
+            <div class="col">
+              <div class="card card-body" style="border-style: none;">
+                <form method="get" class="form-group">
+                  <div class="table-responsive">
+                    <table class='table ' >
+                      {{ filter.form.as_table }}
+                    </table>          
+                  </div>
+                  <div class="row justify-content-center">
+                    <button class="btn btn-primary" type="submit">Buscar</button>
+                  </div>                  
+                </form>
+              </div>
+            </div>
+          </div>          
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="container-fluid pb-4 pt-3 ">

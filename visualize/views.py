@@ -19,7 +19,7 @@ from tests.models import VariantsTest, LineagesTest, PicardTest, NextcladeTest, 
 from .models import SampleTable, RegionTable, SampleMetaDataTable, CompletedTestsTable
 from .models import LineagesTable, PicardTable, NextcladeTable, NGSTable, VariantsTable, SingleCheckTable
 # Filtros
-from .models import SampleFilter, MetaDataFilter, RegionFilter
+from .models import SampleFilter, MetaDataFilter, RegionFilter, NextcladeFilter, PangolinFilter, VariantsFilter
 # Formularios
 from .forms import GraphsFormMultipleChoice
 from .forms import SampleForm, SampleMetaDataForm, RegionForm
@@ -383,17 +383,25 @@ def metadata(request):
 # Para tablas de resultados
 @login_required(login_url="/accounts/login")
 def lineages(request):
-    table = LineagesTable(LineagesTest.objects.all().order_by('id_uvigo'))
+    data = LineagesTest.objects.all().order_by('id_uvigo')
+    filter = PangolinFilter(request.GET, queryset=data)
+    data = filter.qs
+
+    table = LineagesTable(data)
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
-    return render(request, 'visualize/lineages.html', {'table':table})
+    return render(request, 'visualize/lineages.html', {'table':table, 'filter':filter})
 
 @login_required(login_url="/accounts/login")
 def nextclade(request):
-    table = NextcladeTable(NextcladeTest.objects.all().order_by('id_uvigo'))
+    data = NextcladeTest.objects.all().order_by('id_uvigo')
+    filter = NextcladeFilter(request.GET, queryset=data)
+    data = filter.qs
+
+    table = NextcladeTable(data)
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
-    return render(request, 'visualize/nextclade.html', {'table':table})
+    return render(request, 'visualize/nextclade.html', {'table':table, 'filter':filter})
 
 @login_required(login_url="/accounts/login")
 def ngsstats(request):
@@ -418,10 +426,14 @@ def singlecheck(request):
 
 @login_required(login_url="/accounts/login")
 def variants(request):
-    table = VariantsTable(VariantsTest.objects.all().order_by('id_uvigo'))
+    data = VariantsTest.objects.all().order_by('id_uvigo')
+    filter = VariantsFilter(request.GET, queryset=data)
+    data = filter.qs
+
+    table = VariantsTable(data)
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
-    return render(request, 'visualize/variants.html', {'table':table})
+    return render(request, 'visualize/variants.html', {'table':table, 'filter':filter})
 
 
 

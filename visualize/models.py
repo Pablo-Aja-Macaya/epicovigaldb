@@ -127,10 +127,43 @@ class RegionFilter(django_filters.FilterSet):
         model = Region
         fields = ['id_region','localizacion','cp','division']
 
-#
-# class CompletedTestsFilter(django_filters.FilterSet):
-#     id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo', lookup_expr='icontains')
-#     class Meta:
-#         # model = Sample
-#         fields = ['id_uvigo']
 
+class NextcladeFilter(django_filters.FilterSet):
+    clade_choices = [(i,i) for i in NextcladeTest.objects.values_list('clade', flat=True).distinct().order_by('clade').exclude(clade='')]
+    
+    id_uvigo_id__id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo_id__id_uvigo', lookup_expr='icontains')
+    clade = django_filters.MultipleChoiceFilter(choices=clade_choices, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    class Meta:
+        model = Sample
+        fields = ['id_uvigo_id__id_uvigo']
+
+class PangolinFilter(django_filters.FilterSet):
+    lineage_choices = [(i,i) for i in LineagesTest.objects.values_list('lineage', flat=True).distinct().order_by('lineage').exclude(lineage='')]
+    
+    id_uvigo_id__id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo_id__id_uvigo', lookup_expr='icontains')
+    lineage = django_filters.MultipleChoiceFilter(choices=lineage_choices, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    class Meta:
+        model = Sample
+        fields = ['id_uvigo_id__id_uvigo']
+
+class VariantsFilter(django_filters.FilterSet):
+    ref_choices = [(i,i) for i in VariantsTest.objects.values_list('ref', flat=True).distinct().order_by('ref').exclude(ref='')]
+    alt_choices = [(i,i) for i in VariantsTest.objects.values_list('alt', flat=True).distinct().order_by('alt').exclude(ref='')]
+    ref_aa_choices = [(i,i) for i in VariantsTest.objects.values_list('ref_aa', flat=True).distinct().order_by('ref_aa').exclude(ref='')]
+    alt_aa_choices = [(i,i) for i in VariantsTest.objects.values_list('alt_aa', flat=True).distinct().order_by('alt_aa').exclude(ref='')]
+    ref_codon_choices = [(i,i) for i in VariantsTest.objects.values_list('ref_codon', flat=True).distinct().order_by('ref_codon').exclude(ref='')]
+    alt_codon_choices = [(i,i) for i in VariantsTest.objects.values_list('alt_codon', flat=True).distinct().order_by('alt_codon').exclude(ref='')]
+
+    id_uvigo_id__id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo_id__id_uvigo', lookup_expr='icontains')
+    pos = django_filters.RangeFilter()
+    ref_aa = django_filters.MultipleChoiceFilter(choices=ref_aa_choices, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    alt_aa = django_filters.MultipleChoiceFilter(choices=alt_aa_choices, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    ref_codon = django_filters.MultipleChoiceFilter(choices=ref_codon_choices, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    alt_codon = django_filters.MultipleChoiceFilter(choices=alt_codon_choices, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    ref = django_filters.MultipleChoiceFilter(choices=ref_choices, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    alt = django_filters.MultipleChoiceFilter(choices=alt_choices, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+
+
+    class Meta:
+        model = Sample
+        fields = ['id_uvigo_id__id_uvigo', 'pos']
