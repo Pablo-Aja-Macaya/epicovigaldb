@@ -262,7 +262,6 @@ def upload_nextclade(reader):
         qc_stopcodons_status = line.get('qc_stopcodons_status')
         qc_stopcodons_stopcodons = line.get('qc_stopcodons_stopcodons')
 
-        print(qc_stopcodons_stopcodons, qc_stopcodons_status)
         if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
 
@@ -284,6 +283,28 @@ def upload_nextclade(reader):
                     'qc_stopcodons_stopcodons' : qc_stopcodons_stopcodons       
                 }
             )
+
+
+def upload_missing_on_target_nextclade(file):
+    # './totalMissing_on_target.2021-07-13.tsv'
+    with open(file, 'rt') as f:
+        dialect = csv.Sniffer().sniff(f.readline())
+        f.seek(0)
+        fieldnames = f.readline().strip().lower().split(str(dialect.delimiter))
+        reader = csv.DictReader(f, fieldnames=fieldnames, dialect=dialect)
+        for line in reader:
+            id_uvigo = find_sample_name(line.get('samplename'))
+            missing_on_target = line.get('totalmissing_on_target')
+
+            if id_uvigo:
+                sample_reference = comprobar_existencia(id_uvigo)
+                try:
+                    obj = NextcladeTest.objects.get(id_uvigo=id_uvigo)
+                    obj.missing_on_target = missing_on_target
+                    obj.save()
+                except:
+                    pass # no existe el id en la fila de nextclade
+
 
 
 def upload_variants(reader, sample_name):
