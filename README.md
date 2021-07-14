@@ -120,6 +120,8 @@ AXES_META_PRECEDENCE_ORDER = [
 ```
 
 ## Configuraciones adicionales
+Debido a problemas en una de las migraciones con respecto al servidor falta `epicovigaldb/tests/migrations/0070_country_lineagestest.py`. Pedir al administrador y sólo copiar el archivo en `epicovigaldb/tests/migrations/`.
+
 Una vez que la base de datos ha sido creada e importada, y Django tiene acceso a ella, es necesario aplicar migraciones (sincronizar Django con la base de datos):
 ```
 python manage.py makemigrations
@@ -128,6 +130,10 @@ python manage.py migrate
 Y crear un superuser:
 ```
 crear superuser
+```
+Probar que funciona con:
+```
+python manage.py runserver
 ```
 
 ## Celery, Redis, Gunicorn y Supervisor
