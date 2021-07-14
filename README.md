@@ -64,10 +64,71 @@ Una vez MySQL esté instalado y configurado, se importa un dump de la base de da
 sudo mysql -u root -p epicovigal_web < dump.sql
 ```
 
-## Configuración de acceso de Django a base de datos
-- acreditaciones de accesp
-- - migraciones
-- superuser
+## Configuración local
+
+Ahora es necesario crear un archivo de configuración local en `epicovigaldb/epicovigal/local_settings.py`. **Este archivo jamás debe subirse a GitHub, ya que va a tener información peligrosa**. También contendrá caminos relativos al sistema en el que se use la aplicación. Esta configuración será importada por `epicovigdaldb/epicovigal/settings.py`. 
+
+En este archivo se meten las credenciales a la base de datos:
+```
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'epicovigal_weeb',
+        'USER': 'nombre_usuario',
+        'PASSWORD': 'contraseña',
+        'HOST': 'localhost',
+        'PORT': '3306',
+    }
+}
+```
+
+La llave secreta (importante que no se filtre) también va en este archivo. Se genera una vez con:
+```
+from django.core.management.utils import get_random_secret_key  
+get_random_secret_key()
+```
+Y se pone en `epicovigaldb/epicovigal/local_settings.py` como:
+```
+SECRET_KEY = 'resultado de la función anterior'
+```
+
+Otra configuración importante es especificar el estado de la aplicación. Las siguientes líneas se usan en el servidor cuando la web está activa, ya que si esta da error no revelará datos y variables importantes. Lo más importante es que en el servidor `DEBUG = TEMPLATE_DEBUG = False`, pero en local esto es mejor si es `DEBUG = TEMPLATE_DEBUG = True` para poder encontrar los fallos en el desarrollo.
+```
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+DEBUG = TEMPLATE_DEBUG = False
+SECURE_SSL_REDIRECT = True
+```
+
+También se pone:
+```
+GS_DATA_KEY = 'pedir llave'
+GS_DATA_GID = 'pedir llave'
+GS_DATA_GID_LIST = ['pedir llave','pedir llave']
+
+ALLOWED_HOSTS = ['193.144.35.166','epicovigaldb.com','www.epicovigaldb.com']
+
+# Caminos para actualizar desde carpeta en tests
+TESTS_PCKL_FOLDER = '/root/epicovigal/data/' # camino de la caché
+TESTS_FOLDER_BASE = '/mnt/epicovigal/data/'
+
+# Esto obtiene ip de la gente que accede al login
+AXES_META_PRECEDENCE_ORDER = [
+   'HTTP_X_FORWARDED_FOR',
+   'REMOTE_ADDR',
+]
+```
+
+## Configuraciones adicionales
+Una vez que la base de datos ha sido creada e importada, y Django tiene acceso a ella, es necesario aplicar migraciones (sincronizar Django con la base de datos):
+```
+python manage.py makemigrations
+python manage.py migrate
+```
+Y crear un superuser:
+```
+crear superuser
+```
 
 ## Celery, Redis, Gunicorn y Supervisor
 
@@ -163,5 +224,15 @@ sudo supervisorctl restart all
 ```
 
 Nota: En realidad si no se han cambiado funciones que usen Celery y Redis sólo es necesario hacerlo para Gunicorn, pero es mejor asegurarse.
+
+Si se está dentro del entorno virtual, se puede acceder a la consola de Django con:
+```
+python manage.py shell
+```
+Y a la base de datos sin que te pida credenciales (ya las tiene Django en la configuración local) con:
+```
+python manage.py dbshell
+```
+
 
 
