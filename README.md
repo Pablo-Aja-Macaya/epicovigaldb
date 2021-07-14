@@ -1,34 +1,95 @@
+# Aplicación
+La aplicación consiste en el manejo de la base de datos del proyecto EPICOVIGAL, ejecución de herramientas bioinformáticas y actualización automática de datos. Puede verse en:
+- [Ver parte abierta](https://epicovigaldb.com)
+- [Ver interior](https://drive.google.com/drive/folders/1bJJ79mJ55iZNr-0z6XlTxIaE0qcJxhBa?usp=sharing)
+
 # Instalación de epicovigaldb
 
-Esta aplicación usa: Ubuntu, Django, Pyhton, Gunicorn, Celery, Redis, Supervisor y una base de datos (MySQL). Para que todas las funciones estén activas son necesarias todas menos Supervisor. Para ver la web pero sin usar la cola de tareas (no se podrán actualizar los datos) sólo es necesario Django, Python y MySQL. 
+Esta aplicación usa: Ubuntu, Django, Pyhton, Gunicorn, Celery, Redis, Supervisor y una base de datos (MySQL). Para que todas las funciones estén activas son necesarias todas menos Supervisor. Para ver la web pero sin usar la cola de tareas (no se podrán actualizar los datos) sólo es necesario Django, Python y MySQL.
 
 En primer lugar, se obtiene el código:
 ```
 git clone https://github.com/Pablo-Aja-Macaya/epicovigaldb
 ```
+## Instalar base de datos
+La aplicación usa MySQL (aunque en teoría podría usar cualquier base de datos). Para instalarlo:
+```
+sudo apt install mysql-server
+```
 
-La aplicación usa un entorno virtual creado con `virtualenv`:
+## Entorno virtual
+Se usa un entorno virtual creado con `virtualenv`. La aplicación sólo podrá funcionar desde un terminal que esté en el entorno. Para instalar virtualenv:
+```
+sudo apt-get install python3-pip
+sudo pip3 install virtualenv 
+```
+Para crear el entorno virtual:
 ```
 cd /path/for/env
 virtualenv django
+```
+
+Ahora hay que meterse en el entorno con:
+```
+source django/bin/activate
+```
+
+E instalar todos los paquetes necesarios con el archivo `epicovigaldb/pip_requirements.txt`:
+```
+sudo apt install libmysqlclient-dev
+pip install -r ./epicovigaldb/pip_requirements.txt
 ```
 
 Activar entorno:
 ```
 source /path/to/env/bin/activate
 ```
+## Configurar base de datos
 
-Una vez creado, usar el archivo `pip_requirements.txt`para instalar todas las carpetas:
+Entrar en MySQL y crear la base de datos:
 ```
-pip install -r pip_requirements.txt
+sudo mysql -u root
+CREATE DATABASE epicovigal_web;
 ```
 
-#### Falta instalar celery, mysql, redis, gunicorn
+Configurar un usuario que tenga acceso a esta y sólo esta (si se usa root hay problemas de seguridad, ya que root puede acceder a todas las bases de datos):
+```
+CREATE USER 'nombre_usuario'@'%' IDENTIFIED WITH mysql_native_password BY 'contraseña';
+GRANT ALL ON epicovigal_web.* TO 'nombre_usuario'@'%';
+FLUSH PRIVILEGES;
+```
 
-Una vez MySQL esté instalado y configurado, se importa un dump de la base de datos:
+Una vez MySQL esté instalado y configurado, se importa un dump de la base de datos (pedir a administrador):
 ```
-FALTA
+sudo mysql -u root -p epicovigal_web < dump.sql
 ```
+
+## Configuración de acceso de Django a base de datos
+- acreditaciones de accesp
+- - migraciones
+- superuser
+
+## Celery, Redis, Gunicorn y Supervisor
+
+Para realizar tareas asíncronas se usan Celery y Redis. Con `pip install -r epicovigaldb/pip_requirements.txt` ya se instala casi todo, únicamente falta instalar Redis:
+
+```
+sudo apt install redis-server
+```
+Para que funcione la actualización desde el Google Sheet, la actualización por carpetas o la actualización de coordenadas es necesario que estén activos. En local, se puede simplemente iniciar en tres terminales separadas cada parte. Primero Django, luego Redis y después Celery:
+
+```
+python manage.py runserver # ventana 1
+sudo systemctl restart redis # ventana 2
+celery -A epicovigal worker # ventana 3
+```
+
+En el servidor se usan estas tres partes (Django, Celery y Redis) junto a Gunicorn. Gunicorn es el que activa la aplicación de Django en un entorno virtual indicado. En el servidor se encuentran automatiadas, de tal manera que cuando se recibe una petición automáticamente se activan todas las partes. Para una instalación local no es necesario. 
+
+La automatización se da de la siguiente manera: el servidor recibe una petición mediante NGINX, este despierta a Gunicorn, el cual despierta a Django. Redis está siempre activo y Celery está manejado por Supervisor, siempre activo.
+
+## NGINX
+El servidor usa NGINX para manejar las peticiones online a la herramienta, pero en local no es necesario.
 
 # Manejo de epicovigaldb en local
 
@@ -101,5 +162,6 @@ sudo systemctl restart redis
 sudo supervisorctl restart all
 ```
 
+Nota: En realidad si no se han cambiado funciones que usen Celery y Redis sólo es necesario hacerlo para Gunicorn, pero es mejor asegurarse.
 
 
