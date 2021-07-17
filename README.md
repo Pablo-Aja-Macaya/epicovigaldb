@@ -1,7 +1,6 @@
 # Aplicación
 La aplicación consiste en el manejo de la base de datos del proyecto EPICOVIGAL, ejecución de herramientas bioinformáticas y actualización automática de datos. Puede verse en:
 - [Ver parte abierta](https://epicovigaldb.com)
-- [Ver interior](https://drive.google.com/drive/folders/1bJJ79mJ55iZNr-0z6XlTxIaE0qcJxhBa?usp=sharing)
 
 # Instalación de epicovigaldb
 
