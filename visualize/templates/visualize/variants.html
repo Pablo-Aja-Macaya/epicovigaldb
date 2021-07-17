@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
 {% load render_table from django_tables2 %}
+{% load export_url from django_tables2 %}
 
 {% block content %}
 <div class="container-lg">
   {% include 'visualize_tabs.html' %}
-  <h2><strong>Variantes (iVar)</strong></h2>
+  <h2><strong>Variantes (iVar)</strong> <a href="{% export_url 'tsv' %}"><button type="button" class="btn btn-warning btn-sm" ><strong>Descargar</strong></button></a></h2>
   Tabla de resultados procedentes de iVar.
 </br>
 <div class="accordion pt-3" id="accordionExample">

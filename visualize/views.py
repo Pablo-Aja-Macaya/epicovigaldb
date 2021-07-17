@@ -20,6 +20,7 @@ from .models import SampleTable, RegionTable, SampleMetaDataTable, CompletedTest
 from .models import LineagesTable, PicardTable, NextcladeTable, NGSTable, VariantsTable, SingleCheckTable
 # Filtros
 from .models import SampleFilter, MetaDataFilter, RegionFilter, NextcladeFilter, PangolinFilter, VariantsFilter
+from django_tables2.export.export import TableExport
 # Formularios
 from .forms import GraphsFormMultipleChoice
 from .forms import SampleForm, SampleMetaDataForm, RegionForm
@@ -352,7 +353,13 @@ def regions(request):
     table = RegionTable(data)
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)   
+    
+    export_format = request.GET.get("_export", None)
+    if TableExport.is_valid_format(export_format):
+        exporter = TableExport(export_format, table)
+        return exporter.response("regions_table.{}".format(export_format))
     context = {'table':table, 'filter':filter} 
+    
     return render(request, 'visualize/regions.html', context)   
     
 @login_required(login_url="/accounts/login")
@@ -378,6 +385,7 @@ def metadata(request):
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50) 
     context = {'table':table, 'filter':filter}    
+    
     return render(request, 'visualize/oursamplecharacteristics.html', context)
 
 # Para tablas de resultados
@@ -390,6 +398,12 @@ def lineages(request):
     table = LineagesTable(data)
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
+
+    export_format = request.GET.get("_export", None)
+    if TableExport.is_valid_format(export_format):
+        exporter = TableExport(export_format, table)
+        return exporter.response("pangolin_table.{}".format(export_format))
+
     return render(request, 'visualize/lineages.html', {'table':table, 'filter':filter})
 
 @login_required(login_url="/accounts/login")
@@ -401,6 +415,12 @@ def nextclade(request):
     table = NextcladeTable(data)
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
+
+    export_format = request.GET.get("_export", None)
+    if TableExport.is_valid_format(export_format):
+        exporter = TableExport(export_format, table)
+        return exporter.response("nextclade_table.{}".format(export_format))
+
     return render(request, 'visualize/nextclade.html', {'table':table, 'filter':filter})
 
 @login_required(login_url="/accounts/login")
@@ -408,6 +428,12 @@ def ngsstats(request):
     table = NGSTable(NGSstatsTest.objects.all().order_by('id_uvigo'))
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
+
+    export_format = request.GET.get("_export", None)
+    if TableExport.is_valid_format(export_format):
+        exporter = TableExport(export_format, table)
+        return exporter.response("ngstats_table.{}".format(export_format))
+
     return render(request, 'visualize/ngsstats.html', {'table':table})
 
 @login_required(login_url="/accounts/login")
@@ -415,6 +441,12 @@ def picard(request):
     table = PicardTable(PicardTest.objects.all().order_by('id_uvigo'))
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
+
+    export_format = request.GET.get("_export", None)
+    if TableExport.is_valid_format(export_format):
+        exporter = TableExport(export_format, table)
+        return exporter.response("picard_table.{}".format(export_format))
+
     return render(request, 'visualize/picard.html', {'table':table})
 
 @login_required(login_url="/accounts/login")
@@ -422,6 +454,12 @@ def singlecheck(request):
     table = SingleCheckTable(SingleCheckTest.objects.all().order_by('id_uvigo'))
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
+
+    export_format = request.GET.get("_export", None)
+    if TableExport.is_valid_format(export_format):
+        exporter = TableExport(export_format, table)
+        return exporter.response("singlecheck_table.{}".format(export_format))
+
     return render(request, 'visualize/singlecheck.html', {'table':table})
 
 @login_required(login_url="/accounts/login")
@@ -433,6 +471,12 @@ def variants(request):
     table = VariantsTable(data)
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
+
+    export_format = request.GET.get("_export", None)
+    if TableExport.is_valid_format(export_format):
+        exporter = TableExport(export_format, table)
+        return exporter.response("varinats_table.{}".format(export_format))
+
     return render(request, 'visualize/variants.html', {'table':table, 'filter':filter})
 
 

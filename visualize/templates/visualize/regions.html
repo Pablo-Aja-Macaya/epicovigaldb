@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
 {% load render_table from django_tables2 %}
+{% load export_url from django_tables2 %}
 
 {% block content %}
 <div class="container-lg">
   {% include 'visualize_tabs.html' %}
-  <h2><strong>Regiones</strong></h2>
+  <h2><strong>Regiones</strong> <a href="{% export_url 'tsv' %}"><button type="button" class="btn btn-warning btn-sm" ><strong>Descargar</strong></button></a></h2>
   Esta tabla muestra las localizaciones recabadas a partir de cada paciente. Una localización puede corresponder a varias muestras.
   </br>
   <div class="accordion pt-3" id="accordionExample">
