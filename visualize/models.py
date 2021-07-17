@@ -146,6 +146,26 @@ class PangolinFilter(django_filters.FilterSet):
         model = Sample
         fields = ['id_uvigo_id__id_uvigo']
 
+class PicardFilter(django_filters.FilterSet):    
+    id_uvigo_id__id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo_id__id_uvigo', lookup_expr='icontains')
+    mean_target_coverage = django_filters.RangeFilter()
+    median_target_coverage = django_filters.RangeFilter()
+    pct_target_bases_1x = django_filters.RangeFilter()
+    pct_target_bases_10x = django_filters.RangeFilter()
+    pct_target_bases_100x = django_filters.RangeFilter()
+    class Meta:
+        model = Sample
+        fields = ['id_uvigo_id__id_uvigo']
+
+class NGSFilter(django_filters.FilterSet):    
+    id_uvigo_id__id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo_id__id_uvigo', lookup_expr='icontains')
+    total_reads = django_filters.RangeFilter()
+    mapped = django_filters.RangeFilter()
+    trimmed = django_filters.RangeFilter()
+    class Meta:
+        model = Sample
+        fields = ['id_uvigo_id__id_uvigo']
+
 class VariantsFilter(django_filters.FilterSet):
     # ref_choices = [(i,i) for i in VariantsTest.objects.values_list('ref', flat=True).distinct().order_by('ref').exclude(ref='')]
     # alt_choices = [(i,i) for i in VariantsTest.objects.values_list('alt', flat=True).distinct().order_by('alt').exclude(ref='')]

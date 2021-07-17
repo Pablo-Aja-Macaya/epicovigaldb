@@ -19,7 +19,7 @@ from tests.models import VariantsTest, LineagesTest, PicardTest, NextcladeTest, 
 from .models import SampleTable, RegionTable, SampleMetaDataTable, CompletedTestsTable
 from .models import LineagesTable, PicardTable, NextcladeTable, NGSTable, VariantsTable, SingleCheckTable
 # Filtros
-from .models import SampleFilter, MetaDataFilter, RegionFilter, NextcladeFilter, PangolinFilter, VariantsFilter
+from .models import SampleFilter, MetaDataFilter, RegionFilter, NGSFilter, NextcladeFilter, PangolinFilter, VariantsFilter, PicardFilter
 from django_tables2.export.export import TableExport
 # Formularios
 from .forms import GraphsFormMultipleChoice
@@ -425,7 +425,11 @@ def nextclade(request):
 
 @login_required(login_url="/accounts/login")
 def ngsstats(request):
-    table = NGSTable(NGSstatsTest.objects.all().order_by('id_uvigo'))
+    data = NGSstatsTest.objects.all().order_by('id_uvigo')
+    filter = NGSFilter(request.GET, queryset=data)
+    data = filter.qs
+
+    table = NGSTable(data)
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
 
@@ -434,11 +438,15 @@ def ngsstats(request):
         exporter = TableExport(export_format, table)
         return exporter.response("ngstats_table.{}".format(export_format))
 
-    return render(request, 'visualize/ngsstats.html', {'table':table})
+    return render(request, 'visualize/ngsstats.html', {'table':table, 'filter':filter})
 
 @login_required(login_url="/accounts/login")
 def picard(request):
-    table = PicardTable(PicardTest.objects.all().order_by('id_uvigo'))
+    data = PicardTest.objects.all().order_by('id_uvigo')
+    filter = PicardFilter(request.GET, queryset=data)
+    data = filter.qs
+
+    table = PicardTable(data)
     RequestConfig(request).configure(table)
     table.paginate(page=request.GET.get("page", 1), per_page=50)    
 
@@ -447,7 +455,7 @@ def picard(request):
         exporter = TableExport(export_format, table)
         return exporter.response("picard_table.{}".format(export_format))
 
-    return render(request, 'visualize/picard.html', {'table':table})
+    return render(request, 'visualize/picard.html', {'table':table, 'filter':filter})
 
 @login_required(login_url="/accounts/login")
 def singlecheck(request):
