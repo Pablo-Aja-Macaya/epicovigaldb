@@ -16,12 +16,14 @@ def get_report_urls(obj):
     url_linajes_hospital = reverse('linajes_hospitales_graph',args=[obj.encrypted_url_code])
     url_linajes = reverse('linajes_porcentaje_total',args=[obj.encrypted_url_code])
     url_concellos = reverse('concellos_gal_graph',args=[obj.encrypted_url_code]) 
+    url_variants_column_graph = reverse('variants_column_graph',args=[obj.encrypted_url_code])
 
     urls_dicc = {
         'url_origen' : url_origen,
         'url_linajes_hospital' : url_linajes_hospital,
         'url_linajes' : url_linajes,
         'url_concellos' : url_concellos,        
+        'url_variants_column_graph' : url_variants_column_graph
     }
     return urls_dicc
     

@@ -29,6 +29,23 @@
       </div>
     </div>
   </div> 
+  <!-- Variantes por dia -->
+  <div class="container-lg pt-2 pb-4">
+    <div class="card" style="width: 100%;border-style: none;">
+      <div class="row">
+        <div class="col-lg-6 d-flex justify-content-center my-auto">
+          <div class="card-body">
+              <h5 class="card-title"><strong>Variantes por día</strong></h5>
+              <h6 class="card-subtitle mb-2 text-muted">Categoría: {{ report.categoria }} - ({{ report.fecha_inicial|date:'d-m-Y' }} | {{ report.fecha_final|date:'d-m-Y' }})</h6>
+              <p class="card-text">Haz click y arrastra sobre una zona para hacer zoom.</p>
+          </div>
+        </div>
+        <div class="col-lg-6 justify-content-center my-auto">
+          <div id="variants_column_graph" data-url={{url_variants_column_graph}}></div>
+        </div>
+      </div>
+    </div>
+  </div>  
   <!-- Procedencia -->
   <div class="container-lg pt-2 pb-4">
     <div class="card" style="width: 100%;border-style: none;">
@@ -36,7 +53,7 @@
         <div class="col-lg-6 d-flex justify-content-center my-auto">
           <div class="card-body">
               <h5 class="card-title"><strong>Procedencia de muestras</strong></h5>
-              <h6 class="card-subtitle mb-2 text-muted">Subtítulo</h6>
+              <h6 class="card-subtitle mb-2 text-muted">Categoría: {{ report.categoria }} - ({{ report.fecha_inicial|date:'d-m-Y' }} | {{ report.fecha_final|date:'d-m-Y' }})</h6>
               <p class="card-text">{{ report.texto_procedencia }} </p>
           </div>
         </div>
@@ -101,6 +118,15 @@
 
 
   {% endfor %}
+  <script>
+    $.ajax({
+      url: $("#variants_column_graph").attr("data-url"),
+      dataType: 'json',
+      success: function (data) {
+        Highcharts.chart("variants_column_graph", data);
+      }
+    });
+  </script>
   <script>
     $.ajax({
       url: $("#linajes_porcentaje_total").attr("data-url"),
