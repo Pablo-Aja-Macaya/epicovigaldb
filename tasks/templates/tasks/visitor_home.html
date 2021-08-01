@@ -160,14 +160,14 @@
   <div class="container-lg pt-2 pb-4">
     <div class="card" style="width: 100%;border-style: none;">
       <div class="row">
-        <div class="col-lg-6 d-flex justify-content-center my-auto">
+        <div class="col-lg-4 d-flex justify-content-center my-auto">
           <div class="card-body">
               <h5 class="card-title"><strong>Variantes por día</strong></h5>
               <h6 class="card-subtitle mb-2 text-muted">Categoría: {{ report.categoria }} - ({{ report.fecha_inicial|date:'d-m-Y' }} | {{ report.fecha_final|date:'d-m-Y' }})</h6>
               <p class="card-text">Haz click y arrastra sobre una zona para hacer zoom.</p>
           </div>
         </div>
-        <div class="col-lg-6 justify-content-center my-auto">
+        <div class="col-lg-8 justify-content-center my-auto">
           <div id="variants_column_graph" data-url={{url_variants_column_graph}}></div>
         </div>
       </div>
@@ -225,7 +225,7 @@
     </div>
   </div>  
   <!-- Mapa -->
-  <div class="container-lg pt-2 pb-4">
+  <!-- <div class="container-lg pt-2 pb-4">
     <div class="card" style="width: 100%; border-style: none;">
       <div class="row">
         <div class="col-lg-6 justify-content-center my-auto">
@@ -241,7 +241,7 @@
         </div>
       </div>
     </div>
-  </div>  
+  </div>   -->
   {% endfor %}
   
 </main>
@@ -295,7 +295,7 @@
     }
   });
 </script>
-<script>
+<!-- <script>
   $.ajax({
     url: $("#concellos_gal_graph").attr("data-url"),
     dataType: 'json',
@@ -303,6 +303,6 @@
       Highcharts.mapChart("concellos_gal_graph", data);
     }
   });
-</script>
+</script> -->
 
 {% endblock %}
