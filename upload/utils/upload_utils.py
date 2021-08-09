@@ -279,7 +279,7 @@ def upload_sample_hospital(self):
                     division = 'Galicia'
 
                 # Insertado en la base de datos
-                if not Region.objects.filter(cp=cp, localizacion=loc).exists():
+                if not Region.objects.filter(cp=cp, localizacion=loc, localizacion_org__contains=loc_org).exists():
                     _, created = Region.objects.update_or_create(
                             cp = int(cp),
                             localizacion = loc,
@@ -292,7 +292,7 @@ def upload_sample_hospital(self):
                                 'region' : 'Europa'
                             }
                         )
-                region_reference = Region.objects.get(cp=cp, localizacion=loc)
+                region_reference = Region.objects.get(cp=cp, localizacion=loc, localizacion_org__contains=loc_org)
                 if id_uvigo:
                     _, created = Sample.objects.update_or_create(
                             id_uvigo = id_uvigo,
