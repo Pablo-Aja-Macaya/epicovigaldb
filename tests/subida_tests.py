@@ -88,6 +88,15 @@ fields_correspondence = {
     },
 }
 
+def check_excess_length(cadena, modelo, campo):
+    # Comprueba si una cadena se pasa de la longitud máxima de su campo
+    max_length = modelo._meta.get_field(campo).max_length
+    if cadena and len(cadena) > max_length:
+        return 'excess'
+    else:
+        return cadena
+
+
 def check_if_number(value):
     try:
         int(value)
@@ -261,6 +270,9 @@ def upload_nextclade(reader):
         qc_frameshifts_frameshifts = line.get('qc_frameshifts_frameshifts')
         qc_stopcodons_status = line.get('qc_stopcodons_status')
         qc_stopcodons_stopcodons = line.get('qc_stopcodons_stopcodons')
+
+        # Checkear exceso (longitud mayor que lo que permite el campo)
+        qc_stopcodons_stopcodons = check_excess_length(qc_stopcodons_stopcodons, NextcladeTest, 'qc_stopcodons_stopcodons')
 
         if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
