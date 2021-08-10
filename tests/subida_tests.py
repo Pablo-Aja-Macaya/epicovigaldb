@@ -273,6 +273,7 @@ def upload_nextclade(reader):
 
         # Checkear exceso (longitud mayor que lo que permite el campo)
         qc_stopcodons_stopcodons = check_excess_length(qc_stopcodons_stopcodons, NextcladeTest, 'qc_stopcodons_stopcodons')
+        qc_frameshifts_frameshifts = check_excess_length(qc_frameshifts_frameshifts, NextcladeTest, 'qc_frameshifts_frameshifts')
 
         if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
@@ -406,6 +407,9 @@ def upload_lineages(reader):
         # Puede haber valores tipo 'NA' que dan error porque no son números. Esto transforma a None si pasa
         conflict = check_if_number(conflict)
         probability = check_if_number(probability)
+
+        # Checkear exceso (longitud mayor que lo que permite el campo)
+        comments = check_excess_length(comments, LineagesTest, 'comments')
 
         if id_uvigo:
             sample_reference = comprobar_existencia(id_uvigo)
