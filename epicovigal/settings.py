@@ -127,11 +127,6 @@ DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': '/home/pabs/MasterBioinformatica/TFM/backup'}
 
 
-#### QUITAR ESTO EN PRODUCCIÖN !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# Para poder manipular muchas filas en admin
-DATA_UPLOAD_MAX_NUMBER_FIELDS = None
-
-
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 

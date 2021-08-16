@@ -8,8 +8,8 @@ class Region(models.Model):
     division = models.CharField(max_length=50, default=None, blank=True, null=True) 
     pais = models.CharField(max_length=50, default=None, blank=True, null=True) 
     region = models.CharField(max_length=50, default=None, blank=True, null=True) 
-    latitud = models.TextField(max_length=50, default=None, blank=True, null=True)
-    longitud = models.TextField(max_length=50, default=None, blank=True, null=True)
+    latitud = models.FloatField(max_length=50, default=None, blank=True, null=True)
+    longitud = models.FloatField(max_length=50, default=None, blank=True, null=True)
    
     class Meta:
         unique_together = ('cp','localizacion')
