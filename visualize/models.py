@@ -99,7 +99,7 @@ class CompletedTestsTable(tables.Table):
 
 # In[4]: Filtros
 class SampleFilter(django_filters.FilterSet):
-    obj = Sample.objects.values('categoria_muestra','vigilancia','nodo_secuenciacion')
+    obj = Sample.objects.values('categoria_muestra','vigilancia','nodo_secuenciacion').distinct()
     choices_categoria = [(i,i) for i in obj.values_list('categoria_muestra',flat=True).distinct().order_by('categoria_muestra') if i]
     choices_vigilancia = [(i,i) for i in obj.values_list('vigilancia',flat=True).distinct().order_by('vigilancia') if i]
     choices_nodos = [(i,i) for i in obj.values_list('nodo_secuenciacion',flat=True).distinct().order_by('nodo_secuenciacion') if i]
