@@ -99,14 +99,21 @@ class CompletedTestsTable(tables.Table):
 
 # In[4]: Filtros
 class SampleFilter(django_filters.FilterSet):
+    obj = Sample.objects.values('categoria_muestra','vigilancia','nodo_secuenciacion')
+    choices_categoria = [(i,i) for i in obj.values_list('categoria_muestra',flat=True).distinct().order_by('categoria_muestra') if i]
+    choices_vigilancia = [(i,i) for i in obj.values_list('vigilancia',flat=True).distinct().order_by('vigilancia') if i]
+    choices_nodos = [(i,i) for i in obj.values_list('nodo_secuenciacion',flat=True).distinct().order_by('nodo_secuenciacion') if i]
+    choices_hospitales = [(i,i) for i in SampleMetaData.objects.values_list('id_hospital',flat=True).distinct().order_by('id_hospital') if i]
+    
     id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo', lookup_expr='icontains')
-    categoria_muestra = django_filters.CharFilter(field_name = 'categoria_muestra', lookup_expr='icontains')
-    nodo_secuenciacion = django_filters.CharFilter(field_name = 'nodo_secuenciacion', lookup_expr='icontains')
-    fecha_muestra = django_filters.DateFromToRangeFilter(field_name = 'fecha_muestra')
-
+    categoria_muestra = django_filters.MultipleChoiceFilter(choices=choices_categoria, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    vigilancia = django_filters.MultipleChoiceFilter(choices=choices_vigilancia, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    nodo_secuenciacion = django_filters.MultipleChoiceFilter(choices=choices_nodos, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    fecha_muestra = django_filters.DateFromToRangeFilter(field_name = 'fecha_muestra', widget=django_filters.widgets.RangeWidget(attrs={'type': 'date'}))
+    samplemetadata__id_hospital = django_filters.MultipleChoiceFilter(choices=choices_hospitales, label='Hospital', widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
     class Meta:
         model = Sample
-        fields = ['id_uvigo','categoria_muestra','nodo_secuenciacion', 'fecha_muestra']
+        fields = ['id_uvigo', 'fecha_muestra', 'samplemetadata__id_hospital', 'vigilancia', 'categoria_muestra', 'nodo_secuenciacion']
 
 class MetaDataFilter(django_filters.FilterSet):
     id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo', lookup_expr='icontains')
