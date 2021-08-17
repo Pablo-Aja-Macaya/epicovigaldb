@@ -91,46 +91,52 @@ def find_coords(self):
     start_process(id, command, start.strftime('%Y-%m-%d %H:%M:%S'))
     print(f'Starting coords update... (Task ID: {id})')
 
-    data = Region.objects.filter(longitud=None) |  Region.objects.filter(longitud='NULL') | Region.objects.filter(longitud='0')
-    sin_coords = len(data)
-    # print('Lugares sin coordenadas:',sin_coords)
-    errores = 0
-    actualizados = 0
-    for obj in data:
-        lat = obj.latitud
-        long = obj.longitud
+    try:
+        data = Region.objects.filter(longitud=None) |  Region.objects.filter(longitud='NULL') | Region.objects.filter(longitud='0')
+        sin_coords = len(data)
+        # print('Lugares sin coordenadas:',sin_coords)
+        errores = 0
+        actualizados = 0
+        for obj in data:
+            lat = obj.latitud
+            long = obj.longitud
 
-        country = obj.pais
-        loc = obj.localizacion
-        cp = obj.cp
+            country = obj.pais
+            loc = obj.localizacion
+            cp = obj.cp
 
-        if len(loc)>2:
-            lat, long = coords(str(cp)+' '+ loc + ' ' + country)
-            obj.latitud = lat
-            obj.longitud = long
-            obj.save()
-            if lat is None:
-                # print(f'Could not update: {cp}, {loc}')
-                errores += 1   
+            if len(loc)>2:
+                lat, long = coords(str(cp)+' '+ loc + ' ' + country)
+                obj.latitud = lat
+                obj.longitud = long
+                obj.save()
+                if lat is None:
+                    # print(f'Could not update: {cp}, {loc}')
+                    errores += 1   
+                else:
+                    # print(f'Updated: {cp}, {loc}, {lat}, {long}')
+                    actualizados += 1
             else:
-                # print(f'Updated: {cp}, {loc}, {lat}, {long}')
-                actualizados += 1
-        else:
-            obj.latitud = None
-            obj.longitud = None
-            obj.save()
-            # print(f'No cumple condición: {cp}, {loc}')
-            errores += 1                 
- 
-    # print('Finished updating coordinates')
-    sin_coords -= actualizados
+                obj.latitud = None
+                obj.longitud = None
+                obj.save()
+                # print(f'No cumple condición: {cp}, {loc}')
+                errores += 1                 
+    
+        # print('Finished updating coordinates')
+        sin_coords -= actualizados
 
-    finish = datetime.now()
-    elapsed_time = finish - start
-    mensaje = f'Coordenadas actualizadas: {errores} errores, {actualizados} actualizados.'
-    finish_process(id, elapsed_time.seconds, mensaje)
+        finish = datetime.now()
+        elapsed_time = finish - start
+        mensaje = f'Coordenadas actualizadas: {errores} errores, {actualizados} actualizados.'
+        finish_process(id, elapsed_time.seconds, mensaje)
 
-    # return errores, actualizados, sin_coords
+        # return errores, actualizados, sin_coords
+    except Exception as e:
+        finish = datetime.now()
+        elapsed_time = finish - start
+        failed_process(id, elapsed_time.seconds, e)
+
 
 
 # In[2]
