@@ -98,103 +98,102 @@ class CompletedTestsTable(tables.Table):
 
 
 # In[4]: Filtros
+def get_choices(obj, campo):
+    # Devuelve una tupla de tuplas con los distintos valores de un atributo para un objeto model determiando
+    return [(i,i) for i in obj.values_list(campo,flat=True).distinct().order_by(campo) if i]
+
+CHECKBOX_WIDGET = forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '})
+TEXT_WIDGET = forms.widgets.TextInput(attrs={'class':'col-4 text-center form-control'})
+RANGE_WIDGET = django_filters.widgets.RangeWidget(attrs={'class':'col-4 text-center form-control'})
+
 class SampleFilter(django_filters.FilterSet):
     obj = Sample.objects.values('categoria_muestra','vigilancia','nodo_secuenciacion').distinct()
-    choices_categoria = [(i,i) for i in obj.values_list('categoria_muestra',flat=True).distinct().order_by('categoria_muestra') if i]
-    choices_vigilancia = [(i,i) for i in obj.values_list('vigilancia',flat=True).distinct().order_by('vigilancia') if i]
-    choices_nodos = [(i,i) for i in obj.values_list('nodo_secuenciacion',flat=True).distinct().order_by('nodo_secuenciacion') if i]
-    choices_hospitales = [(i,i) for i in SampleMetaData.objects.values_list('id_hospital',flat=True).distinct().order_by('id_hospital') if i]
+    choices_categoria = get_choices(obj, 'categoria_muestra')
+    choices_vigilancia = get_choices(obj, 'vigilancia')
+    choices_nodos = get_choices(obj, 'nodo_secuenciacion')
+    choices_hospitales = get_choices(SampleMetaData.objects.values('id_hospital'), 'id_hospital')
     
-    id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo', lookup_expr='icontains', widget=forms.widgets.TextInput(attrs={'class':'col-4 text-center form-control'}))
-    categoria_muestra = django_filters.MultipleChoiceFilter(choices=choices_categoria, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
-    vigilancia = django_filters.MultipleChoiceFilter(choices=choices_vigilancia, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
-    nodo_secuenciacion = django_filters.MultipleChoiceFilter(choices=choices_nodos, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo', lookup_expr='icontains', widget=TEXT_WIDGET)
+    categoria_muestra = django_filters.MultipleChoiceFilter(choices=choices_categoria, widget=CHECKBOX_WIDGET)
+    vigilancia = django_filters.MultipleChoiceFilter(choices=choices_vigilancia, widget=CHECKBOX_WIDGET)
+    nodo_secuenciacion = django_filters.MultipleChoiceFilter(choices=choices_nodos, widget=CHECKBOX_WIDGET)
     fecha_muestra = django_filters.DateFromToRangeFilter(field_name = 'fecha_muestra', label='Fecha de muestra entre:', widget=django_filters.widgets.RangeWidget(attrs={'type': 'date', 'class':'col-4 text-center form-control'}))
-    samplemetadata__id_hospital = django_filters.MultipleChoiceFilter(choices=choices_hospitales, label='Hospital', widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    samplemetadata__id_hospital = django_filters.MultipleChoiceFilter(choices=choices_hospitales, label='Hospital', widget=CHECKBOX_WIDGET)
     class Meta:
         model = Sample
         fields = ['id_uvigo', 'fecha_muestra', 'samplemetadata__id_hospital', 'vigilancia', 'categoria_muestra', 'nodo_secuenciacion']
 
 class MetaDataFilter(django_filters.FilterSet):
-    id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo', lookup_expr='icontains')
-    fecha_entrada = django_filters.DateFromToRangeFilter(field_name = 'fecha_entrada')
+    id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo', lookup_expr='icontains', widget=TEXT_WIDGET)
+    fecha_entrada = django_filters.DateFromToRangeFilter(field_name = 'fecha_entrada', widget=django_filters.widgets.RangeWidget(attrs={'type': 'date', 'class':'col-4 text-center form-control'}))
 
     class Meta:
         model = SampleMetaData
         fields = ['id_uvigo', 'fecha_entrada']
 
 class RegionFilter(django_filters.FilterSet):
-    obj = Region.objects.values('id_region','localizacion','division','pais','region').distinct()
-    choices_localizacion = [(i,i) for i in obj.values_list('localizacion',flat=True).distinct().order_by('localizacion') if i]
-    choices_division = [(i,i) for i in obj.values_list('division',flat=True).distinct().order_by('division') if i]
-    choices_pais = [(i,i) for i in obj.values_list('pais',flat=True).distinct().order_by('pais') if i]
-    choices_region = [(i,i) for i in obj.values_list('region',flat=True).distinct().order_by('region') if i]
+    obj = Region.objects.values('localizacion','division','pais').distinct()
+    choices_localizacion = get_choices(obj, 'localizacion')
+    choices_division = get_choices(obj, 'division')
+    choices_pais = get_choices(obj, 'pais')
 
-    cp = django_filters.CharFilter(field_name = 'cp', lookup_expr='icontains', widget=forms.widgets.TextInput(attrs={'class':'col-5 text-center form-control'}))
-    division = django_filters.MultipleChoiceFilter(choices=choices_division, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
-    pais = django_filters.MultipleChoiceFilter(choices=choices_pais, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
-    localizacion = django_filters.MultipleChoiceFilter(choices=choices_localizacion, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    cp = django_filters.CharFilter(field_name = 'cp', lookup_expr='icontains', widget=TEXT_WIDGET)
+    division = django_filters.MultipleChoiceFilter(choices=choices_division, widget=CHECKBOX_WIDGET)
+    pais = django_filters.MultipleChoiceFilter(choices=choices_pais, widget=CHECKBOX_WIDGET)
+    localizacion = django_filters.MultipleChoiceFilter(choices=choices_localizacion, widget=CHECKBOX_WIDGET)
 
-    # region = django_filters.MultipleChoiceFilter(choices=choices_region, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
     class Meta:
         model = Region
         fields = ['cp','division','pais','localizacion']
 
 
 class NextcladeFilter(django_filters.FilterSet):
-    clade_choices = [(i,i) for i in NextcladeTest.objects.values_list('clade', flat=True).distinct().order_by('clade').exclude(clade='')]
+    clade_choices = get_choices(NextcladeTest.objects.values('clade'), 'clade')
     
-    id_uvigo_id__id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo_id__id_uvigo', lookup_expr='icontains')
-    clade = django_filters.MultipleChoiceFilter(choices=clade_choices, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    id_uvigo_id__id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo_id__id_uvigo', lookup_expr='icontains', widget=TEXT_WIDGET)
+    clade = django_filters.MultipleChoiceFilter(choices=clade_choices, widget=CHECKBOX_WIDGET)
     class Meta:
         model = Sample
         fields = ['id_uvigo_id__id_uvigo']
 
 class PangolinFilter(django_filters.FilterSet):
-    lineage_choices = [(i,i) for i in LineagesTest.objects.values_list('lineage', flat=True).distinct().order_by('lineage').exclude(lineage='')]
+    lineage_choices = get_choices(LineagesTest.objects.values('lineage'), 'lineage')
     
-    id_uvigo_id__id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo_id__id_uvigo', lookup_expr='icontains')
-    lineage = django_filters.MultipleChoiceFilter(choices=lineage_choices, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    id_uvigo_id__id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo_id__id_uvigo', lookup_expr='icontains', widget=TEXT_WIDGET)
+    lineage = django_filters.MultipleChoiceFilter(choices=lineage_choices, widget=CHECKBOX_WIDGET)
     class Meta:
         model = Sample
         fields = ['id_uvigo_id__id_uvigo']
 
 class PicardFilter(django_filters.FilterSet):    
-    id_uvigo_id__id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo_id__id_uvigo', lookup_expr='icontains')
-    mean_target_coverage = django_filters.RangeFilter()
-    median_target_coverage = django_filters.RangeFilter()
-    pct_target_bases_1x = django_filters.RangeFilter()
-    pct_target_bases_10x = django_filters.RangeFilter()
-    pct_target_bases_100x = django_filters.RangeFilter()
+    id_uvigo_id__id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo_id__id_uvigo', lookup_expr='icontains', widget=TEXT_WIDGET)
+    mean_target_coverage = django_filters.RangeFilter(widget=RANGE_WIDGET)
+    median_target_coverage = django_filters.RangeFilter(widget=RANGE_WIDGET)
+    pct_target_bases_1x = django_filters.RangeFilter(widget=RANGE_WIDGET)
+    pct_target_bases_10x = django_filters.RangeFilter(widget=RANGE_WIDGET)
+    pct_target_bases_100x = django_filters.RangeFilter(widget=RANGE_WIDGET)
     class Meta:
         model = Sample
         fields = ['id_uvigo_id__id_uvigo']
 
 class NGSFilter(django_filters.FilterSet):    
-    id_uvigo_id__id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo_id__id_uvigo', lookup_expr='icontains')
-    total_reads = django_filters.RangeFilter()
-    mapped = django_filters.RangeFilter()
-    trimmed = django_filters.RangeFilter()
+    id_uvigo_id__id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo_id__id_uvigo', lookup_expr='icontains', widget=TEXT_WIDGET)
+    total_reads = django_filters.RangeFilter(widget=RANGE_WIDGET)
+    mapped = django_filters.RangeFilter(widget=RANGE_WIDGET)
+    trimmed = django_filters.RangeFilter(widget=RANGE_WIDGET)
     class Meta:
         model = Sample
         fields = ['id_uvigo_id__id_uvigo']
 
 class VariantsFilter(django_filters.FilterSet):
-    # ref_choices = [(i,i) for i in VariantsTest.objects.values_list('ref', flat=True).distinct().order_by('ref').exclude(ref='')]
-    # alt_choices = [(i,i) for i in VariantsTest.objects.values_list('alt', flat=True).distinct().order_by('alt').exclude(ref='')]
-    ref_aa_choices = [(i,i) for i in VariantsTest.objects.values_list('ref_aa', flat=True).distinct().order_by('ref_aa').exclude(ref='')]
-    alt_aa_choices = [(i,i) for i in VariantsTest.objects.values_list('alt_aa', flat=True).distinct().order_by('alt_aa').exclude(ref='')]
-    # ref_codon_choices = [(i,i) for i in VariantsTest.objects.values_list('ref_codon', flat=True).distinct().order_by('ref_codon').exclude(ref='')]
-    # alt_codon_choices = [(i,i) for i in VariantsTest.objects.values_list('alt_codon', flat=True).distinct().order_by('alt_codon').exclude(ref='')]
+    obj = VariantsTest.objects.values('ref_aa','alt_aa')
+    ref_aa_choices = get_choices(obj, 'ref_aa')
+    alt_aa_choices = get_choices(obj, 'alt_aa')
 
-    id_uvigo_id__id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo_id__id_uvigo', lookup_expr='icontains')
-    pos = django_filters.RangeFilter()
-    ref_aa = django_filters.MultipleChoiceFilter(choices=ref_aa_choices, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
-    alt_aa = django_filters.MultipleChoiceFilter(choices=alt_aa_choices, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
-    # ref_codon = django_filters.MultipleChoiceFilter(choices=ref_codon_choices, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
-    # alt_codon = django_filters.MultipleChoiceFilter(choices=alt_codon_choices, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
-    # ref = django_filters.MultipleChoiceFilter(choices=ref_choices, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
-    # alt = django_filters.MultipleChoiceFilter(choices=alt_choices, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    id_uvigo_id__id_uvigo = django_filters.CharFilter(label='id_uvigo', field_name = 'id_uvigo_id__id_uvigo', lookup_expr='icontains', widget=TEXT_WIDGET)
+    pos = django_filters.RangeFilter(widget=RANGE_WIDGET)
+    ref_aa = django_filters.MultipleChoiceFilter(choices=ref_aa_choices, widget=CHECKBOX_WIDGET)
+    alt_aa = django_filters.MultipleChoiceFilter(choices=alt_aa_choices, widget=CHECKBOX_WIDGET)
 
 
     class Meta:
