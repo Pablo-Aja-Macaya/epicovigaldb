@@ -21,13 +21,13 @@ class GraphsFormMultipleChoice(forms.Form):
     choices_vigilancia = [(i,i) for i in Sample.objects.values_list('vigilancia',flat=True).distinct().order_by('vigilancia') if i]
     # choices_calidad = [(i,i) for i in Sample.objects.values_list('samplemetadata__calidad_secuenciacion',flat=True).distinct().order_by('samplemetadata__calidad_secuenciacion')]
     # Campos
-    fecha_inicial = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
-    fecha_final = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+    fecha_inicial = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date', 'class':'col-3 text-center form-control'}))
+    fecha_final = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date', 'class':'col-3 text-center form-control'}))
     categoria = forms.MultipleChoiceField(choices=choices_categoria, required=True, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))#
     vigilancia = forms.MultipleChoiceField(choices=choices_vigilancia, required=True, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))#,widget=forms.CheckboxSelectMultiple())
     # calidad_secuenciacion = forms.MultipleChoiceField(choices=choices_calidad, required=True, widget=forms.SelectMultiple()
-    umbral = forms.IntegerField(required=False)
-    filtro = forms.CharField(required=False)
+    umbral = forms.IntegerField(required=False, widget=forms.widgets.NumberInput(attrs={'class':'col-2 text-center form-control'}))
+    filtro = forms.CharField(required=False, widget=forms.widgets.TextInput(attrs={'class':'col-2 text-center form-control'}))
 
 class SampleForm(ModelForm):
     id_uvigo = forms.CharField(required=False, disabled=True)

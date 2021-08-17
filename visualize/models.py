@@ -105,11 +105,11 @@ class SampleFilter(django_filters.FilterSet):
     choices_nodos = [(i,i) for i in obj.values_list('nodo_secuenciacion',flat=True).distinct().order_by('nodo_secuenciacion') if i]
     choices_hospitales = [(i,i) for i in SampleMetaData.objects.values_list('id_hospital',flat=True).distinct().order_by('id_hospital') if i]
     
-    id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo', lookup_expr='icontains')
+    id_uvigo = django_filters.CharFilter(field_name = 'id_uvigo', lookup_expr='icontains', widget=forms.widgets.TextInput(attrs={'class':'col-4 text-center form-control'}))
     categoria_muestra = django_filters.MultipleChoiceFilter(choices=choices_categoria, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
     vigilancia = django_filters.MultipleChoiceFilter(choices=choices_vigilancia, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
     nodo_secuenciacion = django_filters.MultipleChoiceFilter(choices=choices_nodos, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
-    fecha_muestra = django_filters.DateFromToRangeFilter(field_name = 'fecha_muestra', widget=django_filters.widgets.RangeWidget(attrs={'type': 'date'}))
+    fecha_muestra = django_filters.DateFromToRangeFilter(field_name = 'fecha_muestra', label='Fecha de muestra entre:', widget=django_filters.widgets.RangeWidget(attrs={'type': 'date', 'class':'col-4 text-center form-control'}))
     samplemetadata__id_hospital = django_filters.MultipleChoiceFilter(choices=choices_hospitales, label='Hospital', widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
     class Meta:
         model = Sample
@@ -124,15 +124,21 @@ class MetaDataFilter(django_filters.FilterSet):
         fields = ['id_uvigo', 'fecha_entrada']
 
 class RegionFilter(django_filters.FilterSet):
-    id_region = django_filters.NumberFilter(field_name = 'id_region', lookup_expr='icontains')
-    localizacion = django_filters.CharFilter(field_name = 'localizacion', lookup_expr='icontains')
-    cp = django_filters.CharFilter(field_name = 'cp', lookup_expr='icontains')
-    division = django_filters.CharFilter(field_name = 'division', lookup_expr='icontains')
-    pais = django_filters.CharFilter(field_name = 'pais', lookup_expr='icontains')
-    region = django_filters.CharFilter(field_name = 'region', lookup_expr='icontains')
+    obj = Region.objects.values('id_region','localizacion','division','pais','region').distinct()
+    choices_localizacion = [(i,i) for i in obj.values_list('localizacion',flat=True).distinct().order_by('localizacion') if i]
+    choices_division = [(i,i) for i in obj.values_list('division',flat=True).distinct().order_by('division') if i]
+    choices_pais = [(i,i) for i in obj.values_list('pais',flat=True).distinct().order_by('pais') if i]
+    choices_region = [(i,i) for i in obj.values_list('region',flat=True).distinct().order_by('region') if i]
+
+    cp = django_filters.CharFilter(field_name = 'cp', lookup_expr='icontains', widget=forms.widgets.TextInput(attrs={'class':'col-5 text-center form-control'}))
+    division = django_filters.MultipleChoiceFilter(choices=choices_division, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    pais = django_filters.MultipleChoiceFilter(choices=choices_pais, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+    localizacion = django_filters.MultipleChoiceFilter(choices=choices_localizacion, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
+
+    # region = django_filters.MultipleChoiceFilter(choices=choices_region, widget=forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '}))
     class Meta:
         model = Region
-        fields = ['id_region','localizacion','cp','division']
+        fields = ['cp','division','pais','localizacion']
 
 
 class NextcladeFilter(django_filters.FilterSet):
