@@ -92,7 +92,7 @@ def find_coords(self):
     print(f'Starting coords update... (Task ID: {id})')
 
     try:
-        data = Region.objects.filter(longitud=None) |  Region.objects.filter(longitud='NULL') | Region.objects.filter(longitud='0')
+        data = Region.objects.filter(longitud=None) |  Region.objects.filter(longitud=0)
         sin_coords = len(data)
         # print('Lugares sin coordenadas:',sin_coords)
         errores = 0
