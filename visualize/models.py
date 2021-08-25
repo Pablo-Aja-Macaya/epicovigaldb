@@ -100,7 +100,7 @@ class CompletedTestsTable(tables.Table):
 # In[4]: Filtros
 def get_choices(obj, campo):
     # Devuelve una tupla de tuplas con los distintos valores de un atributo para un objeto model determiando
-    return [(i,i) for i in obj.values_list(campo,flat=True).distinct().order_by(campo) if i]
+    return [(i,i) for i in obj.values_list(campo,flat=True).distinct().order_by(campo).all() if i]
 
 CHECKBOX_WIDGET = forms.CheckboxSelectMultiple(attrs={'class':'ul-no-bullets '})
 TEXT_WIDGET = forms.widgets.TextInput(attrs={'class':'col-4 text-center form-control'})

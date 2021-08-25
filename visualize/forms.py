@@ -17,8 +17,8 @@ class GraphsForm(forms.Form):
 
 class GraphsFormMultipleChoice(forms.Form):
     # Choices
-    choices_categoria = [(i,i) for i in Sample.objects.values_list('categoria_muestra',flat=True).distinct().order_by('categoria_muestra') if i]
-    choices_vigilancia = [(i,i) for i in Sample.objects.values_list('vigilancia',flat=True).distinct().order_by('vigilancia') if i]
+    choices_categoria = [(i,i) for i in Sample.objects.values_list('categoria_muestra',flat=True).distinct().order_by('categoria_muestra').all() if i]
+    choices_vigilancia = [(i,i) for i in Sample.objects.values_list('vigilancia',flat=True).distinct().order_by('vigilancia').all() if i]
     # choices_calidad = [(i,i) for i in Sample.objects.values_list('samplemetadata__calidad_secuenciacion',flat=True).distinct().order_by('samplemetadata__calidad_secuenciacion')]
     # Campos
     fecha_inicial = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date', 'class':'col-3 text-center form-control'}))
