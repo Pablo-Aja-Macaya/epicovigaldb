@@ -72,7 +72,7 @@ En este archivo se meten las credenciales a la base de datos:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'epicovigal_weeb',
+        'NAME': 'epicovigal_web',
         'USER': 'nombre_usuario',
         'PASSWORD': 'contraseña',
         'HOST': 'localhost',
