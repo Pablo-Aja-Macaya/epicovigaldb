@@ -37,7 +37,7 @@ def home(request):
         'lineage_count':lineage_count
         }
     if report:
-        context['data'] = data
+        context['data'] = [report]
     if urls_dicc:
         context = {**context, **urls_dicc}
 
