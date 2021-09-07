@@ -22,7 +22,7 @@ def home(request):
         tasks = Task.objects.filter(show_to='all')
         url = 'tasks/visitor_home.html'
         try:
-            data = Report.objects.filter(titulo='Informe 2020-2021')
+            data = Report.objects.filter(tipo='mensual').order_by('-fecha_inicial')
             report = data[0]
             urls_dicc = get_report_urls(report)
         except:
